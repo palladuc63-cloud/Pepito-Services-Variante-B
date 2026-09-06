@@ -10,6 +10,8 @@ const rightItems = settings.nav.slice(splitAt);
 
 // Find the dropdown item (Réalisations) to build a mega-menu panel
 const dropdownItem = settings.nav.find((link) => link.children);
+
+const logoSrc = typeof settings.logo === 'string' ? settings.logo : settings.logo.src;
 ---
 
 <header class="site-header sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200" data-has-dropdown={!!dropdownItem}>
@@ -26,11 +28,11 @@ const dropdownItem = settings.nav.find((link) => link.children);
       </button>
 
       <a href="/" class="brand-mobile inline-flex items-center flex-1 z-20 md:hidden" aria-label={`Accueil ${settings.name}`}>
-        <Image
-          src={settings.logo}
+        <img
+          src={logoSrc}
           alt=""
-          width={140}
-          height={56}
+          width="140"
+          height="56"
           class="h-14 w-auto object-contain"
         />
       </a>
@@ -49,11 +51,11 @@ const dropdownItem = settings.nav.find((link) => link.children);
       </ul>
 
       <a href="/" class="brand hidden md:inline-flex items-center flex-shrink-0 z-20 group" aria-label={`Accueil ${settings.name}`}>
-        <Image
-          src={settings.logo}
+        <img
+          src={logoSrc}
           alt=""
-          width={180}
-          height={72}
+          width="180"
+          height="72"
           class="h-16 w-auto object-contain transition-all duration-300 group-hover:scale-105"
         />
       </a>

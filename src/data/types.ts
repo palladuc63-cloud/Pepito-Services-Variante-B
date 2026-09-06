@@ -15,7 +15,7 @@ export interface SiteSettings {
   name: string;
   baseline: string;
   description: string;
-  logo: ImageMetadata;
+  logo: ImageMetadata | string;
   /** Public URL used for SEO. Set via astro.config.mjs site value. */
   siteUrl: string;
   /** Social networks known and confirmed by the business. */
