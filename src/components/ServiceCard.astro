@@ -1,0 +1,62 @@
+---
+import { Image } from 'astro:assets';
+import type { Service } from '../data/types';
+import ContentBadge from './ContentBadge.astro';
+
+export interface Props {
+  service: Service;
+}
+
+const { service } = Astro.props;
+---
+
+<article class="card service-card">
+  <div class="card-media">
+    <Image
+      src={service.image}
+      alt={`Illustration du service ${service.title}`}
+      widths={[400, 800]}
+      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+    />
+  </div>
+  <div class="card-body">
+    <h3 class="card-title">{service.title}</h3>
+    <p class="card-text">{service.summary}</p>
+    {service.provisional && (
+      <div class="service-badge">
+        <ContentBadge />
+      </div>
+    )}
+    <a href="/contact" class="service-link">En savoir plus</a>
+  </div>
+</article>
+
+<style>
+  .service-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .service-card .card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .service-badge {
+    margin-top: auto;
+    padding-top: var(--space-4);
+  }
+
+  .service-link {
+    margin-top: var(--space-4);
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .service-link:hover {
+    text-decoration: underline;
+  }
+</style>

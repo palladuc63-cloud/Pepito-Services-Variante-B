@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+dist/
+.astro/
+
+# Generated lock files
+package-lock.json
+
+# Large media files
+imagesFB/
+public/

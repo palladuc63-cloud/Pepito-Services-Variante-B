@@ -1,0 +1,88 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import Section from '../components/Section.astro';
+import ContentBadge from '../components/ContentBadge.astro';
+---
+
+<MainLayout
+  title="Mentions légales"
+  description="Mentions légales du site Pépito Services."
+  canonicalPath="/mentions-legales"
+  noIndex={true}
+>
+  <Section>
+    <div class="page-header">
+      <h1 class="section-title">Mentions légales</h1>
+      <p class="section-subtitle">
+        Les informations légales ci-dessous sont en attente de validation avec
+        l’entreprise.
+      </p>
+      <ContentBadge label="Mentions légales à valider avec l’entreprise" />
+    </div>
+
+    <div class="legal-content">
+      <section class="legal-section">
+        <h2>Éditeur du site</h2>
+        <p>Raison sociale : À valider avec l’entreprise</p>
+        <p>Forme juridique : À valider avec l’entreprise</p>
+        <p>Capital social : À valider avec l’entreprise</p>
+        <p>Numéro SIRET : À valider avec l’entreprise</p>
+        <p>RCS : À valider avec l’entreprise</p>
+        <p>Code APE : À valider avec l’entreprise</p>
+        <p>Adresse du siège social : À valider avec l’entreprise</p>
+        <p>Email de contact : À valider avec l’entreprise</p>
+        <p>Téléphone : À valider avec l’entreprise</p>
+        <p>Directeur de la publication : À valider avec l’entreprise</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Hébergement</h2>
+        <p>Nom de l’hébergeur : À valider avec l’entreprise</p>
+        <p>Adresse de l’hébergeur : À valider avec l’entreprise</p>
+        <p>Site web de l’hébergeur : À valider avec l’entreprise</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Propriété intellectuelle</h2>
+        <p>
+          L’ensemble des contenus (textes, images, logo) présents sur ce site est
+          la propriété de Pépito Services ou fait l’objet d’une autorisation
+          d’utilisation. Toute reproduction ou représentation, totale ou
+          partielle, est interdite sans autorisation préalable.
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Crédits photos</h2>
+        <p>
+          Les photographies proviennent des contenus fournis par Pépito Services
+          (Facebook / dossiers images). Crédits à préciser avec l’entreprise.
+        </p>
+      </section>
+    </div>
+  </Section>
+</MainLayout>
+
+<style>
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .legal-content {
+    max-width: 70ch;
+  }
+
+  .legal-section {
+    margin-bottom: var(--space-8);
+  }
+
+  .legal-section h2 {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-3);
+  }
+
+  .legal-section p {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-2);
+  }
+</style>

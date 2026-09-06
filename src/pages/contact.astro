@@ -1,0 +1,160 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import Section from '../components/Section.astro';
+import ContactForm from '../components/ContactForm.astro';
+import ContentBadge from '../components/ContentBadge.astro';
+import { settings } from '../data/settings';
+---
+
+<MainLayout
+  title="Contact"
+  description="Contactez Pépito Services pour une demande de chiffrage personnalisée."
+  canonicalPath="/contact"
+>
+  <Section>
+    <div class="page-header">
+      <h1 class="section-title">Contact</h1>
+      <p class="section-subtitle">
+        Vous avez un projet de clôture, palissade, portillon ou aménagement
+        extérieur ? Écrivez-nous pour échanger autour de votre besoin.
+      </p>
+      <ContentBadge label="Coordonnées à valider avec l’entreprise" />
+    </div>
+
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h2 class="contact-heading">Restons en contact</h2>
+        <p class="contact-text">
+          Les coordonnées complètes (téléphone, adresse, zone d’intervention)
+          seront ajoutées après validation par l’entreprise.
+        </p>
+
+        <ul class="contact-list">
+          <li>
+            <span class="contact-label">Entreprise</span>
+            <span>{settings.name}</span>
+          </li>
+          {
+            settings.contact.phone && (
+              <li>
+                <span class="contact-label">Téléphone</span>
+                <a href={`tel:${settings.contact.phone.replace(/\s+/g, '')}`}>
+                  {settings.contact.phone}
+                </a>
+              </li>
+            )
+          }
+          {
+            settings.contact.email && (
+              <li>
+                <span class="contact-label">Email</span>
+                <a href={`mailto:${settings.contact.email}`}>
+                  {settings.contact.email}
+                </a>
+              </li>
+            )
+          }
+          {
+            settings.contact.address && (
+              <li>
+                <span class="contact-label">Adresse</span>
+                <span>{settings.contact.address}</span>
+              </li>
+            )
+          }
+        </ul>
+
+        {
+          settings.socials.length > 0 && (
+            <div class="contact-socials">
+              <h3 class="contact-heading">Suivez-nous</h3>
+              <ul class="social-list">
+                {settings.socials.map((social) => (
+                  <li>
+                    <a
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {social.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+
+      <ContactForm />
+    </div>
+  </Section>
+</MainLayout>
+
+<style>
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .contact-grid {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 1024px) {
+    .contact-grid {
+      grid-template-columns: 1fr 1.5fr;
+      align-items: start;
+    }
+  }
+
+  .contact-info {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .contact-heading {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .contact-text {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
+  }
+
+  .contact-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+
+  .contact-list li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .contact-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  .contact-socials {
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .social-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: var(--space-4);
+  }
+</style>

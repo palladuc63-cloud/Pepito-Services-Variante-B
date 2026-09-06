@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="72" viewBox="0 0 108 72">
+  <defs>
+    <linearGradient id="picket" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#3e2723" />
+      <stop offset="0.2" stop-color="#5d4037" />
+      <stop offset="0.5" stop-color="#6d4c41" />
+      <stop offset="0.8" stop-color="#4e342e" />
+      <stop offset="1" stop-color="#3e2723" />
+    </linearGradient>
+    <linearGradient id="rail" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#5d4037" />
+      <stop offset="0.5" stop-color="#4e342e" />
+      <stop offset="1" stop-color="#3e2723" />
+    </linearGradient>
+    <radialGradient id="nail" cx="0.35" cy="0.35" r="0.6">
+      <stop offset="0" stop-color="#d7ccc8" />
+      <stop offset="0.5" stop-color="#8d6e63" />
+      <stop offset="1" stop-color="#281815" />
+    </radialGradient>
+  </defs>
+
+  <!-- lisses horizontales -->
+  <rect x="0" y="28" width="108" height="5" fill="url(#rail)" />
+  <rect x="0" y="48" width="108" height="5" fill="url(#rail)" />
+
+  <!-- piquet 1 -->
+  <g transform="translate(6, 0)">
+    <path d="M0,14 L12,2 L24,14 L24,68 L0,68 Z" fill="url(#picket)" />
+    <g stroke-linecap="round" fill="none" opacity="0.4">
+      <path d="M12,2 Q13,35 12,68" stroke="#d7ccc8" stroke-width="1.2" />
+      <path d="M4,14 Q5,40 4,68" stroke="#a1887f" stroke-width="0.9" />
+      <path d="M20,14 Q19,38 20,68" stroke="#a1887f" stroke-width="0.9" />
+      <path d="M8,14 Q9,30 8,68" stroke="#d7ccc8" stroke-width="0.7" />
+    </g>
+    <circle cx="12" cy="30.5" r="1.4" fill="url(#nail)" />
+    <circle cx="12" cy="50.5" r="1.4" fill="url(#nail)" />
+  </g>
+
+  <!-- piquet 2 -->
+  <g transform="translate(42, 0)">
+    <path d="M0,14 L12,2 L24,14 L24,68 L0,68 Z" fill="url(#picket)" />
+    <g stroke-linecap="round" fill="none" opacity="0.4">
+      <path d="M12,2 Q11,35 12,68" stroke="#d7ccc8" stroke-width="1.2" />
+      <path d="M6,14 Q7,42 6,68" stroke="#a1887f" stroke-width="0.9" />
+      <path d="M18,14 Q17,32 18,68" stroke="#a1887f" stroke-width="0.9" />
+      <path d="M15,14 Q16,28 15,68" stroke="#d7ccc8" stroke-width="0.7" />
+    </g>
+    <circle cx="12" cy="30.5" r="1.4" fill="url(#nail)" />
+    <circle cx="12" cy="50.5" r="1.4" fill="url(#nail)" />
+  </g>
+
+  <!-- piquet 3 -->
+  <g transform="translate(78, 0)">
+    <path d="M0,14 L12,2 L24,14 L24,68 L0,68 Z" fill="url(#picket)" />
+    <g stroke-linecap="round" fill="none" opacity="0.4">
+      <path d="M12,2 Q13,30 12,68" stroke="#d7ccc8" stroke-width="1.2" />
+      <path d="M5,14 Q4,40 5,68" stroke="#a1887f" stroke-width="0.9" />
+      <path d="M19,14 Q20,36 19,68" stroke="#a1887f" stroke-width="0.9" />
+      <path d="M9,14 Q8,26 9,68" stroke="#d7ccc8" stroke-width="0.7" />
+    </g>
+    <circle cx="12" cy="30.5" r="1.4" fill="url(#nail)" />
+    <circle cx="12" cy="50.5" r="1.4" fill="url(#nail)" />
+  </g>
+</svg>

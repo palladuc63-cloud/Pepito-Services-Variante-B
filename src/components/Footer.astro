@@ -1,0 +1,103 @@
+---
+import { settings } from '../data/settings';
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <strong class="footer-name">{settings.name}</strong>
+      <p class="footer-tagline">{settings.baseline}</p>
+    </div>
+
+    <nav class="footer-nav" aria-label="Pied de page">
+      <ul class="footer-links">
+        {settings.nav.map((link) => (
+          <li><a href={link.href}>{link.label}</a></li>
+        ))}
+        <li><a href="/mentions-legales">Mentions légales</a></li>
+        <li><a href="/politique-confidentialite">Politique de confidentialité</a></li>
+      </ul>
+    </nav>
+
+    <div class="footer-socials">
+      {settings.socials.map((social) => (
+        <a
+          href={social.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${settings.name} sur ${social.name} (nouvelle fenêtre)`}
+        >
+          {social.name}
+        </a>
+      ))}
+    </div>
+
+    <p class="footer-legal">
+      © {currentYear} {settings.name} – Tous droits réservés.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: var(--space-10);
+    background-color: var(--color-surface-soft);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .footer-inner {
+    display: grid;
+    gap: var(--space-6);
+    text-align: center;
+  }
+
+  .footer-name {
+    display: block;
+    font-size: var(--text-lg);
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .footer-tagline {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+    list-style: none;
+    padding: 0;
+  }
+
+  .footer-links a {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+
+  .footer-links a:hover {
+    text-decoration: underline;
+    color: var(--color-primary);
+  }
+
+  .footer-socials {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+  }
+
+  .footer-socials a {
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .footer-legal {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+</style>

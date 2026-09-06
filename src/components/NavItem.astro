@@ -1,0 +1,124 @@
+---
+import { Image } from 'astro:assets';
+import type { NavLink } from '../data/types';
+
+export interface Props {
+  link: NavLink;
+  currentPath: string;
+  dropdownId: string;
+  /**
+   * When true, the inline dropdown menu and toggle button are NOT rendered.
+   * Used for desktop items when a mega-panel handles the dropdown instead.
+   */
+  megaMode?: boolean;
+}
+
+const { link, currentPath, dropdownId, megaMode = false } = Astro.props;
+const isActive =
+  currentPath === link.href || currentPath.startsWith(`${link.href}/`);
+---
+
+<li
+  class:list={[
+    'nav-item relative flex items-center',
+    { 'has-dropdown': link.children && !megaMode },
+  ]}
+  role="none"
+  data-has-children={link.children ? 'true' : 'false'}
+>
+  <a
+    href={link.href}
+    class:list={[
+      'nav-link relative inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 no-underline',
+      isActive
+        ? 'text-emerald-700 bg-emerald-50'
+        : 'text-stone-600 hover:bg-stone-100 hover:text-emerald-700',
+    ]}
+    role="menuitem"
+    aria-current={isActive ? 'page' : undefined}
+  >
+    {link.label}
+  </a>
+
+  {
+    link.children && !megaMode && (
+      <>
+        <button
+          type="button"
+          class="dropdown-toggle ml-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-stone-400 bg-transparent border border-transparent cursor-pointer transition-all duration-200 hover:bg-stone-100 hover:text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+          aria-label={`Afficher les catégories de ${link.label}`}
+          aria-expanded="false"
+          aria-controls={dropdownId}
+          aria-haspopup="true"
+        >
+          <svg
+            class="chevron transition-transform duration-200"
+            aria-hidden="true"
+            width="14"
+            height="14"
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="2 4 6 8 10 4" />
+          </svg>
+        </button>
+
+        <ul id={dropdownId} class="dropdown-menu" role="menu">
+          {link.children.map((child) => (
+            <li role="none">
+              <a
+                href={child.href}
+                class="dropdown-link block p-2 rounded-xl text-stone-700 font-medium no-underline transition-all duration-200 hover:bg-white hover:text-emerald-700"
+                role="menuitem"
+              >
+                {child.image && (
+                  <Image
+                    src={child.image}
+                    alt=""
+                    width={320}
+                    height={180}
+                    class="w-full h-18 object-cover rounded-lg mb-2"
+                    loading="eager"
+                  />
+                )}
+                <span class="block text-sm px-1">{child.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  {
+    link.children && megaMode && (
+      <button
+        type="button"
+        class="dropdown-toggle mega-trigger ml-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-stone-400 bg-transparent border border-transparent cursor-pointer transition-all duration-200 hover:bg-stone-100 hover:text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+        aria-label={`Afficher les catégories de ${link.label}`}
+        aria-expanded="false"
+        aria-controls="mega-panel"
+        aria-haspopup="true"
+      >
+        <svg
+          class="chevron transition-transform duration-200"
+          aria-hidden="true"
+          width="14"
+          height="14"
+          viewBox="0 0 12 12"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="2 4 6 8 10 4" />
+        </svg>
+      </button>
+    )
+  }
+</li>

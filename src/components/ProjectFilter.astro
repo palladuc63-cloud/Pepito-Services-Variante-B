@@ -1,0 +1,149 @@
+---
+import type { Project } from '../data/types';
+import { projectCategories } from '../data/projects';
+import ProjectCard from './ProjectCard.astro';
+
+export interface Props {
+  projects: Project[];
+}
+
+const { projects } = Astro.props;
+---
+
+<div class="project-filter">
+  <div class="filter-bar" role="group" aria-label="Filtrer les réalisations par catégorie">
+    <button
+      type="button"
+      class="filter-btn is-active"
+      data-filter="all"
+      aria-pressed="true"
+    >
+      Toutes
+    </button>
+    {
+      projectCategories.map((category) => (
+        <button
+          type="button"
+          class="filter-btn"
+          data-filter={category.id}
+          aria-pressed="false"
+        >
+          {category.label}
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="project-grid">
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </div>
+
+  <p class="filter-empty" id="filter-empty" role="status" hidden>
+    Aucune réalisation dans cette catégorie pour le moment.
+  </p>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterButtons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const projectCards = document.querySelectorAll<HTMLElement>('.project-card');
+    const emptyMessage = document.getElementById('filter-empty') as HTMLParagraphElement | null;
+
+    const updateEmptyState = () => {
+      if (!emptyMessage) return;
+      const visibleCards = document.querySelectorAll('.project-card:not([hidden])');
+      emptyMessage.hidden = visibleCards.length > 0;
+    };
+
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter ?? 'all';
+
+        filterButtons.forEach((btn) => {
+          btn.classList.toggle('is-active', btn === button);
+          btn.setAttribute('aria-pressed', String(btn === button));
+        });
+
+        projectCards.forEach((card) => {
+          const category = card.dataset.category;
+          const shouldShow = filter === 'all' || category === filter;
+          card.hidden = !shouldShow;
+        });
+
+        updateEmptyState();
+      });
+    });
+
+    const initialCategory = new URLSearchParams(window.location.search).get('categorie');
+    if (initialCategory) {
+      const initialButton = document.querySelector<HTMLButtonElement>(
+        `.filter-btn[data-filter="${initialCategory}"]`
+      );
+      if (initialButton) initialButton.click();
+    }
+  });
+</script>
+
+<style>
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-8);
+  }
+
+  .filter-btn {
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-fast),
+      border-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  .filter-btn:hover,
+  .filter-btn:focus-visible {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .filter-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  .filter-btn.is-active {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-warm-white);
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 640px) {
+    .project-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .project-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .filter-empty {
+    padding: var(--space-8);
+    text-align: center;
+    color: var(--color-text-muted);
+    background-color: var(--color-surface-soft);
+    border-radius: var(--radius-md);
+  }
+</style>

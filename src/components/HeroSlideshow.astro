@@ -1,0 +1,441 @@
+---
+import { Image } from 'astro:assets';
+import { settings } from '../data/settings';
+import { projects } from '../data/projects';
+
+const slides = projects.slice(0, 6).map((project) => ({
+  image: project.image,
+  alt: `Réalisation Pépito Services — ${project.title} (contenu à valider)`,
+}));
+---
+
+<section
+  class="hero-slideshow"
+  data-hero-slideshow
+  aria-label="Diaporama de réalisations"
+  tabindex="0"
+>
+  <div class="slideshow-track">
+    {
+      slides.map((slide, index) => (
+        <div
+          class:list={['slide', { 'is-active': index === 0 }]}
+          data-slide
+          aria-hidden={index !== 0}
+        >
+          <Image
+            src={slide.image}
+            alt={slide.alt}
+            class="slide-image"
+            loading={index === 0 ? 'eager' : 'lazy'}
+            decoding={index === 0 ? 'sync' : 'async'}
+            widths={[640, 960, 1280, 1920]}
+            sizes="100vw"
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="slideshow-overlay" aria-hidden="true"></div>
+
+  <div class="container hero-content">
+    <h1 id="hero-title" class="hero-title">{settings.name}</h1>
+    <p class="hero-baseline">{settings.baseline}</p>
+    <p class="hero-description">{settings.description}</p>
+    <div class="hero-actions">
+      <a href="/contact" class="btn btn-primary">Demander un chiffrage</a>
+      <a href="/realisations" class="btn btn-secondary">Voir nos réalisations</a>
+    </div>
+  </div>
+
+  <div class="slideshow-controls">
+    <button
+      type="button"
+      class="slide-control slide-control--prev"
+      data-prev
+      aria-label="Image précédente"
+    >
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="slide-control slide-control--next"
+      data-next
+      aria-label="Image suivante"
+    >
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </div>
+
+  <div class="slide-dots" role="tablist" aria-label="Sélectionner une image">
+    {
+      slides.map((_, index) => (
+        <button
+          type="button"
+          class:list={['slide-dot', { 'is-active': index === 0 }]}
+          data-dot
+          role="tab"
+          aria-selected={index === 0}
+          aria-label={`Image ${index + 1} sur ${slides.length}`}
+        ></button>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  (function initSlideshow() {
+    const slideshow = document.querySelector('[data-hero-slideshow]') as HTMLElement | null;
+    if (!slideshow) return;
+
+    const slides = Array.from(slideshow.querySelectorAll('[data-slide]')) as HTMLElement[];
+    const dots = Array.from(slideshow.querySelectorAll('[data-dot]')) as HTMLElement[];
+    const prevBtn = slideshow.querySelector('[data-prev]') as HTMLElement | null;
+    const nextBtn = slideshow.querySelector('[data-next]') as HTMLElement | null;
+
+    if (slides.length <= 1) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const delay = 6000;
+    let current = 0;
+    let interval: number | undefined;
+
+    function update() {
+      slides.forEach((slide, index) => {
+        const active = index === current;
+        slide.classList.toggle('is-active', active);
+        slide.setAttribute('aria-hidden', String(!active));
+      });
+      dots.forEach((dot, index) => {
+        const active = index === current;
+        dot.classList.toggle('is-active', active);
+        dot.setAttribute('aria-selected', String(active));
+      });
+
+      const activeImg = slides[current]?.querySelector('img');
+      if (activeImg && slideshow) {
+        const src = activeImg.currentSrc || activeImg.src;
+        slideshow.dispatchEvent(
+          new CustomEvent('heroSlideChange', {
+            detail: { src },
+            bubbles: true,
+          })
+        );
+      }
+    }
+
+    function goTo(index: number) {
+      current = (index + slides.length) % slides.length;
+      update();
+    }
+
+    function next() {
+      goTo(current + 1);
+    }
+
+    function previous() {
+      goTo(current - 1);
+    }
+
+    function start() {
+      if (prefersReducedMotion) return;
+      stop();
+      interval = window.setInterval(next, delay);
+    }
+
+    function stop() {
+      if (interval) {
+        window.clearInterval(interval);
+        interval = undefined;
+      }
+    }
+
+    function restart() {
+      stop();
+      start();
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        previous();
+        restart();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        next();
+        restart();
+      });
+    }
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        goTo(index);
+        restart();
+      });
+    });
+
+    slideshow.addEventListener('mouseenter', stop);
+    slideshow.addEventListener('mouseleave', start);
+    slideshow.addEventListener('focusin', stop);
+    slideshow.addEventListener('focusout', start);
+
+    slideshow.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        previous();
+        restart();
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        next();
+        restart();
+      }
+    });
+
+    update();
+    start();
+  })();
+</script>
+
+<style>
+  .hero-slideshow {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: calc(100dvh - 4rem);
+    padding-top: 4rem;
+    overflow: hidden;
+    color: var(--color-warm-white);
+    outline: none;
+  }
+
+  .slideshow-track {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-color: var(--color-secondary-dark);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 900ms ease;
+    overflow: hidden;
+  }
+
+  .slide.is-active {
+    opacity: 1;
+  }
+
+  .slide-image {
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    margin: -1px;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .slideshow-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      105deg,
+      rgb(23 39 47 / 0.88) 0%,
+      rgb(23 39 47 / 0.58) 45%,
+      rgb(23 39 47 / 0.2) 100%
+    );
+    mask-image: linear-gradient(
+      to top,
+      transparent 0,
+      black 80px
+    );
+    -webkit-mask-image: linear-gradient(
+      to top,
+      transparent 0,
+      black 80px
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 65ch;
+  }
+
+  .hero-title {
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--color-warm-white);
+    margin-bottom: var(--space-4);
+  }
+
+  .hero-baseline {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: #bfe1ca;
+    margin-bottom: var(--space-4);
+  }
+
+  .hero-description {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: rgb(255 255 255 / 0.86);
+    margin-bottom: var(--space-8);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .hero-actions .btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-warm-white);
+  }
+
+  .hero-actions .btn-primary:hover {
+    background-color: var(--color-primary-dark);
+  }
+
+  .hero-actions .btn-secondary {
+    background-color: rgba(255 255 255 / 0.08);
+    border-color: rgba(255 255 255 / 0.45);
+    color: var(--color-warm-white);
+  }
+
+  .hero-actions .btn-secondary:hover {
+    background-color: rgba(255 255 255 / 0.16);
+    border-color: rgba(255 255 255 / 0.7);
+    color: var(--color-warm-white);
+  }
+
+  .slideshow-controls {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .slide-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    background-color: rgba(255 255 255 / 0.1);
+    color: var(--color-warm-white);
+    border: 1px solid rgba(255 255 255 / 0.25);
+    border-radius: 50%;
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  .slide-control:hover {
+    background-color: rgba(255 255 255 / 0.2);
+    border-color: rgba(255 255 255 / 0.45);
+  }
+
+  .slide-control:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255 255 255 / 0.35);
+  }
+
+  .slide-control--prev {
+    left: var(--space-4);
+  }
+
+  .slide-control--next {
+    right: var(--space-4);
+  }
+
+  .slide-dots {
+    position: absolute;
+    bottom: var(--space-8);
+    left: 50%;
+    z-index: 3;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .slide-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    padding: 0;
+    background-color: rgba(255 255 255 / 0.4);
+    border: 1px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+  }
+
+  .slide-dot:hover,
+  .slide-dot:focus-visible {
+    background-color: rgba(255 255 255 / 0.75);
+  }
+
+  .slide-dot:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255 255 255 / 0.35);
+  }
+
+  .slide-dot.is-active {
+    background-color: var(--color-warm-white);
+    transform: scale(1.25);
+  }
+
+  @media (min-width: 768px) {
+    .hero-title {
+      font-size: 3.5rem;
+    }
+
+    .hero-baseline {
+      font-size: 1.5rem;
+    }
+
+    .hero-description {
+      font-size: 1.25rem;
+    }
+
+    .slide-control {
+      width: 3.5rem;
+      height: 3.5rem;
+    }
+
+    .slide-control--prev {
+      left: var(--space-8);
+    }
+
+    .slide-control--next {
+      right: var(--space-8);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-actions {
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .hero-actions .btn {
+      width: 100%;
+    }
+  }
+</style>

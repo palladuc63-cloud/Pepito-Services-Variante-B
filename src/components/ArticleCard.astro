@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+import type { Article } from '../data/types';
+
+export interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+const publishDate = new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<article class="card article-card">
+  {
+    article.image && (
+      <div class="card-media">
+        <Image
+          src={article.image}
+          alt={`Illustration de l’article ${article.title}`}
+          widths={[400, 800]}
+          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+        />
+      </div>
+    )
+  }
+  <div class="card-body">
+    <time datetime={article.publishedAt} class="article-date">{publishDate}</time>
+    <h3 class="card-title">
+      <a href={`/actualites/${article.slug}`}>{article.title}</a>
+    </h3>
+    <p class="card-text">{article.summary}</p>
+  </div>
+</article>
+
+<style>
+  .article-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .article-card .card-title a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .article-card .card-title a:hover {
+    color: var(--color-primary);
+  }
+
+  .article-date {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-2);
+  }
+</style>

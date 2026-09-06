@@ -1,0 +1,32 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import Section from '../components/Section.astro';
+import ProjectFilter from '../components/ProjectFilter.astro';
+import ContentBadge from '../components/ContentBadge.astro';
+import { projects } from '../data/projects';
+---
+
+<MainLayout
+  title="Réalisations"
+  description="Découvrez les réalisations de Pépito Services : clôtures rigides, occultations, palissades, portillons et aménagements extérieurs."
+  canonicalPath="/realisations"
+>
+  <Section>
+    <div class="page-header">
+      <h1 class="section-title">Nos réalisations</h1>
+      <p class="section-subtitle">
+        Aperçu de chantiers réalisés par Pépito Services. Les descriptions et
+        catégories sont provisoires et seront validées avec l’entreprise.
+      </p>
+      <ContentBadge />
+    </div>
+
+    <ProjectFilter projects={projects} />
+  </Section>
+</MainLayout>
+
+<style>
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+</style>

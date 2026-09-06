@@ -1,0 +1,200 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import HeroSlideshow from '../components/HeroSlideshow.astro';
+import ArrowDivider from '../components/ArrowDivider.astro';
+import Section from '../components/Section.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import EmptyState from '../components/EmptyState.astro';
+import ContentBadge from '../components/ContentBadge.astro';
+import { settings } from '../data/settings';
+import { services } from '../data/services';
+import { projects } from '../data/projects';
+import { articles } from '../data/articles';
+
+const featuredProjects = projects.slice(0, 3);
+const latestArticles = articles.slice(0, 3);
+---
+
+<MainLayout
+  title={settings.name}
+  description={settings.description}
+  canonicalPath="/"
+>
+  <HeroSlideshow />
+
+  <ArrowDivider
+    background="var(--color-cream)"
+    prolongement
+  />
+
+  <Section id="services">
+    <div class="section-header">
+      <h2 class="section-title">Nos services</h2>
+      <p class="section-subtitle">
+        Des solutions de clôture et d’aménagement extérieur sur mesure, à
+        adapter ensemble selon votre terrain et vos envies.
+      </p>
+      <ContentBadge />
+    </div>
+
+    <div class="services-grid">
+      {services.map((service) => <ServiceCard service={service} />)}
+    </div>
+  </Section>
+
+  <ArrowDivider
+    fill="var(--color-cream)"
+    background="var(--color-surface)"
+  />
+
+  <Section id="realisations" class="section-alt">
+    <div class="section-header">
+      <h2 class="section-title">Quelques réalisations</h2>
+      <p class="section-subtitle">
+        Découvrez un aperçu de nos chantiers. Les descriptions et catégories
+        sont provisoires en attendant les informations validées par
+        l’entreprise.
+      </p>
+    </div>
+
+    <div class="projects-grid-preview">
+      {featuredProjects.map((project) => <ProjectCard project={project} />)}
+    </div>
+
+    <div class="section-actions">
+      <a href="/realisations" class="btn btn-secondary">Voir toutes les réalisations</a>
+    </div>
+  </Section>
+
+  <ArrowDivider
+    fill="var(--color-surface)"
+    background="var(--color-cream)"
+  />
+
+  <Section id="actualites">
+    <div class="section-header">
+      <h2 class="section-title">Actualités</h2>
+      <p class="section-subtitle">
+        Retrouvez bientôt ici les nouvelles de Pépito Services et nos conseils
+        autour des clôtures et aménagements extérieurs.
+      </p>
+    </div>
+
+    {
+      latestArticles.length > 0 ? (
+        <div class="articles-grid"><!-- future ArticleCard mapping --></div>
+      ) : (
+        <EmptyState
+          title="Aucun article pour le moment"
+          message="Le blog sera alimenté une fois les premiers contenus validés avec l’entreprise. Les articles futurs pourront être créés via le back-office prévu."
+        />
+      )
+    }
+
+    <div class="section-actions">
+      <a href="/actualites" class="btn btn-secondary">Voir les actualités</a>
+    </div>
+  </Section>
+
+  <ArrowDivider
+    fill="var(--color-cream)"
+    background="var(--color-secondary)"
+  />
+
+  <Section class="section-cta">
+    <div class="cta-box">
+      <h2 class="section-title">Un projet en tête ?</h2>
+      <p class="cta-text">
+        Discutons-en ensemble. Demandez une estimation personnalisée pour votre
+        clôture, palissade, portillon ou aménagement extérieur.
+      </p>
+      <a href="/contact" class="btn btn-primary">Demander un chiffrage</a>
+    </div>
+  </Section>
+</MainLayout>
+
+<style>
+  .section-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 640px) {
+    .services-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .services-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .section-alt {
+    background-color: var(--color-surface);
+    border-block: 1px solid var(--color-border);
+  }
+
+  .projects-grid-preview {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 640px) {
+    .projects-grid-preview {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .projects-grid-preview {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .section-actions {
+    margin-top: var(--space-8);
+    text-align: center;
+  }
+
+  .section-cta {
+    background: linear-gradient(
+      135deg,
+      var(--color-secondary) 0%,
+      var(--color-secondary-dark) 100%
+    );
+    color: var(--color-warm-white);
+  }
+
+  .section-cta .section-title {
+    color: var(--color-warm-white);
+  }
+
+  .cta-box {
+    max-width: 60ch;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .cta-text {
+    margin-bottom: var(--space-6);
+    opacity: 0.95;
+  }
+
+  .section-cta .btn-primary {
+    background-color: var(--color-warm-white);
+    color: var(--color-secondary-dark);
+  }
+
+  .section-cta .btn-primary:hover {
+    background-color: var(--color-sand);
+  }
+</style>

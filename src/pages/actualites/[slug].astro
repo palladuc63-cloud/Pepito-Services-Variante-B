@@ -1,0 +1,70 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { articles } from '../../data/articles';
+
+export function getStaticPaths() {
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+---
+
+<MainLayout
+  title={article.title}
+  description={article.summary}
+  canonicalPath={`/actualites/${article.slug}`}
+>
+  <article class="section">
+    <div class="container article-container">
+      <header class="article-header">
+        <h1 class="section-title">{article.title}</h1>
+        <time datetime={article.publishedAt} class="article-date">
+          {
+            new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          }
+        </time>
+      </header>
+
+      <div class="article-content">
+        {article.content}
+      </div>
+
+      <footer class="article-footer">
+        <a href="/actualites" class="btn btn-secondary">← Retour aux actualités</a>
+      </footer>
+    </div>
+  </article>
+</MainLayout>
+
+<style>
+  .article-container {
+    max-width: 70ch;
+  }
+
+  .article-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .article-date {
+    display: block;
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+  }
+
+  .article-content {
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-10);
+  }
+
+  .article-footer {
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+</style>

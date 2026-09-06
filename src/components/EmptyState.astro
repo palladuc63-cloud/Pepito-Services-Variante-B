@@ -1,0 +1,61 @@
+---
+export interface Props {
+  title?: string;
+  message?: string;
+}
+
+const {
+  title = 'Aucun contenu pour le moment',
+  message = 'Cette section sera complétée prochainement. Les informations présentées ici nécessitent une validation avec l’entreprise.',
+} = Astro.props;
+---
+
+<div class="empty-state" role="status" aria-live="polite">
+  <div class="empty-icon" aria-hidden="true">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="48"
+      height="48"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+    </svg>
+  </div>
+  <h2 class="empty-title">{title}</h2>
+  <p class="empty-message">{message}</p>
+</div>
+
+<style>
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--space-12) var(--space-6);
+    background-color: var(--color-surface-soft);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .empty-icon {
+    color: var(--color-taupe);
+    margin-bottom: var(--space-4);
+  }
+
+  .empty-title {
+    font-size: var(--text-xl);
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .empty-message {
+    color: var(--color-text-muted);
+    max-width: 55ch;
+  }
+</style>

@@ -1,0 +1,369 @@
+GUIDE OPÉRATIONNEL — CONCEVOIR DES MAQUETTES DE SITES WEB AVEC DEVIN ET DES MODÈLES DE LANGAGE
+
+Version de travail : [À REMPLIR]
+Responsable : [À REMPLIR]
+Projet : [À REMPLIR]
+Client : [À REMPLIR]
+
+OBJECTIF DU GUIDE
+
+Ce guide décrit une méthode reproductible pour passer d’un brief à une maquette web navigable, présentable au client et exploitable par une équipe de développement. Devin et les modèles de langage sont utilisés comme des assistants de conception, de rédaction, de prototypage et de vérification. Ils ne remplacent ni la direction artistique, ni la validation humaine, ni les contrôles d’accessibilité, de sécurité, de confidentialité et de conformité.
+
+Les noms d’outils, bibliothèques et fonctionnalités peuvent évoluer. Avant chaque projet, vérifier leur documentation officielle, leur disponibilité, leurs licences, leurs conditions d’utilisation et leur compatibilité avec les contraintes du client. Ne pas attribuer à un modèle une capacité qui n’a pas été vérifiée dans l’environnement réellement utilisé.
+
+1. PRINCIPES DE LA MÉTHODE
+
+1.1 Partir du problème, pas de l’outil
+
+Avant de demander une interface, clarifier :
+- l’objectif commercial ou institutionnel du site ;
+- les publics prioritaires et leurs besoins ;
+- les actions attendues : prendre rendez-vous, demander un devis, acheter, s’inscrire, comprendre, contacter ;
+- les contenus disponibles et ceux qui restent à produire ;
+- les contraintes de marque, de technologie, de délai, de budget et de conformité ;
+- les critères de réussite mesurables.
+
+1.2 Concevoir par itérations courtes
+
+Produire d’abord une structure simple, puis enrichir dans cet ordre :
+1) architecture de l’information ;
+2) parcours et hiérarchie des contenus ;
+3) wireframe ou maquette basse fidélité ;
+4) direction visuelle ;
+5) maquette haute fidélité ;
+6) prototype navigable ;
+7) vérification et préparation de la présentation.
+
+1.3 Garder un humain dans la boucle
+
+Chaque résultat généré doit être relu et accepté par une personne compétente. Vérifier notamment les textes, les contrastes, les états d’interface, les comportements responsive, les droits sur les images, les affirmations factuelles, les formulaires et les données collectées.
+
+1.4 Séparer exploration et production
+
+Créer un espace d’exploration pour les idées et variantes. Ne transférer dans le livrable de référence que les décisions validées. Identifier les versions et conserver un journal bref des choix.
+
+2. PRÉPARATION DU PROJET
+
+2.1 Fiche de cadrage à compléter
+
+Nom du projet : Pepito-Services
+Type de site : Site vitrine
+Objectif principal : Visibilité sur internet en local (artisan)
+Objectifs secondaires : Notoriété
+Publics prioritaires : particulier CSP moyen à plus, proprietaire de maison individuelles avec jardin
+Action principale attendue : creer des contacts qualifiés
+Pages incluses dans la première version : Accueil, Contact (avec formulaire), Réalisations
+Contenus disponibles : Voici le facebook du client : https://www.facebook.com/profile.php?id=100063966765186&locale=fr_FR + Contenu a la racine du projet dans imageFB mais également dans le dossier logo/tests-propositions/Logopepitoservices.jpeg
+Contenus manquants : TExte et actualités
+Identité visuelle existante : Non aucune à creer
+Références appréciées par le client : n'en a pas tres éloigné des reseau et d'internet
+Contraintes légales, RGPD, sécurité ou accessibilité : Non pas spécialement le site sera pour la France mais pas de récupération de données
+Technologie cible ou CMS : Astro en front mais prévoir un petit back pour faire des réglages directement par le client
+
+2.2 Questions à poser au client
+
+- Quelle décision l’utilisateur doit-il pouvoir prendre rapidement ?
+contacter pour faire une demande de chiffrage
+- Quelle information manque aujourd’hui aux visiteurs ?
+il n'a pas de presence sur internet c'est son premier site
+- Quelles objections faut-il lever ?
+Aucune particulierement
+- Quelles pages ou fonctionnalités sont indispensables au lancement ?
+Accueil - Actualités - Réalisations - Contact
+- Quelles contraintes de marque ne sont pas négociables ?
+Aucune
+- Qui fournit les textes, photos, illustrations, traductions et mentions légales ?
+Le client 
+- Qui valide, sous quel délai et selon quel nombre de cycles de retours ?
+Je valide tout directement 
+- Existe-t-il des outils à intégrer : CRM, agenda, paiement, recherche, analytics ou support ?
+Oui il faudra prévoir un back-office ou il pourra faire des réglages et recevoir et répondre a ses emails et CRUD des articles et réalisations avec un dashboard récap
+- Quelles données personnelles seront demandées et pourquoi ?
+Aucune à part avec la demande de contact 
+
+3. STACK RECOMMANDÉE POUR UN PROTOTYPE WEB
+
+La stack ci-dessous est une base pratique pour produire une maquette codée et responsive. Elle doit être adaptée au contexte plutôt que suivie aveuglément.
+
+- Éditeur et dépôt : Git avec une plateforme de dépôt choisie par l’équipe ; une branche ou un espace de travail séparé pour les essais.
+- Structure applicative : React avec un framework adapté au projet, par exemple Next.js si le besoin concerne une application web ou un site nécessitant une structure de routage et de rendu organisée. Vérifier la version et la configuration retenues.
+- Langage : TypeScript lorsque l’équipe souhaite mieux encadrer les données et les composants.
+- Styles : Tailwind CSS ou CSS modulaire. Choisir un seul système principal afin d’éviter les règles concurrentes.
+- Composants : une bibliothèque documentée ou des composants internes accessibles. shadcn/ui peut servir de base de composants copiables et personnalisables ; vérifier sa licence, ses dépendances et sa compatibilité avec le projet.
+- Icônes : une bibliothèque dont la licence autorise l’usage prévu. Ne pas remplacer une icône par un caractère décoratif ambigu.
+- Images : images fournies et autorisées par le client, banque d’images sous licence ou visuels temporaires clairement marqués « image à remplacer ».
+- Tests et contrôle : linting, formatage, tests de parcours prioritaires, contrôle clavier, vérification responsive et audit de performance adapté au stade du projet.
+- Déploiement de démonstration : environnement approuvé par l’équipe. Ne pas publier de données client réelles dans un environnement de test.
+
+Pour une maquette purement visuelle, un outil de design peut être plus approprié qu’un prototype codé. Pour une maquette destinée à tester un parcours réel, le prototype web offre souvent un retour plus concret, mais exige davantage de contrôle technique.
+
+4. ROUTINE CLIENT RECOMMANDÉE
+
+Étape 0 — Alignement initial
+Livrables : fiche de cadrage, périmètre, calendrier, rôles et critères d’acceptation.
+Validation client : objectifs, publics, pages prioritaires et contraintes.
+
+Étape 1 — Exploration
+Livrables : arborescence, parcours principal, inventaire de contenu, références et deux ou trois directions visuelles.
+Validation client : choix d’une direction, sans demander encore la perfection des détails.
+
+Étape 2 — Structure
+Livrables : wireframes des écrans prioritaires, hiérarchie des blocs, états principaux.
+Validation client : ordre des contenus, messages clés, appels à l’action et parcours.
+
+Étape 3 — Direction visuelle
+Livrables : palette, typographies, principes d’espacement, boutons, cartes, champs, exemples de composants et une page de référence.
+Validation client : style général avant de décliner toutes les pages.
+
+Étape 4 — Maquette et prototype
+Livrables : écrans prioritaires desktop et mobile, liens de navigation, états utiles, textes de travail identifiés.
+Validation client : retours regroupés dans un seul canal, idéalement selon les critères prévus.
+
+Étape 5 — Ajustements et transfert
+Livrables : version validée, liste des décisions, composants réutilisables, contenu manquant, points ouverts et recommandations de développement.
+Validation client : accord écrit sur le périmètre de la version présentée.
+
+Règle de communication : présenter des choix et leurs conséquences, plutôt qu’une succession infinie de variantes. Définir à l’avance le nombre de cycles de retours : [À REMPLIR].
+
+5. PROCESSUS DE TRAVAIL AVEC DEVIN ET UN MODÈLE DE LANGAGE
+
+5.1 Préparer un contexte propre
+
+Fournir uniquement les informations nécessaires : brief, objectifs, contraintes, structure de fichiers, conventions de code, composants disponibles, critères d’acceptation et définition du résultat attendu. Anonymiser les données personnelles et remplacer les données client sensibles par des exemples fictifs ou des placeholders.
+
+5.2 Demander d’abord un plan
+
+Avant de produire du code, demander à l’assistant de reformuler le besoin, signaler ses hypothèses, proposer une arborescence de pages, lister les composants et indiquer les questions bloquantes. Cela réduit les reprises dues à un brief ambigu.
+
+5.3 Faire construire par petits lots
+
+Exemples de lots :
+- structure de la page d’accueil ;
+- navigation et pied de page ;
+- système de boutons et de champs ;
+- page de détail ;
+- formulaire ;
+- version mobile ;
+- états d’erreur, de chargement et de succès.
+
+5.4 Faire vérifier avant de demander un embellissement
+
+Demander une vérification de la cohérence des routes, des liens, des composants, de l’accessibilité de base, des débordements mobiles, des messages de formulaire et des erreurs de console. Ensuite seulement, demander des améliorations visuelles.
+
+5.5 Devin : cadre d’utilisation
+
+Dans Devin, donner une mission délimitée et observable : lire les fichiers concernés, créer ou modifier une fonctionnalité ciblée, exécuter les vérifications disponibles, résumer les changements et signaler les limites. Ne pas lui confier implicitement l’accès à des informations qu’il n’a pas besoin de traiter.
+
+Exiger un compte rendu contenant :
+- fichiers créés ou modifiés ;
+- décisions prises et hypothèses ;
+- commandes ou vérifications effectuées ;
+- problèmes rencontrés ;
+- points nécessitant une validation humaine ;
+- prochaines étapes proposées.
+
+La forme exacte des fonctionnalités de Devin et de son environnement dépend de la configuration utilisée. Vérifier les permissions, les intégrations et les règles de sécurité avant de l’autoriser à modifier un dépôt ou à publier un résultat.
+
+6. PROMPT GÉNÉRIQUE RÉUTILISABLE — CONCEPTION DE MAQUETTE
+
+Tu es un assistant de conception web et de prototypage. Tu travailles à partir des informations ci-dessous et tu distingues clairement les faits fournis, les hypothèses et les éléments à confirmer.
+
+CONTEXTE
+- Projet : [À REMPLIR]
+- Objectif principal : [À REMPLIR]
+- Publics : [À REMPLIR]
+- Action principale : [À REMPLIR]
+- Pages ou écrans à concevoir : [À REMPLIR]
+- Contenus disponibles : [À REMPLIR]
+- Ton éditorial : [À REMPLIR]
+- Contraintes de marque : [À REMPLIR]
+- Contraintes techniques : [À REMPLIR]
+- Contraintes d’accessibilité, de confidentialité et de conformité : [À REMPLIR]
+- Références visuelles : [À REMPLIR]
+
+MISSION
+Propose une maquette web claire, crédible et responsive. Commence par :
+1) reformuler le problème et le parcours prioritaire ;
+2) lister les hypothèses et questions bloquantes ;
+3) proposer l’architecture de l’écran ;
+4) décrire la hiérarchie visuelle, les composants et les états ;
+5) proposer le contenu d’interface sans inventer de faits ;
+6) fournir une stratégie desktop/mobile ;
+7) définir des critères d’acceptation vérifiables.
+
+Si du code est demandé, produis une implémentation modulaire, lisible et accessible, en respectant la stack indiquée. Utilise [À REMPLIR] pour tout contenu non fourni. Ne présente jamais un texte inventé comme une information réelle. Termine par les limites, contrôles à effectuer et décisions à valider.
+
+7. PROMPT DEVIN — PROTOTYPE CODÉ
+
+Contexte du dépôt : [À REMPLIR]
+Objectif de la mission : [À REMPLIR]
+Écrans concernés : [À REMPLIR]
+Stack et versions : [À REMPLIR]
+Composants ou conventions existants : [À REMPLIR]
+Références autorisées : [À REMPLIR]
+Données de démonstration : utiliser uniquement des données fictives et non personnelles.
+
+Consignes :
+1) Commence par inspecter uniquement les fichiers nécessaires et reformule le plan d’exécution.
+2) Signale les ambiguïtés avant de modifier des fichiers ; si elles ne bloquent pas, consigne des hypothèses explicites.
+3) Implémente la structure et les composants de la maquette demandée sans ajouter de fonctionnalités hors périmètre.
+4) Respecte la hiérarchie sémantique, la navigation au clavier, les libellés de formulaire, les états de focus et des contrastes à vérifier.
+5) Prévois les états normal, survol, focus, désactivé, chargement, succès et erreur lorsque c’est pertinent.
+6) Vérifie l’affichage sur les largeurs [À REMPLIR] et évite les débordements horizontaux.
+7) Lance les vérifications disponibles dans le projet et ne prétends pas avoir exécuté celles qui ne le sont pas.
+8) Ne publie rien, n’envoie aucune donnée à un service externe et ne modifie aucune configuration sensible sans autorisation explicite.
+9) À la fin, fournis : résumé, fichiers modifiés, contrôles réalisés, problèmes restants, hypothèses et prochaines étapes.
+
+Critères d’acceptation :
+- [À REMPLIR]
+- [À REMPLIR]
+- [À REMPLIR]
+
+8. PROMPTS DE VARIANTES
+
+8.1 Variante « sobre et éditoriale »
+À partir de la structure validée, propose une direction sobre, lisible et éditoriale. Priorise la hiérarchie des titres, la lisibilité des paragraphes, les espaces, la preuve et un appel à l’action principal. Ne change pas le parcours sans l’indiquer. Fournis les choix, avantages, risques et composants à tester.
+
+8.2 Variante « conversion »
+Optimise l’écran pour l’action [À REMPLIR], sans utiliser de promesses non vérifiées ni de dark patterns. Clarifie la proposition de valeur, réduit les hésitations, ordonne les preuves et rend l’appel à l’action compréhensible. Indique ce qui doit être mesuré et ce qui doit être validé par le client.
+
+8.3 Variante « mobile d’abord »
+Recompose la page pour un petit écran : contenu prioritaire, ordre des blocs, zones tactiles, navigation, formulaires, images et comportements au clavier. Décris ensuite comment l’interface s’étend vers les écrans plus larges.
+
+8.4 Variante « accessible par défaut »
+Passe en revue la structure, les titres, les labels, les contrastes, les messages d’erreur, le focus, les alternatives textuelles, les animations et la navigation au clavier. Signale les points à vérifier manuellement et ne conclus pas à une conformité complète sans audit approprié.
+
+8.5 Variante « système de design »
+Transforme la maquette en inventaire de tokens et composants : couleurs, typographies, espacements, rayons, ombres, boutons, champs, alertes, cartes et navigation. Donne les états et règles d’usage, pas seulement une liste de styles.
+
+8.6 Comparaison de variantes
+Compare les variantes selon : adéquation à l’objectif, clarté, accessibilité, coût d’implémentation, réutilisabilité, risque de confusion et facilité de validation. Recommande une option avec réserves explicites.
+
+9. ERREURS À ÉVITER
+
+- Commencer par demander « un beau site » sans objectif ni public.
+- Confondre maquette visuelle, prototype fonctionnel et produit prêt à mettre en production.
+- Générer tout le projet en une seule demande impossible à contrôler.
+- Laisser l’assistant inventer des chiffres, témoignages, clients, certifications, prix, sources ou promesses.
+- Utiliser des photos ou logos sans vérifier les droits.
+- Ajouter des données personnelles réelles dans des prompts, dépôts ou environnements de démonstration.
+- Multiplier les bibliothèques de composants et les styles sans convention.
+- Négliger les états d’erreur, de chargement, de succès et les cas vides.
+- Concevoir uniquement pour desktop.
+- Utiliser des textes provisoires qui masquent la longueur réelle des contenus.
+- Oublier les performances, le clavier, le focus, le contraste et les alternatives textuelles.
+- Confondre un résultat plausible avec un résultat vérifié.
+- Demander à Devin de publier, supprimer ou modifier des ressources sensibles sans confirmation.
+- Présenter trop de variantes sans critères de décision.
+- Prendre des références concurrentes comme une autorisation de reproduire leur identité.
+
+10. PLANNING INDICATIF
+
+Planning court sur 5 jours ouvrés, à adapter au projet :
+
+Jour 1 — cadrage et collecte
+Matin : objectifs, publics, contenu, contraintes et critères d’acceptation.
+Après-midi : arborescence, parcours principal et inventaire des écrans.
+Sortie : cadrage validable.
+
+Jour 2 — structure
+Matin : wireframes des écrans prioritaires.
+Après-midi : revue interne, corrections de parcours et préparation de la direction visuelle.
+Sortie : structure validable.
+
+Jour 3 — direction visuelle et prototype
+Matin : composants de base, typographies, couleurs et page de référence.
+Après-midi : déclinaison des écrans prioritaires avec Devin et/ou modèle de langage.
+Sortie : première maquette navigable.
+
+Jour 4 — contrôle et itération
+Matin : revue responsive, clavier, contenu, liens, états et cohérence.
+Après-midi : une série de retours client regroupés et corrections ciblées.
+Sortie : version de présentation.
+
+Jour 5 — présentation et transfert
+Matin : préparation du scénario, des décisions et des points ouverts.
+Après-midi : présentation client, compte rendu et plan de suite.
+Sortie : validation, réserves ou liste d’actions.
+
+Délais réels, participants et jalons : [À REMPLIR]
+
+11. MÉTHODE DE PRÉSENTATION CLIENT
+
+11.1 Préparer la séance
+
+- Définir l’objectif de la réunion : valider une direction, un parcours ou une liste de détails.
+- Préparer un scénario correspondant au parcours utilisateur principal.
+- Présenter la version, la date et le périmètre.
+- Identifier clairement les éléments temporaires et les contenus à fournir.
+- Préparer trois à cinq décisions attendues, pas une demande générale d’avis.
+
+11.2 Déroulé conseillé
+
+1) Rappeler le problème et le public visé.
+2) Expliquer les choix de structure avant les choix décoratifs.
+3) Parcourir une tâche utilisateur complète.
+4) Montrer au moins le comportement mobile lorsque le responsive est dans le périmètre.
+5) Montrer les états importants : formulaire, erreur, succès, contenu vide ou chargement.
+6) Relier chaque choix à un objectif ou une contrainte.
+7) Recueillir les retours par thème : contenu, parcours, visuel, technique, conformité.
+8) Conclure avec les décisions, les réserves, les responsables et les dates.
+
+11.3 Questions de validation
+
+- Le visiteur comprend-il ce que propose le site et pour qui ?
+- L’action principale est-elle évidente ?
+- L’ordre des contenus correspond-il aux questions du public ?
+- Un utilisateur mobile peut-il accomplir la tâche prioritaire ?
+- Les textes sont-ils exacts, validés et suffisamment précis ?
+- Quels éléments sont indispensables au lancement et lesquels peuvent attendre ?
+- Quels risques doivent être traités avant le développement ?
+
+11.4 Compte rendu
+
+Date : [À REMPLIR]
+Participants : [À REMPLIR]
+Version présentée : [À REMPLIR]
+Décisions validées : [À REMPLIR]
+Modifications demandées : [À REMPLIR]
+Points à confirmer : [À REMPLIR]
+Contenus attendus du client : [À REMPLIR]
+Responsables : [À REMPLIR]
+Échéances : [À REMPLIR]
+
+12. CHECK-LIST FINALE
+
+Brief et périmètre
+[ ] Objectif, public et action principale sont écrits.
+[ ] Pages, fonctionnalités et exclusions sont identifiées.
+[ ] Les critères d’acceptation sont mesurables ou observables.
+
+Contenu et confidentialité
+[ ] Les placeholders sont distingués des contenus validés.
+[ ] Aucune donnée personnelle ou donnée client réelle n’est incluse dans les exemples.
+[ ] Les affirmations, images, logos et références ont une source ou une validation appropriée.
+
+Interface
+[ ] La hiérarchie visuelle est cohérente.
+[ ] Les états principaux sont représentés.
+[ ] La navigation fonctionne dans le périmètre de la maquette.
+[ ] Les écrans mobiles ont été vérifiés.
+
+Qualité
+[ ] Les contrôles disponibles ont été exécutés et consignés.
+[ ] Les erreurs de console et débordements visibles ont été traités ou signalés.
+[ ] Le clavier, le focus, les labels et les contrastes ont été vérifiés à un niveau adapté au stade du projet.
+[ ] Les limites du prototype sont explicites.
+
+Présentation
+[ ] Le scénario de démonstration suit un parcours réel mais utilise des données fictives.
+[ ] Les décisions attendues sont listées.
+[ ] Le nombre de cycles de retours et les prochaines étapes sont confirmés.
+
+13. RÈGLE DE TRAÇABILITÉ ET DE CONFIDENTIALITÉ
+
+Conserver un journal minimal : date, version, prompt ou objectif, fichiers modifiés, vérifications réalisées, décision humaine et point restant. Retirer les secrets, identifiants, coordonnées, données de prospects, contenus non publics et informations contractuelles des prompts et des exemples. Si un service externe est utilisé, vérifier au préalable la politique de traitement des données, les permissions, la conservation et les obligations contractuelles applicables au projet.
+
+CONCLUSION
+
+La valeur de Devin et des modèles de langage vient surtout de l’accélération des itérations et de la formalisation des contrôles. Une maquette de qualité repose d’abord sur un cadrage clair, une hiérarchie de contenu, des critères de décision et une validation humaine. Le processus recommandé est donc : cadrer, structurer, prototyper par petits lots, vérifier, présenter un choix argumenté et documenter ce qui reste à faire.

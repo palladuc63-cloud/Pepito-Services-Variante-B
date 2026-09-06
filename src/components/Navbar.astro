@@ -1,0 +1,338 @@
+---
+import { Image } from 'astro:assets';
+import { settings } from '../data/settings';
+import NavItem from './NavItem.astro';
+
+const currentPath = Astro.url.pathname;
+const splitAt = Math.ceil(settings.nav.length / 2);
+const leftItems = settings.nav.slice(0, splitAt);
+const rightItems = settings.nav.slice(splitAt);
+
+// Find the dropdown item (Réalisations) to build a mega-menu panel
+const dropdownItem = settings.nav.find((link) => link.children);
+---
+
+<header class="site-header sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200" data-has-dropdown={!!dropdownItem}>
+  <div class="container">
+    <nav class="main-nav relative flex items-center justify-center min-h-20 gap-4" aria-label="Navigation principale">
+      <button
+        type="button"
+        class="nav-toggle absolute right-0 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-11 h-11 rounded-full border border-stone-200 bg-white shadow-sm cursor-pointer z-30 transition-all duration-200 hover:bg-stone-100 hover:shadow-md hover:border-stone-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 md:hidden"
+        aria-expanded="false"
+        aria-controls="nav-menu"
+        aria-label="Ouvrir le menu"
+      >
+        <span class="hamburger relative block w-5 h-0.5 bg-stone-700 rounded-sm transition-all duration-200" aria-hidden="true"></span>
+      </button>
+
+      <a href="/" class="brand-mobile inline-flex items-center flex-1 z-20 md:hidden" aria-label={`Accueil ${settings.name}`}>
+        <Image
+          src={settings.logo}
+          alt=""
+          width={140}
+          height={56}
+          class="h-14 w-auto object-contain"
+        />
+      </a>
+
+      <ul class="nav-side nav-side--left hidden md:flex list-none m-0 p-0" role="menubar">
+        {
+          leftItems.map((link, index) => (
+            <NavItem
+              link={link}
+              currentPath={currentPath}
+              dropdownId={`nav-dropdown-left-${index}`}
+              megaMode={!!dropdownItem}
+            />
+          ))
+        }
+      </ul>
+
+      <a href="/" class="brand hidden md:inline-flex items-center flex-shrink-0 z-20 group" aria-label={`Accueil ${settings.name}`}>
+        <Image
+          src={settings.logo}
+          alt=""
+          width={180}
+          height={72}
+          class="h-16 w-auto object-contain transition-all duration-300 group-hover:scale-105"
+        />
+      </a>
+
+      <ul class="nav-side nav-side--right hidden md:flex list-none m-0 p-0" role="menubar">
+        {
+          rightItems.map((link, index) => (
+            <NavItem
+              link={link}
+              currentPath={currentPath}
+              dropdownId={`nav-dropdown-right-${index}`}
+              megaMode={!!dropdownItem}
+            />
+          ))
+        }
+      </ul>
+
+      <ul id="nav-menu" class="nav-menu--mobile absolute top-full left-0 right-0 hidden flex-col gap-2 p-4 bg-white border-b border-gray-200 list-none m-0 z-40" role="menubar">
+        {
+          settings.nav.map((link, index) => (
+            <NavItem
+              link={link}
+              currentPath={currentPath}
+              dropdownId={`nav-dropdown-mobile-${index}`}
+            />
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+
+  {
+    dropdownItem && (
+      <div class="mega-panel absolute top-full left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-stone-200 shadow-2xl py-8 z-40" id="mega-panel" role="region" aria-label={`Catégories de ${dropdownItem.label}`} hidden>
+        <div class="container mega-grid grid grid-cols-2 gap-5 lg:grid-cols-4">
+          {dropdownItem.children!.map((child) => (
+            <a href={child.href} class="group relative block overflow-hidden rounded-2xl border border-stone-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-300">
+              {child.image && (
+                <div class="relative overflow-hidden h-32">
+                  <Image
+                    src={child.image}
+                    alt=""
+                    width={320}
+                    height={180}
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="eager"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
+                </div>
+              )}
+              <span class="relative z-10 block px-5 py-4 text-sm font-semibold text-stone-700 group-hover:text-emerald-700">{child.label}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    )
+  }
+</header>
+
+<script>
+  (function () {
+    const toggle = document.querySelector('.nav-toggle') as HTMLButtonElement | null;
+    const menu = document.getElementById('nav-menu');
+
+    if (toggle && menu) {
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        menu.classList.toggle('is-open');
+        toggle.setAttribute(
+          'aria-label',
+          expanded ? 'Ouvrir le menu' : 'Fermer le menu'
+        );
+      });
+
+      menu.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          toggle.setAttribute('aria-expanded', 'false');
+          menu.classList.remove('is-open');
+          toggle.setAttribute('aria-label', 'Ouvrir le menu');
+        });
+      });
+    }
+
+    // --- Mega panel (desktop) ---
+    const megaPanel = document.getElementById('mega-panel');
+    const hasDropdownItem = document.querySelector<HTMLElement>('.nav-side [data-has-children="true"]');
+
+    function openMega() {
+      if (megaPanel) megaPanel.hidden = false;
+      hasDropdownItem?.classList.add('is-active');
+    }
+    function closeMega() {
+      if (megaPanel) megaPanel.hidden = true;
+      hasDropdownItem?.classList.remove('is-active');
+    }
+
+    if (megaPanel && hasDropdownItem) {
+      hasDropdownItem.addEventListener('mouseenter', openMega);
+      hasDropdownItem.addEventListener('mouseleave', () => {
+        setTimeout(() => {
+          if (!megaPanel.matches(':hover') && !hasDropdownItem.matches(':hover')) closeMega();
+        }, 150);
+      });
+      megaPanel.addEventListener('mouseleave', closeMega);
+      megaPanel.addEventListener('mouseenter', openMega);
+
+      hasDropdownItem.addEventListener('focusin', openMega);
+      hasDropdownItem.addEventListener('focusout', () => {
+        setTimeout(() => {
+          if (!hasDropdownItem.contains(document.activeElement) && !megaPanel.contains(document.activeElement)) {
+            closeMega();
+          }
+        }, 50);
+      });
+
+      const ddToggle = hasDropdownItem.querySelector<HTMLButtonElement>('.dropdown-toggle');
+      if (ddToggle) {
+        ddToggle.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (megaPanel.hidden) openMega(); else closeMega();
+        });
+      }
+
+      document.addEventListener('click', (event) => {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.has-dropdown') && !target.closest('.mega-panel') && !target.closest('[data-has-children="true"]')) {
+          closeMega();
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closeMega();
+          if (toggle && menu?.classList.contains('is-open')) {
+            toggle.setAttribute('aria-expanded', 'false');
+            menu.classList.remove('is-open');
+            toggle.setAttribute('aria-label', 'Ouvrir le menu');
+            toggle.focus();
+          }
+        }
+      });
+    }
+
+    // --- Mobile dropdowns (inline) ---
+    const dropdownToggles = document.querySelectorAll<HTMLButtonElement>('.nav-menu--mobile .dropdown-toggle');
+
+    function closeAllMobileDropdowns() {
+      dropdownToggles.forEach((btn) => {
+        btn.setAttribute('aria-expanded', 'false');
+        const id = btn.getAttribute('aria-controls');
+        if (id) {
+          document.getElementById(id)?.classList.remove('is-open');
+        }
+      });
+    }
+
+    dropdownToggles.forEach((btn) => {
+      const id = btn.getAttribute('aria-controls');
+      const dropdown = id ? document.getElementById(id) : null;
+      btn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        if (expanded) {
+          btn.setAttribute('aria-expanded', 'false');
+          dropdown?.classList.remove('is-open');
+        } else {
+          closeAllMobileDropdowns();
+          btn.setAttribute('aria-expanded', 'true');
+          dropdown?.classList.add('is-open');
+        }
+      });
+    });
+  })();
+</script>
+
+<style>
+  /* Hamburger lines */
+  .hamburger::before,
+  .hamburger::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    display: block;
+    width: 1.25rem;
+    height: 2px;
+    background-color: #1f2937;
+    border-radius: 2px;
+    transition: transform 200ms ease, opacity 200ms ease;
+  }
+
+  .hamburger::before {
+    top: -6px;
+  }
+
+  .hamburger::after {
+    top: 6px;
+  }
+
+  /* Mobile menu open state */
+  .nav-menu--mobile {
+    transform: translateY(-10px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 200ms ease, transform 200ms ease, visibility 200ms;
+  }
+
+  .nav-menu--mobile.is-open {
+    display: flex !important;
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* Nav item with dropdown */
+  .nav-item.has-dropdown,
+  .nav-item[data-has-children="true"] {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+
+  /* Mobile dropdown (inline) */
+  .dropdown-menu {
+    grid-column: 1 / -1;
+    display: none;
+    margin: 0;
+    padding: 0.5rem;
+    list-style: none;
+    background-color: #f7f8f5;
+    border-radius: 0.5rem;
+  }
+
+  .dropdown-menu.is-open {
+    display: block;
+  }
+
+  /* Chevron rotation when open */
+  .dropdown-toggle[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+  }
+
+  /* Mega trigger rotation */
+  .mega-trigger[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+  }
+
+  /* Desktop 3-column layout */
+  @media (min-width: 768px) {
+    .main-nav {
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .nav-side {
+      flex: 1 1 0;
+      min-width: 0;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-side--left {
+      justify-content: flex-end;
+    }
+
+    .nav-side--right {
+      justify-content: flex-start;
+    }
+
+    .nav-menu--mobile {
+      display: none !important;
+    }
+
+    /* Highlight the Réalisations item when mega panel is open */
+    .nav-side [data-has-children="true"].is-active .nav-link {
+      color: #047857;
+      background-color: #ecfdf5;
+    }
+  }
+</style>

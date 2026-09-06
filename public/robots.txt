@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap : remplacer par l'URL réelle du site avant mise en production.
+# Sitemap: https://example.com/sitemap-index.xml

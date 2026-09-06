@@ -1,0 +1,104 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import Section from '../components/Section.astro';
+import ContentBadge from '../components/ContentBadge.astro';
+---
+
+<MainLayout
+  title="Politique de confidentialité"
+  description="Politique de confidentialité du site Pépito Services."
+  canonicalPath="/politique-confidentialite"
+  noIndex={true}
+>
+  <Section>
+    <div class="page-header">
+      <h1 class="section-title">Politique de confidentialité</h1>
+      <p class="section-subtitle">
+        Cette page décrit la gestion des données personnelles sur le site.
+        Les informations opérationnelles (durées de conservation, cookies,
+        outils tiers) sont en attente de validation avec l’entreprise.
+      </p>
+      <ContentBadge label="Politique de confidentialité à valider avec l’entreprise" />
+    </div>
+
+    <div class="legal-content">
+      <section class="legal-section">
+        <h2>Données collectées</h2>
+        <p>
+          Pour le moment, ce site vitrine ne collecte aucune donnée personnelle
+          en ligne. Le formulaire de contact affiché est une démonstration : aucune
+          saisie n’est transmise ni stockée.
+        </p>
+        <p>
+          Une fois le formulaire réel activé, les champs collectés (nom, email,
+          téléphone, type de projet, message) seront indiqués ici avec leur
+          finalité exacte.
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Finalités du traitement</h2>
+        <p>
+          À valider avec l’entreprise : réponse aux demandes de contact, envoi
+          de devis, gestion de la relation client.
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Durées de conservation</h2>
+        <p>À valider avec l’entreprise.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Vos droits</h2>
+        <p>
+          Conformément au Règlement Général sur la Protection des Données
+          (RGPD), vous disposez d’un droit d’accès, de rectification, de
+          suppression, de limitation et d’opposition aux traitements de vos
+          données personnelles. Pour exercer ces droits, contactez
+          l’entreprise à l’adresse qui sera publiée ici après validation.
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Cookies et traceurs</h2>
+        <p>
+          Ce site n’utilise actuellement aucun cookie ni traceur. Si des outils
+          d’analyse (ex. statistiques de visite) ou de partage social sont
+          ajoutés ultérieurement, cette section sera mise à jour et un bandeau
+          de consentement sera mis en place.
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Hébergement</h2>
+        <p>À valider avec l’entreprise.</p>
+      </section>
+    </div>
+  </Section>
+</MainLayout>
+
+<style>
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .legal-content {
+    max-width: 70ch;
+  }
+
+  .legal-section {
+    margin-bottom: var(--space-8);
+  }
+
+  .legal-section h2 {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-3);
+  }
+
+  .legal-section p {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+    line-height: var(--leading-relaxed);
+  }
+</style>

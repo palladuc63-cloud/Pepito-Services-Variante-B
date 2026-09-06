@@ -1,0 +1,43 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import Section from '../components/Section.astro';
+import ContentBadge from '../components/ContentBadge.astro';
+---
+
+<MainLayout
+  title="A propos"
+  description="Présentation de Pépito Services. Contenu provisoire en cours de validation avec l’entreprise."
+  canonicalPath="/a-propos"
+>
+  <Section>
+    <div class="page-header">
+      <h1 class="section-title">A propos de Pépito Services</h1>
+      <p class="section-subtitle">
+        Cette page de présentation sera complétée avec les informations
+        validées par l’entreprise.
+      </p>
+      <ContentBadge />
+    </div>
+
+    <div class="prose">
+      <p>
+        Pépito Services accompagne les particuliers dans la pose et la
+        fabrication de clôtures rigides, palissades, portillons et
+        aménagements extérieurs. Les détails de l’activité, de l’expérience et
+        des valeurs seront ajoutés ici prochainement.
+      </p>
+    </div>
+  </Section>
+</MainLayout>
+
+<style>
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .prose {
+    max-width: 70ch;
+    color: var(--color-text);
+    line-height: var(--leading-relaxed);
+  }
+</style>
