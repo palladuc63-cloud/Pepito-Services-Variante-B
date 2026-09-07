@@ -15,7 +15,7 @@ export const settings: SiteSettings = {
   description:
     'Pépito Services vous accompagne dans la pose et la fabrication de clôtures rigides, palissades, portillons et aménagements d’extérieur. Demandez un chiffrage personnalisé.',
   logo,
-  siteUrl: 'https://example.com',
+  siteUrl: 'https://webcrafted.fr',
   socials: [
     {
       name: 'Facebook',
