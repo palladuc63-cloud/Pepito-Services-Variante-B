@@ -1,4 +1,4 @@
-import logo from '../../../Pepito-Services/Logo/Logo Pepito.svg';
+import logo from '../assets/logo.svg';
 import type { SiteSettings } from './types';
 import { projectCategories, projects } from './projects';
 
