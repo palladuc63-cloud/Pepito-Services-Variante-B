@@ -15,7 +15,7 @@ export const settings: SiteSettings = {
   description:
     'Pépito Services vous accompagne dans la pose et la fabrication de clôtures rigides, palissades, portillons et aménagements d’extérieur. Demandez un chiffrage personnalisé.',
   logo,
-  siteUrl: 'https://webcrafted.fr',
+  siteUrl: 'https://palladuc63-cloud.github.io/Pepito-Services-Variante-B/',
   socials: [
     {
       name: 'Facebook',
@@ -30,16 +30,16 @@ export const settings: SiteSettings = {
   },
   nav: [
     { label: 'Accueil', href: '/' },
-    { label: 'A propos', href: '/a-propos' },
+    { label: 'A propos', href: '/a-propos/' },
     {
       label: 'Réalisations',
-      href: '/realisations',
+      href: '/realisations/',
       children: projectCategories.map((category) => ({
         label: category.label,
-        href: `/realisations?categorie=${category.id}`,
+        href: `/realisations/?categorie=${category.id}`,
         image: randomProjectImage(category.id),
       })),
     },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Contact', href: '/contact/' },
   ],
 };

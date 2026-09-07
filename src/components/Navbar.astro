@@ -12,6 +12,7 @@ const rightItems = settings.nav.slice(splitAt);
 const dropdownItem = settings.nav.find((link) => link.children);
 
 const logoSrc = typeof settings.logo === 'string' ? settings.logo : settings.logo.src;
+const base = import.meta.env.BASE_URL;
 ---
 
 <header class="site-header sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200" data-has-dropdown={!!dropdownItem}>
@@ -27,7 +28,7 @@ const logoSrc = typeof settings.logo === 'string' ? settings.logo : settings.log
         <span class="hamburger relative block w-5 h-0.5 bg-stone-700 rounded-sm transition-all duration-200" aria-hidden="true"></span>
       </button>
 
-      <a href="/" class="brand-mobile inline-flex items-center flex-shrink-0 z-20 md:hidden" aria-label={`Accueil ${settings.name}`}>
+      <a href={base} class="brand-mobile inline-flex items-center flex-shrink-0 z-20 md:hidden" aria-label={`Accueil ${settings.name}`}>
         <img
           src={logoSrc}
           alt=""
@@ -51,7 +52,7 @@ const logoSrc = typeof settings.logo === 'string' ? settings.logo : settings.log
         }
       </ul>
 
-      <a href="/" class="brand hidden md:inline-flex items-center flex-shrink-0 z-20 group" aria-label={`Accueil ${settings.name}`}>
+      <a href={base} class="brand hidden md:inline-flex items-center flex-shrink-0 z-20 group" aria-label={`Accueil ${settings.name}`}>
         <img
           src={logoSrc}
           alt=""
@@ -93,8 +94,10 @@ const logoSrc = typeof settings.logo === 'string' ? settings.logo : settings.log
     dropdownItem && (
       <div class="mega-panel absolute top-full left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-stone-200 shadow-2xl py-8 z-40" id="mega-panel" role="region" aria-label={`Catégories de ${dropdownItem.label}`} hidden>
         <div class="container mega-grid grid grid-cols-2 gap-5 lg:grid-cols-4">
-          {dropdownItem.children!.map((child) => (
-            <a href={child.href} class="group relative block overflow-hidden rounded-2xl border border-stone-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-300">
+          {dropdownItem.children!.map((child) => {
+            const childHref = child.href === '/' ? base : `${base}${child.href.replace(/^\//, '')}`;
+            return (
+            <a href={childHref} class="group relative block overflow-hidden rounded-2xl border border-stone-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-300">
               {child.image && (
                 <div class="relative overflow-hidden h-32">
                   <Image
@@ -110,7 +113,7 @@ const logoSrc = typeof settings.logo === 'string' ? settings.logo : settings.log
               )}
               <span class="relative z-10 block px-5 py-4 text-sm font-semibold text-stone-700 group-hover:text-emerald-700">{child.label}</span>
             </a>
-          ))}
+          )})}
         </div>
       </div>
     )

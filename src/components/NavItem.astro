@@ -14,8 +14,9 @@ export interface Props {
 }
 
 const { link, currentPath, dropdownId, megaMode = false } = Astro.props;
-const isActive =
-  currentPath === link.href || currentPath.startsWith(`${link.href}/`);
+const base = import.meta.env.BASE_URL;
+const href = link.href === '/' ? base : `${base}${link.href.replace(/^\//, '')}`;
+const isActive = currentPath === href || (href !== base && currentPath.startsWith(href));
 ---
 
 <li
@@ -27,7 +28,7 @@ const isActive =
   data-has-children={link.children ? 'true' : 'false'}
 >
   <a
-    href={link.href}
+    href={href}
     class:list={[
       'nav-link relative inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 no-underline',
       isActive
@@ -68,10 +69,12 @@ const isActive =
         </button>
 
         <ul id={dropdownId} class="dropdown-menu" role="menu">
-          {link.children.map((child) => (
+          {link.children.map((child) => {
+            const childHref = child.href === '/' ? base : `${base}${child.href.replace(/^\//, '')}`;
+            return (
             <li role="none">
               <a
-                href={child.href}
+                href={childHref}
                 class="dropdown-link block p-2 rounded-xl text-stone-700 font-medium no-underline transition-all duration-200 hover:bg-white hover:text-emerald-700"
                 role="menuitem"
               >
@@ -88,7 +91,7 @@ const isActive =
                 <span class="block text-sm px-1">{child.label}</span>
               </a>
             </li>
-          ))}
+          )})}
         </ul>
       </>
     )

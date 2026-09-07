@@ -10,6 +10,7 @@ export function getStaticPaths() {
 }
 
 const { article } = Astro.props;
+const base = import.meta.env.BASE_URL;
 ---
 
 <MainLayout
@@ -37,7 +38,7 @@ const { article } = Astro.props;
       </div>
 
       <footer class="article-footer">
-        <a href="/actualites" class="btn btn-secondary">← Retour aux actualités</a>
+        <a href={`${base}actualites/`} class="btn btn-secondary">← Retour aux actualités</a>
       </footer>
     </div>
   </article>

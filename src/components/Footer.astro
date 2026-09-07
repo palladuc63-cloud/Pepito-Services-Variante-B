@@ -2,6 +2,7 @@
 import { settings } from '../data/settings';
 
 const currentYear = new Date().getFullYear();
+const base = import.meta.env.BASE_URL;
 ---
 
 <footer class="site-footer">
@@ -13,11 +14,12 @@ const currentYear = new Date().getFullYear();
 
     <nav class="footer-nav" aria-label="Pied de page">
       <ul class="footer-links">
-        {settings.nav.map((link) => (
-          <li><a href={link.href}>{link.label}</a></li>
-        ))}
-        <li><a href="/mentions-legales">Mentions légales</a></li>
-        <li><a href="/politique-confidentialite">Politique de confidentialité</a></li>
+        {settings.nav.map((link) => {
+          const linkHref = link.href === '/' ? base : `${base}${link.href.replace(/^\//, '')}`;
+          return <li><a href={linkHref}>{link.label}</a></li>;
+        })}
+        <li><a href={`${base}mentions-legales/`}>Mentions légales</a></li>
+        <li><a href={`${base}politique-confidentialite/`}>Politique de confidentialité</a></li>
       </ul>
     </nav>
 

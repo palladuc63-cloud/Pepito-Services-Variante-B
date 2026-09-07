@@ -8,6 +8,7 @@ export interface Props {
 }
 
 const { service } = Astro.props;
+const base = import.meta.env.BASE_URL;
 ---
 
 <article class="card service-card">
@@ -27,7 +28,7 @@ const { service } = Astro.props;
         <ContentBadge />
       </div>
     )}
-    <a href="/contact" class="service-link">En savoir plus</a>
+    <a href={`${base}contact/`} class="service-link">En savoir plus</a>
   </div>
 </article>
 

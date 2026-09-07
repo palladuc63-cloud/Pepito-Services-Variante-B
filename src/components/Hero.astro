@@ -1,5 +1,6 @@
 ---
 import { settings } from '../data/settings';
+const base = import.meta.env.BASE_URL;
 ---
 
 <section class="hero" aria-labelledby="hero-title">
@@ -9,8 +10,8 @@ import { settings } from '../data/settings';
       <p class="hero-baseline">{settings.baseline}</p>
       <p class="hero-description">{settings.description}</p>
       <div class="hero-actions">
-        <a href="/contact" class="btn btn-primary">Demander un chiffrage</a>
-        <a href="/realisations" class="btn btn-secondary">Voir nos réalisations</a>
+        <a href={`${base}contact/`} class="btn btn-primary">Demander un chiffrage</a>
+        <a href={`${base}realisations/`} class="btn btn-secondary">Voir nos réalisations</a>
       </div>
     </div>
   </div>

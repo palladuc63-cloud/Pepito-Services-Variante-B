@@ -14,6 +14,7 @@ import { articles } from '../data/articles';
 
 const featuredProjects = projects.slice(0, 3);
 const latestArticles = articles.slice(0, 3);
+const base = import.meta.env.BASE_URL;
 ---
 
 <MainLayout
@@ -63,7 +64,7 @@ const latestArticles = articles.slice(0, 3);
     </div>
 
     <div class="section-actions">
-      <a href="/realisations" class="btn btn-secondary">Voir toutes les réalisations</a>
+      <a href={`${base}realisations/`} class="btn btn-secondary">Voir toutes les réalisations</a>
     </div>
   </Section>
 
@@ -93,7 +94,7 @@ const latestArticles = articles.slice(0, 3);
     }
 
     <div class="section-actions">
-      <a href="/actualites" class="btn btn-secondary">Voir les actualités</a>
+      <a href={`${base}actualites/`} class="btn btn-secondary">Voir les actualités</a>
     </div>
   </Section>
 
@@ -109,7 +110,7 @@ const latestArticles = articles.slice(0, 3);
         Discutons-en ensemble. Demandez une estimation personnalisée pour votre
         clôture, palissade, portillon ou aménagement extérieur.
       </p>
-      <a href="/contact" class="btn btn-primary">Demander un chiffrage</a>
+      <a href={`${base}contact/`} class="btn btn-primary">Demander un chiffrage</a>
     </div>
   </Section>
 </MainLayout>
