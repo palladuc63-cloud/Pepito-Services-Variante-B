@@ -106,6 +106,10 @@ html {
   scroll-behavior: smooth;
 }
 
+body.mobile-menu-open {
+  overflow: hidden;
+}
+
 body {
   font-family: var(--font-body);
   font-size: var(--text-base);

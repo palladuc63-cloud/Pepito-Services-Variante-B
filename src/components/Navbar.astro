@@ -76,17 +76,32 @@ const base = import.meta.env.BASE_URL;
         }
       </ul>
 
-      <ul id="nav-menu" class="nav-menu--mobile absolute top-full left-0 right-0 hidden flex-col gap-2 p-4 bg-white border-b border-gray-200 list-none m-0 z-40" role="menubar">
-        {
-          settings.nav.map((link, index) => (
-            <NavItem
-              link={link}
-              currentPath={currentPath}
-              dropdownId={`nav-dropdown-mobile-${index}`}
-            />
-          ))
-        }
-      </ul>
+      <div id="nav-menu" class="nav-menu--mobile" role="dialog" aria-modal="true" aria-label="Menu principal" hidden>
+        <div class="nav-menu__panel">
+          <div class="nav-menu__header">
+            <span class="nav-menu__title">Menu</span>
+            <button type="button" class="nav-menu__close" aria-label="Fermer le menu">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <ul class="nav-menu__list" role="menubar">
+            {
+              settings.nav.map((link, index) => (
+                <NavItem
+                  link={link}
+                  currentPath={currentPath}
+                  dropdownId={`nav-dropdown-mobile-${index}`}
+                />
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <div class="nav-menu__backdrop" id="nav-menu-backdrop" aria-hidden="true" hidden></div>
     </nav>
   </div>
 
@@ -123,24 +138,53 @@ const base = import.meta.env.BASE_URL;
 <script>
   (function () {
     const toggle = document.querySelector('.nav-toggle') as HTMLButtonElement | null;
-    const menu = document.getElementById('nav-menu');
+    const menu = document.getElementById('nav-menu') as HTMLElement | null;
+    const backdrop = document.getElementById('nav-menu-backdrop') as HTMLElement | null;
+    const closeBtn = menu?.querySelector('.nav-menu__close') as HTMLButtonElement | null;
+
+    function openMenu() {
+      if (!toggle || !menu) return;
+      menu.hidden = false;
+      backdrop && (backdrop.hidden = false);
+      // Force reflow so the transition runs from the hidden state
+      void menu.offsetHeight;
+      backdrop && void backdrop.offsetHeight;
+      menu.classList.add('is-open');
+      backdrop?.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'Fermer le menu');
+      document.body.classList.add('mobile-menu-open');
+      closeBtn?.focus();
+    }
+
+    function closeMenu() {
+      if (!toggle || !menu) return;
+      menu.classList.remove('is-open');
+      backdrop?.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Ouvrir le menu');
+      document.body.classList.remove('mobile-menu-open');
+      setTimeout(() => {
+        if (!menu.classList.contains('is-open')) {
+          menu.hidden = true;
+          backdrop && (backdrop.hidden = true);
+        }
+      }, 300);
+      toggle.focus();
+    }
 
     if (toggle && menu) {
       toggle.addEventListener('click', () => {
         const expanded = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!expanded));
-        menu.classList.toggle('is-open');
-        toggle.setAttribute(
-          'aria-label',
-          expanded ? 'Ouvrir le menu' : 'Fermer le menu'
-        );
+        expanded ? closeMenu() : openMenu();
       });
+
+      closeBtn?.addEventListener('click', closeMenu);
+      backdrop?.addEventListener('click', closeMenu);
 
       menu.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', () => {
-          toggle.setAttribute('aria-expanded', 'false');
-          menu.classList.remove('is-open');
-          toggle.setAttribute('aria-label', 'Ouvrir le menu');
+          closeMenu();
         });
       });
     }
@@ -195,11 +239,8 @@ const base = import.meta.env.BASE_URL;
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
           closeMega();
-          if (toggle && menu?.classList.contains('is-open')) {
-            toggle.setAttribute('aria-expanded', 'false');
-            menu.classList.remove('is-open');
-            toggle.setAttribute('aria-label', 'Ouvrir le menu');
-            toggle.focus();
+          if (menu?.classList.contains('is-open')) {
+            closeMenu();
           }
         }
       });
@@ -260,44 +301,189 @@ const base = import.meta.env.BASE_URL;
     top: 6px;
   }
 
-  /* Mobile menu open state */
-  .nav-menu--mobile {
-    transform: translateY(-10px);
+  /* Hamburger -> X animation */
+  .nav-toggle[aria-expanded='true'] .hamburger {
+    background-color: transparent;
+  }
+
+  .nav-toggle[aria-expanded='true'] .hamburger::before {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .nav-toggle[aria-expanded='true'] .hamburger::after {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* Backdrop behind mobile menu */
+  .nav-menu__backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(21, 35, 43, 0.55);
     opacity: 0;
     visibility: hidden;
-    pointer-events: none;
-    transition: opacity 200ms ease, transform 200ms ease, visibility 200ms;
+    transition: opacity 300ms ease, visibility 300ms ease;
+    z-index: 40;
   }
 
-  .nav-menu--mobile.is-open {
-    display: flex !important;
-    transform: translateY(0);
+  .nav-menu__backdrop.is-open {
     opacity: 1;
     visibility: visible;
-    pointer-events: auto;
   }
 
-  /* Nav item with dropdown */
-  .nav-item.has-dropdown,
-  .nav-item[data-has-children="true"] {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
+  /* Mobile menu container */
+  .nav-menu--mobile {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: flex-end;
+    z-index: 50;
+    pointer-events: none;
   }
 
-  /* Mobile dropdown (inline) */
-  .dropdown-menu {
-    grid-column: 1 / -1;
+  .nav-menu--mobile[hidden] {
     display: none;
+  }
+
+  .nav-menu--mobile:not([hidden]) {
+    display: flex;
+  }
+
+  .nav-menu__panel {
+    width: min(100%, 20rem);
+    height: 100%;
+    background: linear-gradient(180deg, var(--color-secondary) 0%, var(--color-secondary-dark) 100%);
+    color: var(--color-warm-white);
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform 300ms ease, opacity 300ms ease;
+    pointer-events: auto;
+    overflow-y: auto;
+  }
+
+  .nav-menu--mobile.is-open .nav-menu__panel {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .nav-menu__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .nav-menu__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .nav-menu__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-warm-white);
+    border: none;
+    cursor: pointer;
+    transition: background-color 200ms ease;
+  }
+
+  .nav-menu__close:hover,
+  .nav-menu__close:focus {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .nav-menu__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    list-style: none;
     margin: 0;
+    padding: 0;
+  }
+
+  .nav-menu__list .nav-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-menu__list .nav-link {
+    display: block;
+    flex: 1 1 auto;
+    padding: 0.75rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-warm-white);
+    background-color: transparent;
+    border-radius: 0;
+  }
+
+  .nav-menu__list .nav-link:hover,
+  .nav-menu__list .nav-link:focus {
+    color: var(--color-sand);
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .nav-menu__list .nav-link[aria-current='page'] {
+    color: var(--color-primary-light);
+  }
+
+  .nav-menu__list .dropdown-toggle {
+    color: var(--color-warm-white);
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+  }
+
+  .nav-menu__list .dropdown-toggle:hover,
+  .nav-menu__list .dropdown-toggle:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-sand);
+  }
+
+  .nav-menu__list .dropdown-menu {
+    flex: 1 1 100%;
+    width: 100%;
+    display: none;
+    margin: 0.25rem 0 0.75rem;
     padding: 0.5rem;
     list-style: none;
-    background-color: #f7f8f5;
+    background-color: rgba(255, 255, 255, 0.08);
     border-radius: 0.5rem;
   }
 
-  .dropdown-menu.is-open {
+  .nav-menu__list .dropdown-menu.is-open {
     display: block;
+  }
+
+  .nav-menu__list .dropdown-link {
+    display: block;
+    padding: 0.5rem;
+    color: var(--color-warm-white);
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  .nav-menu__list .dropdown-link:hover,
+  .nav-menu__list .dropdown-link:focus {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: var(--color-sand);
+  }
+
+  .nav-menu__list :global(.dropdown-link img) {
+    display: none;
   }
 
   /* Chevron rotation when open */
@@ -332,7 +518,8 @@ const base = import.meta.env.BASE_URL;
       justify-content: flex-start;
     }
 
-    .nav-menu--mobile {
+    .nav-menu--mobile,
+    .nav-menu__backdrop {
       display: none !important;
     }
 
