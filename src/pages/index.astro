@@ -5,12 +5,10 @@ import ArrowDivider from '../components/ArrowDivider.astro';
 import Section from '../components/Section.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import EmptyState from '../components/EmptyState.astro';
 import ContentBadge from '../components/ContentBadge.astro';
 import { settings } from '../data/settings';
 import { services } from '../data/services';
 import { projects } from '../data/projects';
-import { articles } from '../data/articles';
 import coveringSide from '../assets/Covering1.png';
 import coveringFront from '../assets/Covering2.png';
 import enseigne from '../assets/Enseigne.jpeg';
@@ -45,7 +43,6 @@ const siteSignMockup = {
   image: pencarte,
   tags: ['Mockup'],
 };
-const latestArticles = articles.slice(0, 3);
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -57,8 +54,36 @@ const base = import.meta.env.BASE_URL;
   <HeroSlideshow />
 
   <ArrowDivider
-    background="var(--color-cream)"
+    background="var(--color-surface)"
     prolongement
+  />
+
+  <Section id="a-propos" class="section-alt">
+    <div class="section-header">
+      <h2 class="section-title">À propos de Pépito Services</h2>
+      <p class="section-subtitle">
+        Une entreprise artisanale au service de vos projets extérieurs.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        Pépito Services accompagne les particuliers dans la pose et la
+        fabrication de clôtures rigides, palissades, portillons et
+        aménagements extérieurs. L’équipe met son savoir-faire au service de
+        chantiers sur mesure, de la conception à la pose.
+      </p>
+      <p>
+        Chaque projet est mené avec rigueur et un souci du détail, en
+        privilégiant des solutions durables et esthétiques adaptées à votre
+        terrain.
+      </p>
+    </div>
+  </Section>
+
+  <ArrowDivider
+    fill="var(--color-surface)"
+    background="var(--color-cream)"
   />
 
   <Section id="services" class="section-cream">
@@ -108,36 +133,6 @@ const base = import.meta.env.BASE_URL;
 
   <ArrowDivider
     fill="var(--color-surface)"
-    background="var(--color-cream)"
-  />
-
-  <Section id="actualites" class="section-cream">
-    <div class="section-header">
-      <h2 class="section-title">Actualités</h2>
-      <p class="section-subtitle">
-        Retrouvez bientôt ici les nouvelles de Pépito Services et nos conseils
-        autour des clôtures et aménagements extérieurs.
-      </p>
-    </div>
-
-    {
-      latestArticles.length > 0 ? (
-        <div class="articles-grid"><!-- future ArticleCard mapping --></div>
-      ) : (
-        <EmptyState
-          title="Aucun article pour le moment"
-          message="Le blog sera alimenté une fois les premiers contenus validés avec l’entreprise. Les articles futurs pourront être créés via le back-office prévu."
-        />
-      )
-    }
-
-    <div class="section-actions">
-      <a href={`${base}actualites/`} class="btn btn-secondary">Voir les actualités</a>
-    </div>
-  </Section>
-
-  <ArrowDivider
-    fill="var(--color-cream)"
     background="var(--color-secondary)"
   />
 
@@ -208,6 +203,17 @@ const base = import.meta.env.BASE_URL;
   .cta-text {
     margin-bottom: var(--space-6);
     opacity: 0.95;
+  }
+
+  .prose {
+    max-width: 70ch;
+    margin-inline: auto;
+    color: var(--color-text);
+    line-height: var(--leading-relaxed);
+  }
+
+  .prose p + p {
+    margin-top: var(--space-4);
   }
 
 </style>
