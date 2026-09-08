@@ -13,6 +13,7 @@ import { projects } from '../data/projects';
 import { articles } from '../data/articles';
 import coveringSide from '../assets/Covering1.png';
 import coveringFront from '../assets/Covering2.png';
+import enseigne from '../assets/Enseigne.jpeg';
 
 const vehicleMockup = {
   ...projects[0],
@@ -23,7 +24,18 @@ const vehicleMockup = {
   image: coveringSide,
   tags: ['Mockup'],
 };
-const featuredProjects = projects.slice(0, 2);
+
+const signMockup = {
+  ...projects[1],
+  id: 'mockup-enseigne-pepito',
+  title: 'Enseigne Pépito Services',
+  summary: 'Proposition d’enseigne extérieure aux couleurs de Pépito Services.',
+  description: 'Mockup de présentation de l’enseigne de l’entreprise.',
+  image: enseigne,
+  tags: ['Mockup'],
+};
+
+const featuredProjects = projects.slice(0, 1);
 const latestArticles = articles.slice(0, 3);
 const base = import.meta.env.BASE_URL;
 ---
@@ -76,6 +88,7 @@ const base = import.meta.env.BASE_URL;
         secondaryImage={coveringFront}
         categoryLabel="Identité visuelle"
       />
+      <ProjectCard project={signMockup} categoryLabel="Identité visuelle" />
       {featuredProjects.map((project) => <ProjectCard project={project} />)}
     </div>
 
