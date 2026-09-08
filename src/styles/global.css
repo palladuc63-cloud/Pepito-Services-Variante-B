@@ -234,6 +234,34 @@ a:focus-visible {
   background-color: var(--color-surface);
 }
 
+.section-alt {
+  background-color: var(--color-surface);
+  border-block: 1px solid var(--color-border);
+}
+
+.section-cta {
+  background: linear-gradient(
+    135deg,
+    var(--color-secondary) 0%,
+    var(--color-secondary-dark) 100%
+  );
+  color: var(--color-warm-white);
+}
+
+.section-cta .section-title,
+.section-cta .cta-text {
+  color: var(--color-warm-white);
+}
+
+.section-cta .btn-primary {
+  background-color: var(--color-warm-white);
+  color: var(--color-secondary-dark);
+}
+
+.section-cta .btn-primary:hover {
+  background-color: var(--color-sand);
+}
+
 .section-title {
   font-size: var(--text-2xl);
   color: var(--color-heading);
