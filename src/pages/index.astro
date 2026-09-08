@@ -14,6 +14,7 @@ import { articles } from '../data/articles';
 import coveringSide from '../assets/Covering1.png';
 import coveringFront from '../assets/Covering2.png';
 import enseigne from '../assets/Enseigne.jpeg';
+import pencarte from '../assets/Pencarte.jpeg';
 
 const vehicleMockup = {
   ...projects[0],
@@ -35,7 +36,15 @@ const signMockup = {
   tags: ['Mockup'],
 };
 
-const featuredProjects = projects.slice(0, 1);
+const siteSignMockup = {
+  ...projects[2],
+  id: 'mockup-pencarte-pepito',
+  title: 'Pencarte de chantier Pépito Services',
+  summary: 'Panneau A4 Forex imprimé en direct posé sur un chantier de clôture.',
+  description: 'Mockup de présentation de la pencarte de chantier.',
+  image: pencarte,
+  tags: ['Mockup'],
+};
 const latestArticles = articles.slice(0, 3);
 const base = import.meta.env.BASE_URL;
 ---
@@ -89,7 +98,7 @@ const base = import.meta.env.BASE_URL;
         categoryLabel="Identité visuelle"
       />
       <ProjectCard project={signMockup} categoryLabel="Identité visuelle" />
-      {featuredProjects.map((project) => <ProjectCard project={project} />)}
+      <ProjectCard project={siteSignMockup} categoryLabel="Identité visuelle" />
     </div>
 
     <div class="section-actions">
