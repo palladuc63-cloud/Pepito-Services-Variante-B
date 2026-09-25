@@ -10,18 +10,13 @@ import { settings } from '../data/settings';
 import { services } from '../data/services';
 import { projects } from '../data/projects';
 import coveringSide from '../assets/Covering1.png';
-import coveringFront from '../assets/Covering2.png';
 import enseigne from '../assets/Enseigne.jpeg';
 import pencarte from '../assets/Pencarte.jpeg';
-import vehicleLogo1 from '../assets/mockup-vehicule-logo-1.webp';
-import vehicleLogo2 from '../assets/mockup-vehicule-logo-2.webp';
-import vehicleLogo3 from '../assets/mockup-vehicule-logo-3.webp';
-import signLogo1 from '../assets/mockup-enseigne-logo-1.webp';
-import signLogo2 from '../assets/mockup-enseigne-logo-2.webp';
-import signLogo3 from '../assets/mockup-enseigne-logo-3.webp';
-import siteSignLogo1 from '../assets/mockup-pencarte-logo-1.webp';
-import siteSignLogo2 from '../assets/mockup-pencarte-logo-2.webp';
-import siteSignLogo3 from '../assets/mockup-pencarte-logo-3.webp';
+import logoProposal1 from '../assets/logo-proposition-1.webp';
+import logoProposal2 from '../assets/logo-proposition-2.webp';
+import logoProposal3 from '../assets/logo-proposition-3.webp';
+
+const logoVariants = [logoProposal1, logoProposal2, logoProposal3];
 
 const vehicleMockup = {
   ...projects[0],
@@ -137,19 +132,18 @@ const base = import.meta.env.BASE_URL;
     <div class="projects-grid-preview">
       <ProjectCard
         project={vehicleMockup}
-        secondaryImage={coveringFront}
         categoryLabel="Identité visuelle"
-        logoVariants={[vehicleLogo1, vehicleLogo2, vehicleLogo3]}
+        logoVariants={logoVariants}
       />
       <ProjectCard
         project={signMockup}
         categoryLabel="Identité visuelle"
-        logoVariants={[signLogo1, signLogo2, signLogo3]}
+        logoVariants={logoVariants}
       />
       <ProjectCard
         project={siteSignMockup}
         categoryLabel="Identité visuelle"
-        logoVariants={[siteSignLogo1, siteSignLogo2, siteSignLogo3]}
+        logoVariants={logoVariants}
       />
     </div>
 
