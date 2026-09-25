@@ -1,9 +1,16 @@
 ---
 import { settings } from '../data/settings';
+import logoProposal1 from '../../Logo/Tests-Propositions/FLUX-2026-09-06-10-32-51.jpeg';
+import logoProposal2 from '../../Logo/Tests-Propositions/Nano Banana-2026-09-06-10-58-42.png';
+import logoProposal3 from '../../Logo/Tests-Propositions/PepitoLogo.jpeg';
 
 const currentPath = Astro.url.pathname;
 const base = import.meta.env.BASE_URL;
-const logoSrc = typeof settings.logo === 'string' ? settings.logo : settings.logo.src;
+const logoProposals = [
+  { label: 'Logo 1', src: logoProposal1.src },
+  { label: 'Logo 2', src: logoProposal2.src },
+  { label: 'Logo 3', src: logoProposal3.src },
+];
 
 const navLinks = settings.nav.map((link) => ({
   ...link,
@@ -17,16 +24,43 @@ const navLinks = settings.nav.map((link) => ({
 <header class="site-header sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200">
   <div class="container mx-auto px-4">
     <nav class="main-nav flex items-center justify-between min-h-20" aria-label="Navigation principale">
-      <a href={base} class="inline-flex items-center flex-shrink-0" aria-label={`Accueil ${settings.name}`}>
-        <img
-          src={logoSrc}
-          alt=""
-          width="140"
-          height="56"
-          class="w-auto object-contain"
-          style="height: 3.5rem;"
-        />
-      </a>
+      <div class="brand-area">
+        <a href={base} class="inline-flex items-center flex-shrink-0" aria-label={`Accueil ${settings.name}`}>
+          <img
+            src={logoProposals[0].src}
+            alt=""
+            width="140"
+            height="56"
+            class="site-logo w-auto object-contain"
+          />
+        </a>
+
+        <div class="logo-picker">
+          <button
+            type="button"
+            class="logo-picker__toggle"
+            aria-expanded="false"
+            aria-controls="logo-options"
+          >
+            Choisir le logo
+            <span aria-hidden="true">⌄</span>
+          </button>
+          <div id="logo-options" class="logo-picker__options" hidden>
+            {logoProposals.map((logo, index) => (
+              <button
+                type="button"
+                class="logo-picker__option"
+                data-logo-src={logo.src}
+                data-logo-index={index}
+                aria-label={`Afficher ${logo.label}`}
+              >
+                <img src={logo.src} alt="" width="80" height="48" />
+                <span>{logo.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <ul class="desktop-nav hidden md:flex items-center gap-2 list-none m-0 p-0" role="menubar">
         {
@@ -98,6 +132,56 @@ const navLinks = settings.nav.map((link) => ({
 
 <script>
   (function () {
+    const logoToggle = document.querySelector('.logo-picker__toggle') as HTMLButtonElement | null;
+    const logoOptions = document.getElementById('logo-options') as HTMLElement | null;
+    const logoButtons = document.querySelectorAll<HTMLButtonElement>('.logo-picker__option');
+    const siteLogos = () => document.querySelectorAll<HTMLImageElement>('.site-logo, [data-site-logo]');
+
+    function selectLogo(src: string, index: string) {
+      siteLogos().forEach((logo) => {
+        logo.src = src;
+      });
+      logoButtons.forEach((button) => {
+        button.setAttribute('aria-pressed', String(button.dataset.logoIndex === index));
+      });
+      localStorage.setItem('pepito-selected-logo', index);
+    }
+
+    const savedLogo = localStorage.getItem('pepito-selected-logo');
+    const savedButton = savedLogo
+      ? document.querySelector<HTMLButtonElement>(`.logo-picker__option[data-logo-index="${savedLogo}"]`)
+      : null;
+    if (savedButton?.dataset.logoSrc) {
+      selectLogo(savedButton.dataset.logoSrc, savedLogo!);
+    } else if (logoButtons[0]?.dataset.logoSrc) {
+      selectLogo(logoButtons[0].dataset.logoSrc, '0');
+    }
+
+    logoToggle?.addEventListener('click', () => {
+      if (!logoOptions) return;
+      const isOpen = !logoOptions.hidden;
+      logoOptions.hidden = isOpen;
+      logoToggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+
+    logoButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        if (button.dataset.logoSrc && button.dataset.logoIndex) {
+          selectLogo(button.dataset.logoSrc, button.dataset.logoIndex);
+        }
+        if (logoOptions) logoOptions.hidden = true;
+        logoToggle?.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      const target = event.target as Element;
+      if (!target.closest('.logo-picker') && logoOptions) {
+        logoOptions.hidden = true;
+        logoToggle?.setAttribute('aria-expanded', 'false');
+      }
+    });
+
     const toggle = document.querySelector('.mobile-menu-toggle') as HTMLButtonElement | null;
     const menu = document.getElementById('mobile-menu') as HTMLElement | null;
     if (!toggle || !menu) return;
@@ -141,6 +225,98 @@ const navLinks = settings.nav.map((link) => ({
 </script>
 
 <style>
+  .brand-area {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .site-logo {
+    width: 7.5rem;
+    height: 3.5rem;
+    object-fit: contain;
+  }
+
+  .logo-picker {
+    position: relative;
+  }
+
+  .logo-picker__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid #d6d3d1;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #44403c;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .logo-picker__options {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 60;
+    width: 13rem;
+    padding: 0.5rem;
+    border: 1px solid #e7e5e4;
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 12px 30px rgba(23, 39, 47, 0.18);
+  }
+
+  .logo-picker__options[hidden] {
+    display: none;
+  }
+
+  .logo-picker__option {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.45rem;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: #44403c;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .logo-picker__option:hover,
+  .logo-picker__option[aria-pressed='true'] {
+    border-color: #a7c5ad;
+    background: #f0f7f1;
+  }
+
+  .logo-picker__option img {
+    width: 5rem;
+    height: 3rem;
+    border-radius: 0.25rem;
+    background: #fff;
+    object-fit: contain;
+  }
+
+  @media (max-width: 420px) {
+    .brand-area {
+      gap: 0.4rem;
+    }
+
+    .site-logo {
+      width: 5.5rem;
+    }
+
+    .logo-picker__toggle {
+      max-width: 5.5rem;
+      line-height: 1.15;
+    }
+  }
+
   /* Hamburger icon */
   .hamburger {
     width: 1.25rem;
