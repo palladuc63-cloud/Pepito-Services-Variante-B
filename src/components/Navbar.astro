@@ -3,6 +3,7 @@ import { settings } from '../data/settings';
 import logoProposal1 from '../assets/logo-proposition-1.webp';
 import logoProposal2 from '../assets/logo-proposition-2.webp';
 import logoProposal3 from '../assets/logo-proposition-3.webp';
+import logoProposal4 from '../assets/logo-proposition-4.webp';
 
 const currentPath = Astro.url.pathname;
 const base = import.meta.env.BASE_URL;
@@ -10,6 +11,7 @@ const logoProposals = [
   { label: 'Logo 1', src: logoProposal1.src },
   { label: 'Logo 2', src: logoProposal2.src },
   { label: 'Logo 3', src: logoProposal3.src },
+  { label: 'Logo 4', src: logoProposal4.src },
 ];
 
 const navLinks = settings.nav.map((link) => ({
