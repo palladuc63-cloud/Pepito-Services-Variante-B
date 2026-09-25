@@ -8,21 +8,35 @@ export interface Props {
   project: Project;
   secondaryImage?: Project['image'];
   categoryLabel?: string;
+  logoVariants?: Project['image'][];
 }
 
-const { project, secondaryImage, categoryLabel: customCategoryLabel } = Astro.props;
+const { project, secondaryImage, categoryLabel: customCategoryLabel, logoVariants } = Astro.props;
 const categoryLabel = customCategoryLabel ??
   projectCategories.find((c) => c.id === project.category)?.label ?? project.category;
 ---
 
 <article class="card project-card" data-category={project.category}>
   <div class:list={['card-media', { 'card-media--mockup': secondaryImage }] }>
-    <Image
-      src={project.image}
-      alt={`Aperçu de la réalisation ${project.title}`}
-      widths={[400, 800]}
-      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-    />
+    {logoVariants ? (
+      <img
+        src={logoVariants[0].src}
+        alt={`Aperçu de la réalisation ${project.title}`}
+        class="logo-mockup"
+        data-logo-mockup
+        data-logo-0={logoVariants[0].src}
+        data-logo-1={logoVariants[1].src}
+        data-logo-2={logoVariants[2].src}
+        loading="lazy"
+      />
+    ) : (
+      <Image
+        src={project.image}
+        alt={`Aperçu de la réalisation ${project.title}`}
+        widths={[400, 800]}
+        sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+      />
+    )}
     {secondaryImage && (
       <div class="mockup-thumbnail">
         <Image
@@ -60,6 +74,13 @@ const categoryLabel = customCategoryLabel ??
 
   .card-media--mockup {
     position: relative;
+  }
+
+  .logo-mockup {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .mockup-thumbnail {

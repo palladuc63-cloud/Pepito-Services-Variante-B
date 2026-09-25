@@ -141,6 +141,10 @@ const navLinks = settings.nav.map((link) => ({
       siteLogos().forEach((logo) => {
         logo.src = src;
       });
+      document.querySelectorAll<HTMLImageElement>('[data-logo-mockup]').forEach((mockup) => {
+        const variant = mockup.getAttribute(`data-logo-${index}`);
+        if (variant) mockup.src = variant;
+      });
       logoButtons.forEach((button) => {
         button.setAttribute('aria-pressed', String(button.dataset.logoIndex === index));
       });
