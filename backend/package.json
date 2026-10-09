@@ -1,0 +1,33 @@
+{
+  "name": "pepito-backend",
+  "version": "1.0.0",
+  "description": "Backend Pépito Services — Express + Drizzle ORM + MariaDB",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "node src/scripts/seed.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.45.2",
+    "express": "^4.21.0",
+    "express-session": "^1.19.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.1",
+    "mysql2": "^3.11.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10"
+  }
+}

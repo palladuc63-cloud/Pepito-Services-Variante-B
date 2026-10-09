@@ -1,0 +1,65 @@
+# Stack production Pépito Services sur le VPS OVH.
+# Caddy (natif) expose pepito-services.fr → 127.0.0.1:8092 (frontend SSR)
+#   /api/* et /uploads/* → 127.0.0.1:8093 (backend Express)
+# Staging : pepito.agencepoint.fr → mêmes ports, derrière basic_auth Caddy.
+#
+# Usage : docker compose -p pepito \
+#           -f docker-compose.production.yml --env-file .env up -d --build
+#
+# - pepito-db      : MariaDB (tables créées par le seed au premier run)
+# - pepito-backend : Express/Drizzle sur :3002
+# - pepito-frontend: Astro SSR Node sur :4321
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: pepito-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - pepito_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [pepito]
+
+  backend:
+    build: ../backend
+    container_name: pepito-backend
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:8093:3002"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - pepito_storage:/app/storage
+    networks: [pepito]
+
+  frontend:
+    build: ../frontend
+    container_name: pepito-frontend
+    restart: unless-stopped
+    environment:
+      API_INTERNAL_URL: http://pepito-backend:3002
+      HOST: 0.0.0.0
+      PORT: 4321
+    ports:
+      - "127.0.0.1:8092:4321"
+    depends_on:
+      - backend
+    networks: [pepito]
+
+volumes:
+  pepito_db_data:
+  pepito_storage:
+
+networks:
+  pepito:

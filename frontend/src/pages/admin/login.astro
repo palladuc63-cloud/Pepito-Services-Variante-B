@@ -1,0 +1,61 @@
+---
+import '../../styles/admin.css';
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Connexion — Back-office Pépito Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  </head>
+  <body class="admin">
+    <div class="login-wrap">
+      <div class="card login-card">
+        <div class="logo">PÉPITO SERVICES</div>
+        <p class="sub">Espace administration</p>
+
+        <p id="login-error" class="alert alert-err" style="display:none" role="alert"></p>
+
+        <form id="login-form" novalidate>
+          <div class="form-row">
+            <label class="form-label" for="email">Email</label>
+            <input id="email" name="email" type="email" required autocomplete="email" class="form-input" />
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="password">Mot de passe</label>
+            <input id="password" name="password" type="password" required minlength="8" autocomplete="current-password" class="form-input" />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px">
+            Se connecter
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script>
+  // @ts-nocheck — DOM vanilla, le typage strict ajoute du bruit sans valeur ici.
+  import { auth, ApiError } from '../../lib/adminApi.js';
+
+  const form = document.getElementById('login-form');
+  const errorEl = document.getElementById('login-error');
+
+  auth.me().then(() => { window.location.href = '/admin/dashboard'; }).catch(() => {});
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(form).entries());
+    errorEl.style.display = 'none';
+    try {
+      await auth.login(data.email, data.password);
+      window.location.href = '/admin/dashboard';
+    } catch (err) {
+      errorEl.textContent = err instanceof ApiError ? err.message : 'Connexion impossible.';
+      errorEl.style.display = 'block';
+    }
+  });
+</script>

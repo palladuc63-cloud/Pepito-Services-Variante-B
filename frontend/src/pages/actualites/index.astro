@@ -1,0 +1,56 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import Section from '../../components/Section.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { getArticles } from '../../lib/api.js';
+import type { Article } from '../../data/types';
+
+const articles = await getArticles();
+---
+
+<MainLayout
+  title="Actualités"
+  description="Les actualités et conseils de Pépito Services autour des clôtures, palissades, portails et aménagements extérieurs."
+  canonicalPath="/actualites"
+>
+  <Section>
+    <div class="page-header">
+      <h1 class="section-title">Actualités</h1>
+      <p class="section-subtitle">
+        Actualités, conseils et inspirations de Pépito Services.
+      </p>
+    </div>
+
+    {
+      articles.length > 0 ? (
+        <div class="articles-grid">
+          {articles.map((article: Article) => <ArticleCard article={article} />)}
+        </div>
+      ) : (
+        <EmptyState
+          title="Aucun article pour le moment"
+          message="Les premiers articles seront publiés prochainement."
+        />
+      )
+    }
+  </Section>
+</MainLayout>
+
+<style>
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 768px) {
+    .articles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

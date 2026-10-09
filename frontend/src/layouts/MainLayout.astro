@@ -1,0 +1,47 @@
+---
+import '../styles/global.css';
+import SeoHead from '../components/SeoHead.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import { getSite } from '../lib/site.js';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonicalPath?: string;
+  noIndex?: boolean;
+}
+
+const { title, description, image, canonicalPath, noIndex } = Astro.props;
+const { settings } = await getSite();
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <SeoHead
+      settings={settings}
+      title={title}
+      description={description}
+      image={image}
+      canonicalPath={canonicalPath}
+      noIndex={noIndex}
+    />
+    <script
+      is:inline
+      src="https://app.agencepoint.fr/janus.js"
+      data-org="pepito-services"
+      data-color="#16a34a"
+      async
+    ></script>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    <Navbar settings={settings} />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer settings={settings} />
+  </body>
+</html>

@@ -1,0 +1,79 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getArticle } from '../../lib/api.js';
+
+const article = await getArticle(Astro.params.slug ?? '');
+if (!article) {
+  return new Response(null, { status: 404, statusText: 'Article introuvable' });
+}
+const base = import.meta.env.BASE_URL;
+const articleImage = article.imageUrl
+  ? (article.imageUrl.startsWith('http') ? article.imageUrl : `https://pepito-services.fr${article.imageUrl}`)
+  : undefined;
+---
+
+<MainLayout
+  title={article.title}
+  description={article.summary ?? undefined}
+  image={articleImage}
+  canonicalPath={`/actualites/${article.slug}`}
+>
+  <article class="section">
+    <div class="container article-container">
+      <header class="article-header">
+        <h1 class="section-title">{article.title}</h1>
+        <time datetime={article.publishedAt ?? article.createdAt} class="article-date">
+          {
+            new Date(article.publishedAt ?? article.createdAt).toLocaleDateString('fr-FR', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          }
+        </time>
+      </header>
+
+      {article.imageUrl && (
+        <img src={article.imageUrl} alt={`Illustration de l’article ${article.title}`} class="article-image" />
+      )}
+
+      <div class="article-content" set:html={article.content ?? ''} />
+
+      <footer class="article-footer">
+        <a href={`${base}actualites/`} class="btn btn-secondary">← Retour aux actualités</a>
+      </footer>
+    </div>
+  </article>
+</MainLayout>
+
+<style>
+  .article-container {
+    max-width: 70ch;
+  }
+
+  .article-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .article-date {
+    display: block;
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+  }
+
+  .article-image {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-8);
+  }
+
+  .article-content {
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-10);
+  }
+
+  .article-footer {
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+</style>
