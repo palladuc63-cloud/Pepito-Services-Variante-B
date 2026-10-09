@@ -1,6 +1,6 @@
 # Stack production Pépito Services sur le VPS OVH.
-# Caddy (natif) expose pepito-services.fr → 127.0.0.1:8092 (frontend SSR)
-#   /api/* et /uploads/* → 127.0.0.1:8093 (backend Express)
+# Caddy (natif) expose pepito-services.fr → 127.0.0.1:8094 (frontend SSR)
+#   /api/* et /uploads/* → 127.0.0.1:8095 (backend Express)
 # Staging : pepito.agencepoint.fr → mêmes ports, derrière basic_auth Caddy.
 #
 # Usage : docker compose -p pepito \
@@ -35,7 +35,7 @@ services:
     restart: unless-stopped
     env_file: .env
     ports:
-      - "127.0.0.1:8093:3002"
+      - "127.0.0.1:8095:3002"
     depends_on:
       db:
         condition: service_healthy
@@ -52,7 +52,7 @@ services:
       HOST: 0.0.0.0
       PORT: 4321
     ports:
-      - "127.0.0.1:8092:4321"
+      - "127.0.0.1:8094:4321"
     depends_on:
       - backend
     networks: [pepito]
