@@ -6,6 +6,7 @@ import {
 import { slugify } from '../utils/slug.js';
 import { buildPostContent, postLink } from '../utils/social.js';
 import { notify } from '../utils/notify.js';
+import { sanitizeRichHtml } from '../utils/sanitize.js';
 
 // ─── Helpers ────────────────────────────────────────────────
 async function uniqueSlug(table, base, excludeId) {
@@ -116,7 +117,8 @@ export async function createProject(req, res) {
   if (!title) return res.status(400).json({ error: 'Titre requis' });
   const slug = await uniqueSlug(projects, title);
   const [r] = await db.insert(projects).values({
-    slug, title, categoryId: categoryId || null, summary, description, imageUrl,
+    slug, title, categoryId: categoryId || null, summary,
+    description: sanitizeRichHtml(description), imageUrl,
     tags: Array.isArray(tags) ? tags : [], published: published !== false, sortOrder,
   }).$returningId();
   if (published !== false) {
@@ -134,7 +136,7 @@ export async function updateProject(req, res) {
     ...(title !== undefined && { title }),
     ...(categoryId !== undefined && { categoryId: categoryId || null }),
     ...(summary !== undefined && { summary }),
-    ...(description !== undefined && { description }),
+    ...(description !== undefined && { description: sanitizeRichHtml(description) }),
     ...(imageUrl !== undefined && { imageUrl }),
     ...(tags !== undefined && { tags: Array.isArray(tags) ? tags : [] }),
     ...(published !== undefined && { published }),
@@ -162,7 +164,7 @@ export async function createArticle(req, res) {
   if (!title) return res.status(400).json({ error: 'Titre requis' });
   const slug = await uniqueSlug(articles, title);
   const [r] = await db.insert(articles).values({
-    slug, title, summary, content, imageUrl, published,
+    slug, title, summary, content: sanitizeRichHtml(content), imageUrl, published,
     publishedAt: published ? new Date() : null,
   }).$returningId();
   if (published) queueSocialPost('article', { id: r.id, slug, title, summary, imageUrl });
@@ -177,7 +179,7 @@ export async function updateArticle(req, res) {
   await db.update(articles).set({
     ...(title !== undefined && { title }),
     ...(summary !== undefined && { summary }),
-    ...(content !== undefined && { content }),
+    ...(content !== undefined && { content: sanitizeRichHtml(content) }),
     ...(imageUrl !== undefined && { imageUrl }),
     ...(published !== undefined && { published }),
     ...(publishNow && { publishedAt: new Date() }),

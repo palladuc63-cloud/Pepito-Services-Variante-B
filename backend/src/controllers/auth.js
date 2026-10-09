@@ -23,7 +23,6 @@ export async function login(req, res) {
 
     const payload = { id: user.id, email: user.email, role: user.role };
     setAuthCookie(res, signToken(payload));
-    req.session.userId = user.id;
 
     res.json({ id: user.id, email: user.email, role: user.role });
   } catch (err) {
@@ -34,7 +33,6 @@ export async function login(req, res) {
 
 export function logout(req, res) {
   clearAuthCookie(res);
-  req.session?.destroy(() => {});
   res.json({ status: 'ok' });
 }
 

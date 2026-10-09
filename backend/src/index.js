@@ -3,7 +3,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import session from 'express-session';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import authRouter from './routes/auth.js';
@@ -14,45 +13,37 @@ import uploadRouter from './routes/upload.js';
 const app = express();
 const PORT = process.env.PORT || 3002;
 
-if (!process.env.SESSION_SECRET || !process.env.JWT_SECRET) {
-  console.error('SESSION_SECRET et JWT_SECRET doivent être définis dans .env');
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET doit être défini dans .env');
   process.exit(1);
 }
 
+// Le backend n'est joignable que via Caddy (ports bind 127.0.0.1) →
+// X-Forwarded-For est fiable pour le rate limiting par IP réelle.
+app.set('trust proxy', 1);
+
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
-const allowedOrigins = [
+const allowedOrigins = new Set([
   process.env.FRONTEND_URL,
   'https://pepito-services.fr',
   'https://www.pepito-services.fr',
   'https://pepito.agencepoint.fr',
   'http://localhost:4321',
-].filter(Boolean);
+].filter(Boolean));
 
+// Whitelist stricte : les requêtes cross-origin non listées n'ont ni en-têtes
+// CORS ni cookie exploitable (les GET same-origin sans Origin passent toujours).
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.some((o) => origin.startsWith(o))) {
-      callback(null, true);
-    } else {
-      callback(null, true); // même politique permissive que les autres sites pour l'instant
-    }
+    if (!origin || allowedOrigins.has(origin)) return callback(null, true);
+    return callback(null, false);
   },
   credentials: true,
 }));
 
 app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 2 * 60 * 60 * 1000,
-  },
-}));
 
 // Uploads (images administrées via le back-office)
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
