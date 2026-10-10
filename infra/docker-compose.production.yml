@@ -24,7 +24,7 @@ services:
       - pepito_db_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 10s
+      interval: 60s
       timeout: 5s
       retries: 12
     networks: [pepito]
