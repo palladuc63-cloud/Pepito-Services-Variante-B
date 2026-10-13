@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import './tokens.css';
 
 /* ───────────────────────────────────────────────────────────────
    Pépito Services — Variant B design system
@@ -7,42 +8,41 @@
 
 /* ─── CSS variables ─── */
 :root {
-  /* Variant B palette */
-  --color-cream: #f7f8f5;
+  /* Aliases historiques → tokens canoniques (voir tokens.css) */
+  --color-cream: var(--paper);
   --color-warm-white: #ffffff;
-  --color-sand: #e9ede8;
-  --color-taupe: #65747c;
-  --color-earth: #243641;
+  --color-sand: #e9ede8;      /* local : surface douce */
+  --color-taupe: var(--stone-light);
+  --color-earth: var(--basalt);
 
-  --color-primary: #2e7d4f;
-  --color-primary-dark: #205f3a;
-  --color-primary-light: #dcece2;
+  --color-primary: var(--signal);
+  --color-primary-dark: var(--signal-dark);
+  --color-primary-light: var(--signal-soft);
 
-  --color-secondary: #243641;
-  --color-secondary-dark: #17272f;
-  --color-secondary-light: #dfe5e8;
-  --color-accent: #c66a3d;
+  --color-secondary: var(--basalt);
+  --color-secondary-dark: var(--basalt-dark);
+  --color-secondary-light: #dfe5e8; /* local */
+  --color-accent: #c66a3d;   /* local : terracotta, accent secondaire */
 
-  --color-text: #33464f;
-  --color-text-muted: #63747c;
-  --color-heading: #243641;
+  --color-text: var(--ink);
+  --color-text-muted: var(--stone);
+  --color-heading: var(--basalt);
 
   --color-surface: #ffffff;
-  --color-surface-soft: #f7f8f5;
-  --color-border: #dbe2df;
+  --color-surface-soft: var(--paper);
+  --color-border: var(--line);
 
   /* Validation / info badge */
   --color-info-bg: #eef6fc;
   --color-info-text: #205b7a;
 
   /* Status */
-  --color-success-bg: #e9f5ec;
-  --color-success-text: #2a5c38;
+  --color-success-bg: var(--ok-soft);
+  --color-success-text: var(--ok);
 
   /* Typography */
-  --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, sans-serif;
-  --font-heading: var(--font-body);
+  --font-body: var(--font-body);
+  --font-heading: var(--font-display);
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;

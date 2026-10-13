@@ -1,0 +1,37 @@
+/* ───────────────────────────────────────────────────────────────
+   Pépito Services Variante B — design tokens (grammaire canonique)
+   Voir docs/DESIGN-SYSTEM.md. Palette moderne froide :
+   vert en accent, ardoise en surface sombre, terracotta en
+   accent secondaire (local).
+   ─────────────────────────────────────────────────────────────── */
+:root {
+  /* Surfaces */
+  --paper: #f7f8f5;
+  --basalt: #243641;         /* surface sombre (ardoise) */
+  --basalt-dark: #17272f;
+
+  /* Texte */
+  --ink: #33464f;
+  --stone: #63747c;
+  --stone-light: #65747c;    /* taupe */
+  --line: #dbe2df;
+
+  /* Accent — vert */
+  --signal: #2e7d4f;
+  --signal-dark: #205f3a;
+  --signal-light: #5aa877;
+  --signal-soft: #dcece2;
+
+  /* Statuts */
+  --ok: #2a5c38;
+  --ok-soft: #e9f5ec;
+  --warn: #d97706;
+  --warn-soft: #fdf3e3;
+  --danger: #dc2626;
+  --danger-soft: #fdecea;
+
+  /* Forme & typo */
+  --radius: 0.4rem;
+  --font-display: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: var(--font-display);
+}
