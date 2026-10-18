@@ -5,28 +5,15 @@ import ContentBadge from './ContentBadge.astro';
 export interface Props {
   project: Project;
   categoryLabel?: string;
-  logoVariants?: string[];
 }
 
-const { project, categoryLabel: customCategoryLabel, logoVariants } = Astro.props;
+const { project, categoryLabel: customCategoryLabel } = Astro.props;
 const categoryLabel = customCategoryLabel ?? project.category?.label ?? 'Réalisation';
 ---
 
 <article class="card project-card" data-category={project.category?.slug ?? ''} id={project.slug}>
-  <div class:list={['card-media', { 'card-media--logo': logoVariants }] }>
-    {logoVariants ? (
-      <img
-        src={logoVariants[0]}
-        alt={`Aperçu de la réalisation ${project.title}`}
-        class="logo-mockup"
-        data-logo-mockup
-        data-logo-0={logoVariants[0]}
-        data-logo-1={logoVariants[1]}
-        data-logo-2={logoVariants[2]}
-        data-logo-3={logoVariants[3]}
-        loading="lazy"
-      />
-    ) : project.imageUrl ? (
+  <div class="card-media">
+    {project.imageUrl ? (
       <img
         src={project.imageUrl}
         alt={`Aperçu de la réalisation ${project.title}`}
@@ -55,44 +42,6 @@ const categoryLabel = customCategoryLabel ?? project.category?.label ?? 'Réalis
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-  }
-
-  .card-media--mockup {
-    position: relative;
-  }
-
-  .card-media--logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    aspect-ratio: 4 / 3;
-    padding: clamp(1.5rem, 4vw, 3rem);
-    background: var(--color-surface);
-  }
-
-  .logo-mockup {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
-  .mockup-thumbnail {
-    position: absolute;
-    right: 0.75rem;
-    bottom: 0.75rem;
-    width: 30%;
-    aspect-ratio: 1;
-    overflow: hidden;
-    border: 3px solid var(--color-surface);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .mockup-thumbnail :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
   }
 
   .project-category {
