@@ -4,9 +4,11 @@ import ContentBadge from './ContentBadge.astro';
 
 export interface Props {
   service: Service;
+  index?: number;
 }
 
-const { service } = Astro.props;
+const { service, index } = Astro.props;
+const number = index === undefined ? null : String(index + 1).padStart(2, '0');
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -21,6 +23,7 @@ const base = import.meta.env.BASE_URL;
     )}
   </div>
   <div class="card-body">
+    {number && <span class="service-number" aria-hidden="true">N° {number}</span>}
     <h3 class="card-title">{service.title}</h3>
     <p class="card-text">{service.summary}</p>
     {service.provisional && (
@@ -45,6 +48,18 @@ const base = import.meta.env.BASE_URL;
     flex-grow: 1;
   }
 
+  .service-number {
+    display: var(--deco);
+    margin-bottom: var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--copper-dark);
+  }
+
   .service-badge {
     margin-top: auto;
     padding-top: var(--space-4);
@@ -53,11 +68,13 @@ const base = import.meta.env.BASE_URL;
   .service-link {
     margin-top: var(--space-4);
     font-weight: 600;
-    color: var(--color-primary);
+    color: var(--forest);
     text-decoration: none;
+    border-bottom: 2px solid var(--copper);
+    align-self: flex-start;
   }
 
   .service-link:hover {
-    text-decoration: underline;
+    color: var(--copper-dark);
   }
 </style>

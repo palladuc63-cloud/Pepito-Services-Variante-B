@@ -1,0 +1,103 @@
+---
+const themes = [
+  { id: 'nature', label: 'Nature' },
+  { id: 'artisan', label: 'Artisan' },
+  { id: 'bento', label: 'Bento' },
+  { id: 'editorial', label: 'Éditorial' },
+  { id: 'blason', label: 'Blason' },
+];
+---
+
+<div class="theme-switcher" role="group" aria-label="Choisir le thème du site">
+  <span class="theme-switcher__title">Thème</span>
+  {
+    themes.map((theme) => (
+      <button type="button" class="theme-switcher__btn" data-theme-id={theme.id} aria-pressed="false">
+        {theme.label}
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  (function () {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.theme-switcher__btn');
+
+    function apply(theme: string) {
+      document.documentElement.dataset.theme = theme;
+      buttons.forEach((btn) => btn.setAttribute('aria-pressed', String(btn.dataset.themeId === theme)));
+      try {
+        localStorage.setItem('pepito-theme', theme);
+      } catch (e) {}
+    }
+
+    apply(document.documentElement.dataset.theme || 'nature');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (btn.dataset.themeId) apply(btn.dataset.themeId);
+      });
+    });
+  })();
+</script>
+
+<style>
+  .theme-switcher {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.3rem 0.4rem 0.3rem 0.8rem;
+    background: var(--panel, #fff);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    box-shadow: var(--shadow-md);
+    font-size: var(--text-xs);
+  }
+
+  .theme-switcher__title {
+    margin-right: 0.25rem;
+    font-weight: 700;
+    color: var(--stone);
+  }
+
+  .theme-switcher__btn {
+    padding: 0.3rem 0.8rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .theme-switcher__btn[aria-pressed='true'] {
+    background: var(--cta);
+    color: var(--cta-text, #fff);
+  }
+
+  @media (max-width: 480px) {
+    .theme-switcher {
+      left: 0.5rem;
+      bottom: 0.75rem;
+      padding: 0.25rem;
+      gap: 0;
+    }
+
+    .theme-switcher__title {
+      display: none;
+    }
+
+    .theme-switcher__btn {
+      padding: 0.3rem 0.55rem;
+      font-size: 0.7rem;
+    }
+  }
+
+  .theme-switcher__btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+</style>

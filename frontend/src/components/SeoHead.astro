@@ -1,4 +1,5 @@
 ---
+import { Font } from 'astro:assets';
 import type { SiteSettings } from '../data/types';
 
 export interface Props {
@@ -46,9 +47,7 @@ const canonicalUrl = canonicalPath
 <meta name="twitter:description" content={description} />
 {image && <meta name="twitter:image" content={image} />}
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-  rel="stylesheet"
-/>
+<Font cssVariable="--font-bricolage" preload />
+<Font cssVariable="--font-fraunces" />
+<Font cssVariable="--font-barlow" />
+<Font cssVariable="--font-inter" preload />

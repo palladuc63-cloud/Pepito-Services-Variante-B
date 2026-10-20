@@ -6,7 +6,7 @@ import Section from '../components/Section.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ContentBadge from '../components/ContentBadge.astro';
-import logo from '../assets/pepito-logo.png';
+import logo from '../assets/pepito-logo.svg';
 import { getSite } from '../lib/site.js';
 import { getProjects } from '../lib/api.js';
 import type { Project, Service } from '../data/types';
@@ -66,7 +66,7 @@ const base = import.meta.env.BASE_URL;
     </div>
 
     <div class="services-grid">
-      {services.map((service: Service) => <ServiceCard service={service} />)}
+      {services.map((service: Service, i: number) => <ServiceCard service={service} index={i} />)}
     </div>
   </Section>
 

@@ -1,0 +1,596 @@
+/* ───────────────────────────────────────────────────────────────
+   Style « Bento » : mise en page en tuiles, navigation repensée.
+   Même HTML que les autres thèmes ; tout est restructuré en CSS.
+   Préfixe :root[data-theme='bento'] (spécificité ≥ 0,3,0) pour
+   passer devant les styles scopés des composants Astro.
+   ─────────────────────────────────────────────────────────────── */
+
+/* ═══ Navigation ═══ */
+
+/* Mobile / tablette : barre du haut compacte + barre d'onglets en bas */
+:root[data-theme='bento'] .site-header {
+  background: color-mix(in srgb, var(--paper) 96%, transparent);
+  border: 0;
+  /* Un backdrop-filter servirait de bloc conteneur aux éléments fixes (barre d'onglets) */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+:root[data-theme='bento'] .main-nav {
+  min-height: 4rem;
+  padding-top: 0.5rem;
+}
+
+:root[data-theme='bento'] .site-logo {
+  width: 8rem;
+  height: 3.25rem;
+}
+
+:root[data-theme='bento'] .mobile-menu-toggle,
+:root[data-theme='bento'] #mobile-menu {
+  display: none;
+}
+
+:root[data-theme='bento'] .main-nav {
+  flex-wrap: wrap;
+  column-gap: 1rem;
+}
+
+:root[data-theme='bento'] .desktop-nav {
+  display: flex;
+  order: 3;
+  width: 100%;
+  gap: 0.4rem;
+  padding: 0 0 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+:root[data-theme='bento'] .desktop-nav::-webkit-scrollbar {
+  display: none;
+}
+
+:root[data-theme='bento'] .desktop-nav > li {
+  flex: none;
+}
+
+:root[data-theme='bento'] .desktop-nav .nav-link {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  letter-spacing: 0;
+  white-space: nowrap;
+  color: var(--ink);
+  background: var(--panel);
+}
+
+:root[data-theme='bento'] .desktop-nav .nav-link:hover {
+  background: var(--forest-soft);
+  color: var(--forest-dark);
+}
+
+:root[data-theme='bento'] .desktop-nav .nav-link[aria-current='page'] {
+  background: var(--basalt);
+  color: var(--on-dark);
+}
+
+/* Desktop : barre latérale fixe en tuile */
+@media (min-width: 1024px) {
+  :root[data-theme='bento'] body {
+    display: grid;
+    grid-template-columns: 15.5rem minmax(0, 1fr);
+    align-items: start;
+    padding-bottom: 0;
+  }
+
+  :root[data-theme='bento'] .site-header {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    padding: 1rem;
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  :root[data-theme='bento'] .site-header > .container {
+    height: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 1.5rem 1rem;
+    background: var(--panel);
+    border-radius: var(--r-card);
+  }
+
+  :root[data-theme='bento'] .main-nav {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 2rem;
+    height: 100%;
+  }
+
+  :root[data-theme='bento'] .brand-area,
+  :root[data-theme='bento'] .brand-area > a {
+    display: block;
+    width: 100%;
+  }
+
+  :root[data-theme='bento'] .site-logo {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+
+  :root[data-theme='bento'] .desktop-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+    padding: 0;
+    overflow: visible;
+  }
+
+  :root[data-theme='bento'] .desktop-nav .nav-link {
+    justify-content: flex-start;
+    padding: 0.8rem 1rem;
+    border-radius: 0.9rem;
+    font-size: 0.95rem;
+    white-space: normal;
+    color: var(--ink);
+    background: transparent;
+  }
+
+  :root[data-theme='bento'] .desktop-nav .nav-link:hover {
+    background: var(--paper);
+    color: var(--forest-dark);
+  }
+
+  :root[data-theme='bento'] .desktop-nav .nav-link[aria-current='page'] {
+    background: var(--basalt);
+    color: var(--on-dark);
+  }
+
+  :root[data-theme='bento'] main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  :root[data-theme='bento'] .site-footer {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  :root[data-theme='bento'] .theme-switcher {
+    left: 16.5rem;
+  }
+}
+
+/* ═══ Grille principale ═══ */
+
+:root[data-theme='bento'] main {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--tile-gap);
+  align-content: start;
+  padding: 0.75rem;
+}
+
+:root[data-theme='bento'] main > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  :root[data-theme='bento'] {
+    --tile-gap: 1rem;
+  }
+
+  :root[data-theme='bento'] main {
+    padding: 1rem 1rem 1rem 0;
+  }
+}
+
+:root[data-theme='bento'] main .section {
+  padding: 0;
+  background: none;
+}
+
+:root[data-theme='bento'] main .section > .container {
+  max-width: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--tile-gap);
+}
+
+/* Tuiles génériques */
+:root[data-theme='bento'] #a-propos,
+:root[data-theme='bento'] main .section.section-cta,
+:root[data-theme='bento'] .page-header,
+:root[data-theme='bento'] main .section > .container > .prose,
+:root[data-theme='bento'] .legal-section,
+:root[data-theme='bento'] .contact-info,
+:root[data-theme='bento'] .contact-form,
+:root[data-theme='bento'] .filter-bar,
+:root[data-theme='bento'] .filter-empty,
+:root[data-theme='bento'] .empty-state,
+:root[data-theme='bento'] .article-header,
+:root[data-theme='bento'] .article-content,
+:root[data-theme='bento'] .article-footer,
+:root[data-theme='bento'] #services .section-header,
+:root[data-theme='bento'] #realisations .section-header,
+:root[data-theme='bento'] .section-actions {
+  margin: 0;
+  max-width: none;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  background: var(--panel);
+  border: 0;
+  border-radius: var(--r-card);
+  box-shadow: none;
+}
+
+:root[data-theme='bento'] .section-title {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+:root[data-theme='bento'] .section-subtitle {
+  margin-bottom: 0;
+}
+
+/* Cartes */
+:root[data-theme='bento'] .card {
+  border: 0;
+  border-radius: var(--r-card);
+  box-shadow: none;
+}
+
+:root[data-theme='bento'] .card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+:root[data-theme='bento'] .card-body {
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+/* ═══ Accueil ═══ */
+
+/* Hero : grande tuile photo, texte en bas à gauche */
+:root[data-theme='bento'] .hero-slideshow {
+  min-height: 30rem;
+  padding-top: 0;
+  align-items: flex-end;
+}
+
+:root[data-theme='bento'] .slideshow-overlay {
+  background: linear-gradient(to top, rgb(var(--hero-rgb) / 0.92) 0%, rgb(var(--hero-rgb) / 0.45) 55%, rgb(var(--hero-rgb) / 0.1) 100%);
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+:root[data-theme='bento'] .hero-content {
+  max-width: 40rem;
+  margin: 0;
+  padding: 2rem clamp(1.5rem, 3vw, 2.5rem) 2.5rem;
+}
+
+:root[data-theme='bento'] .hero-title {
+  font-size: clamp(2.25rem, 4.2vw, 3.5rem);
+  font-weight: 800;
+}
+
+:root[data-theme='bento'] .hero-baseline {
+  border: 0;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.14);
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  color: var(--on-dark);
+}
+
+:root[data-theme='bento'] .hero-description {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 639px) {
+  :root[data-theme='bento'] .slide-control {
+    display: none;
+  }
+
+  :root[data-theme='bento'] .hero-content {
+    padding-top: 4.25rem;
+  }
+}
+
+:root[data-theme='bento'] .slide-control {
+  top: 1.25rem;
+  transform: none;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+:root[data-theme='bento'] .slide-control--prev {
+  left: auto;
+  right: 4.25rem;
+}
+
+:root[data-theme='bento'] .slide-control--next {
+  right: 1.25rem;
+}
+
+:root[data-theme='bento'] .slide-dots {
+  top: 2.1rem;
+  bottom: auto;
+  left: 1.5rem;
+  transform: none;
+}
+
+/* À propos */
+:root[data-theme='bento'] #a-propos > .container {
+  gap: 1rem;
+}
+
+:root[data-theme='bento'] #a-propos .section-header {
+  margin: 0;
+}
+
+:root[data-theme='bento'] #a-propos .about-content {
+  max-width: none;
+  margin: 0;
+  gap: 1.25rem;
+}
+
+:root[data-theme='bento'] #a-propos .prose {
+  max-width: none;
+  margin: 0;
+}
+
+/* Services & réalisations : en-tête et cartes deviennent des tuiles d'une même grille */
+:root[data-theme='bento'] .services-grid,
+:root[data-theme='bento'] .projects-grid-preview {
+  display: contents;
+}
+
+:root[data-theme='bento'] #services .section-header {
+  background: var(--basalt);
+  color: var(--on-dark);
+}
+
+:root[data-theme='bento'] #services .section-header .section-title {
+  color: var(--on-dark);
+}
+
+:root[data-theme='bento'] #services .section-header .section-subtitle {
+  color: rgb(244 242 236 / 0.8);
+  margin-bottom: 1rem;
+}
+
+:root[data-theme='bento'] #realisations .section-header {
+  background: var(--forest-soft);
+}
+
+:root[data-theme='bento'] .section-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--copper-soft);
+}
+
+/* Bandeau contact */
+:root[data-theme='bento'] main .section.section-cta {
+  background: var(--basalt);
+}
+
+:root[data-theme='bento'] .cta-box {
+  max-width: none;
+  margin: 0;
+  text-align: left;
+}
+
+:root[data-theme='bento'] .section-cta .section-title {
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  :root[data-theme='bento'] #services > .container,
+  :root[data-theme='bento'] #realisations > .container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :root[data-theme='bento'] #realisations .section-header,
+  :root[data-theme='bento'] #realisations .project-card:first-child,
+  :root[data-theme='bento'] #realisations .section-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 768px) {
+  :root[data-theme='bento'] .cta-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 2rem;
+  }
+
+  :root[data-theme='bento'] .cta-box .btn {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  :root[data-theme='bento'] .cta-text {
+    margin: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root[data-theme='bento'] .hero-slideshow {
+    grid-column: span 8;
+    min-height: 36rem;
+  }
+
+  :root[data-theme='bento'] #a-propos {
+    grid-column: span 4;
+  }
+
+  :root[data-theme='bento'] #a-propos .about-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  :root[data-theme='bento'] #a-propos .about-logo {
+    max-width: 220px;
+  }
+
+  :root[data-theme='bento'] #services > .container,
+  :root[data-theme='bento'] #realisations > .container {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  :root[data-theme='bento'] #realisations .section-header {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  :root[data-theme='bento'] #realisations .section-actions {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  :root[data-theme='bento'] #realisations .project-card:first-child {
+    grid-column: 2 / span 2;
+    grid-row: 1 / span 2;
+  }
+
+  :root[data-theme='bento'] #realisations .project-card:first-child .card-media,
+
+  :root[data-theme='bento'] #realisations .project-card:first-child .card-body,
+  :root[data-theme='bento'] .project-grid > .project-card:nth-child(5n + 1) .card-body {
+    flex-grow: 0;
+  }
+}
+
+/* ═══ Pages intérieures ═══ */
+
+:root[data-theme='bento'] .page-header {
+  background: var(--forest-soft);
+}
+
+:root[data-theme='bento'] .page-header .section-title {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 800;
+}
+
+:root[data-theme='bento'] .page-header .content-badge {
+  margin-top: 1rem;
+}
+
+/* À propos (page) : en-tête et texte côte à côte */
+@media (min-width: 1024px) {
+  :root[data-theme='bento'] main .section > .container:has(> .prose) {
+    grid-template-columns: 5fr 7fr;
+  }
+}
+
+/* Contact */
+:root[data-theme='bento'] .contact-grid {
+  gap: var(--tile-gap);
+}
+
+/* Réalisations : filtre en tuile + grille bento */
+:root[data-theme='bento'] .project-filter {
+  display: grid;
+  gap: var(--tile-gap);
+}
+
+:root[data-theme='bento'] .filter-btn {
+  border-radius: 999px;
+  border-color: transparent;
+  background: var(--paper);
+}
+
+:root[data-theme='bento'] .project-grid {
+  gap: var(--tile-gap);
+  grid-auto-flow: dense;
+}
+
+@media (min-width: 1024px) {
+  :root[data-theme='bento'] .project-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  :root[data-theme='bento'] .project-grid > .project-card:nth-child(5n + 1) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  :root[data-theme='bento'] .project-grid > .project-card:nth-child(5n + 1) .card-media {
+    flex: 1;
+    aspect-ratio: auto;
+    min-height: 16rem;
+  }
+}
+
+/* Actualités */
+:root[data-theme='bento'] .articles-grid {
+  gap: var(--tile-gap);
+}
+
+:root[data-theme='bento'] .article-container {
+  max-width: none;
+}
+
+:root[data-theme='bento'] .article-image {
+  margin: 0;
+  border-radius: var(--r-card);
+}
+
+/* Pages légales : chaque rubrique est une tuile */
+:root[data-theme='bento'] .legal-content {
+  display: grid;
+  gap: var(--tile-gap);
+  max-width: none;
+}
+
+@media (min-width: 768px) {
+  :root[data-theme='bento'] .legal-content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ═══ Pied de page ═══ */
+
+:root[data-theme='bento'] .site-footer {
+  margin: 0 0.75rem 0.75rem;
+  padding-block: 2rem;
+  border-radius: var(--r-card);
+}
+
+:root[data-theme='bento'] .footer-inner {
+  text-align: left;
+}
+
+:root[data-theme='bento'] .footer-links,
+:root[data-theme='bento'] .footer-socials {
+  justify-content: flex-start;
+}
+
+@media (min-width: 1024px) {
+  :root[data-theme='bento'] .site-footer {
+    margin: 0 1rem 1rem 0;
+  }
+
+  :root[data-theme='bento'] .footer-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  :root[data-theme='bento'] .footer-legal {
+    grid-column: 1 / -1;
+  }
+}

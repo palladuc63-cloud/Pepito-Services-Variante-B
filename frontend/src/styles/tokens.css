@@ -1,37 +1,389 @@
 /* ───────────────────────────────────────────────────────────────
-   Pépito Services Variante B — design tokens (grammaire canonique)
-   Voir docs/DESIGN-SYSTEM.md. Palette moderne froide :
-   vert en accent, ardoise en surface sombre, terracotta en
-   accent secondaire (local).
+   Pépito Services Variante B — design tokens, deux thèmes.
+   Le thème s'applique via <html data-theme="nature | artisan">.
+   - nature  (défaut) : chaleureux, arrondi, bois / terre / vert du logo
+   - artisan : vert forêt, crème, cuivre, serif, motif « piquets »
+   Noms historiques conservés : --forest = couleur de marque,
+   --copper = accent chaud. Voir docs/DESIGN-SYSTEM.md.
    ─────────────────────────────────────────────────────────────── */
-:root {
+
+:root,
+[data-theme='nature'] {
   /* Surfaces */
-  --paper: #f7f8f5;
-  --basalt: #243641;         /* surface sombre (ardoise) */
-  --basalt-dark: #17272f;
+  --paper: #fbf7f0;
+  --paper-deep: #f1e9dc;
+  --basalt: #2c3b25;
+  --basalt-dark: #1f2b1a;
 
   /* Texte */
-  --ink: #33464f;
-  --stone: #63747c;
-  --stone-light: #65747c;    /* taupe */
-  --line: #dbe2df;
+  --ink: #3b342a;
+  --stone: #6a604f;
+  --stone-light: #7a7060;
+  --line: #e6dccb;
 
-  /* Accent — vert */
-  --signal: #2e7d4f;
-  --signal-dark: #205f3a;
-  --signal-light: #5aa877;
-  --signal-soft: #dcece2;
+  /* Marque */
+  --forest: #33603a;
+  --forest-dark: #263521;
+  --forest-soft: #e4ecd9;
+
+  /* Accent chaud (terre cuite) */
+  --copper: #b5653a;
+  --copper-dark: #9a4d28;
+  --copper-light: #e8b48c;
+  --copper-soft: #f6e6d8;
+
+  /* Métal (non utilisé dans ce thème, gardé pour compat) */
+  --steel: #3b342a;
+  --steel-light: #e6dccb;
+
+  /* Bouton principal */
+  --cta: #33603a;
+  --cta-dark: #264a2c;
+  --cta-text: #ffffff;
+  --panel: #ffffff;
+  --on-dark: #f6f1e6;
+  --ring: rgb(51 96 58 / 0.35);
+
+  /* Forme */
+  --radius: 0.75rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --r-btn: 999px;
+  --r-card: 1.25rem;
+  --card-border-bottom: 1px solid var(--line);
+  --card-hover-border: var(--line);
+  --hero-radius: 0 0 2.5rem 2.5rem;
+  --btn-ls: 0;
+
+  /* Ombres (teinte chaude) */
+  --shadow-sm: 0 1px 2px 0 rgb(70 50 20 / 0.06);
+  --shadow-md: 0 6px 14px -4px rgb(70 50 20 / 0.12);
+  --shadow-lg: 0 20px 32px -12px rgb(70 50 20 / 0.22);
+
+  /* Décors : aucun motif dans ce thème */
+  --deco: none;
+  --grain-img: none;
+  --cta-img: radial-gradient(circle at 15% 0%, rgb(255 255 255 / 0.07), transparent 55%);
+
+  /* Étiquette de catégorie (pastille douce) */
+  --tag-bg: var(--forest-soft);
+  --tag-color: var(--forest-dark);
+  --tag-border: transparent;
+  --tag-radius: 999px;
+  --tag-ls: 0.04em;
+  --tag-pad: 0.25rem 0.85rem;
+  --tag-shadow: none;
+  --tag-rivet: none;
+
+  /* Navigation */
+  --nav-active-shadow: none;
+  --nav-active-bg: var(--forest-soft);
+  --header-top-border: 0;
+  --hero-rgb: 36 40 22;
+
+  /* Typo */
+  --font-display: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Statuts */
   --ok: #2a5c38;
   --ok-soft: #e9f5ec;
-  --warn: #d97706;
+  --warn: #b45309;
   --warn-soft: #fdf3e3;
-  --danger: #dc2626;
+  --danger: #b91c1c;
   --danger-soft: #fdecea;
 
-  /* Forme & typo */
-  --radius: 0.4rem;
-  --font-display: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-body: var(--font-display);
+  /* Compat : anciens noms de la grammaire partagée */
+  --signal: var(--forest);
+  --signal-dark: var(--forest-dark);
+  --signal-light: #6f9a73;
+  --signal-soft: var(--forest-soft);
+}
+
+[data-theme='artisan'] {
+  --paper: #f5f2ea;
+  --paper-deep: #ece7dc;
+  --basalt: #284028;
+  --basalt-dark: #1b2c1b;
+
+  --ink: #333a35;
+  --stone: #5d665f;
+  --stone-light: #6d756f;
+  --line: #d9d3c4;
+
+  --forest: #284028;
+  --forest-dark: #1b2c1b;
+  --forest-soft: #e3eadf;
+
+  --copper: #a55e2d;
+  --copper-dark: #8a4c22;
+  --copper-light: #e2a577;
+  --copper-soft: #f3e4d6;
+
+  --steel: #2b2f2e;
+  --steel-light: #cfd3d1;
+
+  --cta: #a55e2d;
+  --cta-dark: #8a4c22;
+  --cta-text: #ffffff;
+  --panel: #ffffff;
+  --on-dark: #f0ede4;
+  --ring: rgb(165 94 45 / 0.4);
+
+  --radius: 0.125rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.1875rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.375rem;
+  --r-btn: 0.125rem;
+  --r-card: 0.125rem;
+  --card-border-bottom: 3px solid var(--line);
+  --card-hover-border: var(--forest);
+  --hero-radius: 0;
+  --btn-ls: 0.02em;
+
+  --shadow-sm: 0 1px 2px 0 rgb(27 44 27 / 0.06);
+  --shadow-md: 0 4px 8px -2px rgb(27 44 27 / 0.1), 0 2px 4px -2px rgb(27 44 27 / 0.06);
+  --shadow-lg: 0 14px 24px -8px rgb(27 44 27 / 0.18), 0 4px 8px -4px rgb(27 44 27 / 0.08);
+
+  --deco: block;
+  --grain-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .16 0 0 0 0 .25 0 0 0 0 .16 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.07'/%3E%3C/svg%3E");
+  --cta-img: var(--grain-img);
+
+  --tag-bg: linear-gradient(180deg, #e9ebea 0%, var(--steel-light) 100%);
+  --tag-color: var(--steel);
+  --tag-border: #aeb4b2;
+  --tag-radius: 0.125rem;
+  --tag-ls: 0.1em;
+  --tag-pad: 0.25rem 1rem;
+  --tag-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+  --tag-rivet: block;
+
+  --nav-active-shadow: inset 0 -2px 0 var(--copper);
+  --nav-active-bg: var(--forest-soft);
+  --header-top-border: 3px solid var(--basalt);
+  --hero-rgb: 20 33 20;
+
+  --font-display: var(--font-fraunces), 'Fraunces', Georgia, 'Times New Roman', serif;
+
+  --warn: #b45309;
+  --signal-light: #5f8a5f;
+}
+
+/* ── Thème « Bento » : catalogue en tuiles (mise en page dans theme-bento.css) ── */
+[data-theme='bento'] {
+  --paper: #eeece6;
+  --paper-deep: #e4e0d6;
+  --basalt: #284028;
+  --basalt-dark: #1c2d1c;
+
+  --ink: #1f2620;
+  --stone: #5c635c;
+  --stone-light: #6f766f;
+  --line: #e2ded4;
+
+  --forest: #2f5a33;
+  --forest-dark: #1c2d1c;
+  --forest-soft: #dde8d0;
+
+  --copper: #c2703d;
+  --copper-dark: #9a4d28;
+  --copper-light: #f0c29a;
+  --copper-soft: #f6e3d1;
+
+  --steel: #1f2620;
+  --steel-light: #eeece6;
+
+  --cta: #1c2d1c;
+  --cta-dark: #0f1a0f;
+  --cta-text: #ffffff;
+  --panel: #ffffff;
+  --on-dark: #f4f2ec;
+  --ring: rgb(47 90 51 / 0.35);
+
+  --radius: 0.75rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --r-btn: 999px;
+  --r-card: 1.5rem;
+  --card-border-bottom: 0;
+  --card-hover-border: transparent;
+  --hero-radius: 1.5rem;
+  --btn-ls: 0;
+  --tile-gap: 0.75rem;
+
+  --shadow-sm: none;
+  --shadow-md: 0 10px 24px -12px rgb(28 45 28 / 0.25);
+  --shadow-lg: 0 18px 36px -16px rgb(28 45 28 / 0.3);
+
+  --deco: none;
+  --grain-img: none;
+  --cta-img: none;
+
+  --tag-bg: var(--paper);
+  --tag-color: var(--ink);
+  --tag-border: transparent;
+  --tag-radius: 999px;
+  --tag-ls: 0.03em;
+  --tag-pad: 0.3rem 0.8rem;
+  --tag-shadow: none;
+  --tag-rivet: none;
+
+  --nav-active-shadow: none;
+  --nav-active-bg: var(--basalt);
+  --header-top-border: 0;
+  --hero-rgb: 16 26 16;
+
+  --font-display: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
+
+  --signal-light: #6f9a73;
+}
+
+/* ── Thème « Éditorial » : revue d'architecture (mise en page dans theme-editorial.css) ── */
+[data-theme='editorial'] {
+  --paper: #f6f4ef;
+  --paper-deep: #ebe7de;
+  --basalt: #151713;
+  --basalt-dark: #0c0d0b;
+
+  --ink: #1a1c18;
+  --stone: #5a5d56;
+  --stone-light: #6e716a;
+  --line: #cfcbc0;
+
+  --forest: #284028;
+  --forest-dark: #1a1c18;
+  --forest-soft: #e3e7dc;
+
+  --copper: #a8552d;
+  --copper-dark: #8a4423;
+  --copper-light: #e0a27c;
+  --copper-soft: #f1e3d8;
+
+  --steel: #1a1c18;
+  --steel-light: #ebe7de;
+
+  --cta: #1a1c18;
+  --cta-dark: #000000;
+  --cta-text: #f6f4ef;
+  --panel: #f6f4ef;
+  --on-dark: #f6f4ef;
+  --ring: rgb(40 64 40 / 0.4);
+
+  --radius: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --r-btn: 0;
+  --r-card: 0;
+  --card-border-bottom: 0;
+  --card-hover-border: transparent;
+  --hero-radius: 0;
+  --btn-ls: 0.14em;
+
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+
+  --deco: none;
+  --grain-img: none;
+  --cta-img: none;
+
+  --tag-bg: transparent;
+  --tag-color: var(--forest);
+  --tag-border: transparent;
+  --tag-radius: 0;
+  --tag-ls: 0.18em;
+  --tag-pad: 0;
+  --tag-shadow: none;
+  --tag-rivet: none;
+
+  --nav-active-shadow: none;
+  --nav-active-bg: transparent;
+  --header-top-border: 0;
+  --hero-rgb: 12 13 11;
+
+  --font-display: var(--font-fraunces), 'Fraunces', Georgia, 'Times New Roman', serif;
+
+  --signal-light: #6f9a73;
+}
+
+/* ── Thème « Blason » : épingles/badges à pointe (mise en page dans theme-blason.css) ── */
+[data-theme='blason'] {
+  --paper: #ece9e6;
+  --paper-deep: #dedad2;
+  --basalt: #1e3a29;
+  --basalt-dark: #132a1d;
+
+  --ink: #22271f;
+  --stone: #5c665c;
+  --stone-light: #75806f;
+  --line: #d6d2c8;
+
+  --forest: #2e7d47;
+  --forest-dark: #1e3a29;
+  --forest-soft: #dceaDF;
+
+  --copper: #c2703d;
+  --copper-dark: #9a4d28;
+  --copper-light: #f0c29a;
+  --copper-soft: #f6e3d1;
+
+  --steel: #22271f;
+  --steel-light: #e0dcd2;
+
+  --cta: #2e7d47;
+  --cta-dark: #1f6134;
+  --cta-text: #ffffff;
+  --panel: #ffffff;
+  --on-dark: #f4f1ea;
+  --ring: rgb(46 125 71 / 0.4);
+
+  --radius: 0.875rem;
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 2rem;
+  --r-btn: 999px;
+  --r-card: 1.25rem;
+  --card-border-bottom: 0;
+  --card-hover-border: transparent;
+  --hero-radius: 0 0 2.5rem 2.5rem;
+  --btn-ls: 0.05em;
+
+  --shadow-sm: 0 2px 6px -2px rgb(19 42 29 / 0.12);
+  --shadow-md: 0 14px 28px -14px rgb(19 42 29 / 0.3);
+  --shadow-lg: 0 30px 50px -20px rgb(19 42 29 / 0.35);
+
+  --deco: none;
+  --grain-img: none;
+  --cta-img: radial-gradient(circle at 85% -20%, rgb(255 255 255 / 0.12), transparent 55%);
+
+  --tag-bg: var(--forest-soft);
+  --tag-color: var(--forest-dark);
+  --tag-border: transparent;
+  --tag-radius: 999px;
+  --tag-ls: 0.06em;
+  --tag-pad: 0.3rem 0.9rem;
+  --tag-shadow: none;
+  --tag-rivet: none;
+
+  --nav-active-shadow: none;
+  --nav-active-bg: transparent;
+  --header-top-border: 0;
+  --hero-rgb: 19 42 29;
+
+  --font-display: var(--font-barlow), 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+
+  --signal-light: #6fae84;
+}
+
+/* Motif « piquets » partagé (utilisé uniquement par le thème artisan) */
+:root {
+  --picket-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='16'%3E%3Cpath d='M1 16V5L3 1L5 5V16Z'/%3E%3C/svg%3E");
 }

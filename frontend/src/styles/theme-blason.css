@@ -1,0 +1,517 @@
+/* ───────────────────────────────────────────────────────────────
+   Style « Blason » : badges pointus façon épingle / piquet.
+   Logo centré dans la nav, titre en italique gras condensé,
+   carte de contenu flottante sur le hero, cartes services en
+   forme de blason pointu, panneaux blancs arrondis sur gris
+   chaud. Même HTML que les autres thèmes.
+   Préfixe :root[data-theme='blason'] (spécificité ≥ 0,3,0).
+   ─────────────────────────────────────────────────────────────── */
+
+:root[data-theme='blason'] {
+  /* Blason blanc : pointe en bas, coins supérieurs arrondis,
+     ombre portée intégrée dans le SVG (feDropShadow). */
+  --shield-card: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 500'%3E%3Cdefs%3E%3Cfilter id='s' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='0' dy='14' stdDeviation='14' flood-color='%23132a1d' flood-opacity='0.22'/%3E%3C/filter%3E%3C/defs%3E%3Cpath filter='url(%23s)' fill='%23ffffff' d='M48 12h264a36 36 0 0 1 36 36v352L180 488 12 400V48a36 36 0 0 1 36-36z'/%3E%3C/svg%3E");
+}
+
+/* ═══ Base ═══ */
+
+:root[data-theme='blason'] h1,
+:root[data-theme='blason'] h2,
+:root[data-theme='blason'] h3,
+:root[data-theme='blason'] h4,
+:root[data-theme='blason'] .section-title,
+:root[data-theme='blason'] .card-title {
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+:root[data-theme='blason'] .section-title {
+  font-size: clamp(2.1rem, 4.6vw, 3.2rem);
+}
+
+/* Pointe d'épingle sous chaque titre de section */
+:root[data-theme='blason'] .section-title::after {
+  display: block;
+  width: 1.15rem;
+  height: 0.75rem;
+  margin-top: 0.8rem;
+  border-radius: 2px;
+  background: var(--forest);
+  -webkit-mask: none;
+  mask: none;
+  clip-path: polygon(50% 100%, 6% 0, 94% 0);
+}
+
+:root[data-theme='blason'] .section-cta .section-title::after {
+  background: var(--copper-light);
+  margin-inline: auto;
+}
+
+:root[data-theme='blason'] .section-subtitle {
+  max-width: 56ch;
+}
+
+:root[data-theme='blason'] .btn {
+  padding: 0.8rem 1.6rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+:root[data-theme='blason'] .card {
+  border: 0;
+  box-shadow: var(--shadow-md);
+}
+
+:root[data-theme='blason'] .arrow-divider {
+  display: none;
+}
+
+/* ═══ Navigation ═══ */
+
+:root[data-theme='blason'] .site-header {
+  background: rgb(255 255 255 / 0.85);
+  border-bottom: 0;
+  box-shadow: 0 1px 0 rgb(19 42 29 / 0.08);
+}
+
+:root[data-theme='blason'] .desktop-nav .nav-link {
+  position: relative;
+  border-radius: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--basalt);
+}
+
+:root[data-theme='blason'] .desktop-nav .nav-link:hover {
+  background: transparent;
+  color: var(--forest);
+}
+
+/* Lien actif : vert + petite pointe d'épingle */
+:root[data-theme='blason'] .desktop-nav .nav-link[aria-current='page'] {
+  background: transparent;
+  color: var(--forest);
+}
+
+:root[data-theme='blason'] .desktop-nav .nav-link[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0.65rem;
+  height: 0.4rem;
+  background: var(--forest);
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  transform: translateX(-50%);
+}
+
+/* Logo centré : la moitié des liens de chaque côté (≥ 1024px) */
+@media (min-width: 1024px) {
+  :root[data-theme='blason'] .main-nav {
+    position: relative;
+  }
+
+  :root[data-theme='blason'] .brand-area {
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    transform: translateX(-50%);
+  }
+
+  :root[data-theme='blason'] .desktop-nav {
+    width: 100%;
+  }
+
+  /* Deux marges auto symétriques = trou centré pour le logo */
+  :root[data-theme='blason'] .desktop-nav > li:nth-child(2) {
+    margin-right: auto;
+  }
+
+  :root[data-theme='blason'] .desktop-nav > li:nth-child(3) {
+    margin-left: auto;
+  }
+}
+
+/* Menu mobile : grands liens italiques */
+:root[data-theme='blason'] .mobile-menu {
+  background: var(--basalt);
+}
+
+:root[data-theme='blason'] .mobile-menu__title {
+  font-family: var(--font-display);
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+:root[data-theme='blason'] .mobile-menu__link {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ═══ Hero : carte de contenu flottante ═══ */
+
+:root[data-theme='blason'] .hero-slideshow {
+  min-height: calc(100dvh - 4rem);
+}
+
+:root[data-theme='blason'] .slideshow-overlay {
+  background: linear-gradient(
+    105deg,
+    rgb(var(--hero-rgb) / 0.55) 0%,
+    rgb(var(--hero-rgb) / 0.3) 50%,
+    rgb(var(--hero-rgb) / 0.08) 100%
+  );
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+:root[data-theme='blason'] .hero-content {
+  display: flex;
+  flex-direction: column;
+  max-width: 33rem;
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  border-radius: 1.75rem;
+  background: rgb(255 255 255 / 0.94);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px -18px rgb(10 22 15 / 0.5);
+  color: var(--ink);
+}
+
+/* La baseline devient un chapeau au-dessus du titre */
+:root[data-theme='blason'] .hero-baseline {
+  order: -1;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0;
+  border-bottom: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--forest);
+}
+
+:root[data-theme='blason'] .hero-title {
+  margin-bottom: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+  color: var(--basalt);
+}
+
+:root[data-theme='blason'] .hero-description {
+  margin-bottom: 1.75rem;
+  font-size: 1.05rem;
+  color: #414b41;
+}
+
+/* .hero-slideshow en plus : bat la spécificité des styles scopés du
+   composant (data-astro-cid sur chaque sélecteur) */
+:root[data-theme='blason'] .hero-slideshow .hero-actions .btn-secondary {
+  border-color: var(--basalt);
+  color: var(--basalt);
+}
+
+:root[data-theme='blason'] .hero-slideshow .hero-actions .btn-secondary:hover {
+  background: var(--basalt);
+  border-color: var(--basalt);
+  color: #fff;
+}
+
+/* ═══ À propos : dalle blanche à cheval sur le hero ═══ */
+
+:root[data-theme='blason'] #a-propos {
+  padding-top: 0;
+}
+
+:root[data-theme='blason'] #a-propos .container {
+  position: relative;
+  z-index: 3;
+  margin-top: -6.5rem;
+  padding: clamp(1.75rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem);
+  border: 1px solid var(--line);
+  border-radius: 2rem;
+  background: #fff;
+  box-shadow: var(--shadow-lg);
+}
+
+:root[data-theme='blason'] #a-propos .section-header {
+  margin-bottom: var(--space-8);
+  text-align: center;
+}
+
+:root[data-theme='blason'] #a-propos .section-title::after {
+  margin-inline: auto;
+}
+
+/* ═══ Services : cartes en forme de blason ═══ */
+
+/* .services-grid en préfixe partout : bat les styles scopés de
+   ServiceCard.astro (deux sélecteurs + cid = 0,4,0) */
+@media (min-width: 768px) {
+  :root[data-theme='blason'] .services-grid {
+    gap: clamp(1.5rem, 3vw, 2.75rem);
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card {
+    position: relative;
+    isolation: isolate;
+    height: auto;
+    aspect-ratio: 0.72;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transition: transform 260ms ease;
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--shield-card) center / 100% 100% no-repeat;
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: none;
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card .card-media {
+    border-radius: 8% 8% 0 0;
+    aspect-ratio: 4 / 2.9;
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card .card-body {
+    align-items: center;
+    padding: clamp(1rem, 2vw, 1.5rem) 1.5rem 0;
+    text-align: center;
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card .card-title {
+    font-size: clamp(1.4rem, 2vw, 1.8rem);
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card .card-text {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card .service-number {
+    padding-bottom: 0;
+    border-bottom: 0;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--forest);
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card .service-link {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    justify-content: center;
+    margin-top: auto;
+    margin-bottom: 19%;
+    padding: 0.55rem 1.3rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--cta);
+    box-shadow: 0 8px 20px rgb(46 125 71 / 0.3);
+    color: var(--cta-text);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: background 200ms ease;
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card .service-link:hover {
+    background: var(--basalt);
+    color: #fff;
+  }
+
+  :root[data-theme='blason'] .services-grid .service-card .service-badge {
+    padding-top: 0.5rem;
+  }
+}
+
+/* ═══ Réalisations : pastilles à pointe ═══ */
+
+:root[data-theme='blason'] .project-category {
+  position: relative;
+}
+
+:root[data-theme='blason'] .project-category::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 0.55rem;
+  height: 0.35rem;
+  background: var(--tag-bg);
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  transform: translateX(-50%);
+}
+
+/* ═══ CTA : panneau vert flottant ═══ */
+
+:root[data-theme='blason'] main .section.section-cta {
+  width: min(74rem, 94vw);
+  margin: 0 auto var(--space-16);
+  border-radius: 2.5rem;
+}
+
+/* ═══ Pages intérieures ═══ */
+
+:root[data-theme='blason'] .page-header .section-title {
+  font-size: clamp(2.6rem, 6.5vw, 4.25rem);
+}
+
+:root[data-theme='blason'] .page-header {
+  padding-top: var(--space-10);
+}
+
+/* Panneaux blancs pour les contenus */
+:root[data-theme='blason'] .legal-section,
+:root[data-theme='blason'] main .section > .container > .prose,
+:root[data-theme='blason'] .contact-form,
+:root[data-theme='blason'] .form-notice,
+:root[data-theme='blason'] .empty-state,
+:root[data-theme='blason'] .filter-bar {
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+:root[data-theme='blason'] .legal-section,
+:root[data-theme='blason'] main .section > .container > .prose,
+:root[data-theme='blason'] .empty-state {
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+/* L'accueil a déjà sa dalle flottante : pas de double panneau */
+:root[data-theme='blason'] #a-propos .prose {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+:root[data-theme='blason'] .contact-info {
+  border-radius: 2rem;
+}
+
+:root[data-theme='blason'] .contact-form {
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+:root[data-theme='blason'] .contact-label {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Barre centrée en pilule (le filtre englobe aussi .project-grid :
+   pas de display:flex sur .project-filter lui-même) */
+:root[data-theme='blason'] .project-filter .filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: 0.4rem;
+  border-radius: 999px;
+}
+
+:root[data-theme='blason'] .project-filter .filter-btn {
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+:root[data-theme='blason'] .project-filter .filter-btn.is-active {
+  background: var(--cta);
+  color: var(--cta-text);
+}
+
+/* Formulaires : champs arrondis */
+:root[data-theme='blason'] .form-input,
+:root[data-theme='blason'] .form-textarea,
+:root[data-theme='blason'] .form-select {
+  border-width: 1.5px;
+  border-radius: 0.9rem;
+}
+
+/* Articles */
+:root[data-theme='blason'] .article-header .section-title {
+  font-size: clamp(2.4rem, 6vw, 3.75rem);
+}
+
+:root[data-theme='blason'] .article-image {
+  border-radius: 1.5rem;
+}
+
+/* ═══ Footer : dalle sombre arrondie ═══ */
+
+:root[data-theme='blason'] .site-footer {
+  width: min(78rem, 97vw);
+  margin: 0 auto;
+  border-radius: 2.5rem 2.5rem 0 0;
+}
+
+:root[data-theme='blason'] .footer-name,
+:root[data-theme='blason'] .footer-heading,
+:root[data-theme='blason'] .site-footer h2,
+:root[data-theme='blason'] .site-footer h3 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ═══ Mobile ═══ */
+
+@media (max-width: 767px) {
+  :root[data-theme='blason'] #a-propos .container {
+    margin-top: -4rem;
+  }
+
+  :root[data-theme='blason'] .hero-content {
+    max-width: none;
+  }
+
+  :root[data-theme='blason'] main .section.section-cta {
+    border-radius: 1.75rem;
+  }
+}

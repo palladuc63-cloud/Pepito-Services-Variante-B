@@ -3,6 +3,7 @@ import '../styles/global.css';
 import SeoHead from '../components/SeoHead.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
+import ThemeSwitcher from '../components/ThemeSwitcher.astro';
 import { getSite } from '../lib/site.js';
 
 export interface Props {
@@ -18,8 +19,17 @@ const { settings } = await getSite();
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-theme="nature">
   <head>
+    <script is:inline>
+      try {
+        var themes = ['nature', 'artisan', 'bento', 'editorial', 'blason'];
+        var fromUrl = new URLSearchParams(location.search).get('theme');
+        if (themes.indexOf(fromUrl) !== -1) localStorage.setItem('pepito-theme', fromUrl);
+        var t = localStorage.getItem('pepito-theme');
+        if (themes.indexOf(t) !== -1) document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
     <SeoHead
       settings={settings}
       title={title}
@@ -43,5 +53,36 @@ const { settings } = await getSite();
       <slot />
     </main>
     <Footer settings={settings} />
+    <ThemeSwitcher />
+    <script>
+      (function () {
+        const targets = document.querySelectorAll<HTMLElement>(
+          '.section-header, .about-content, .cta-box, .page-header, .card'
+        );
+        targets.forEach((el, i) => {
+          el.classList.add('reveal');
+          el.style.setProperty('--reveal-delay', `${Math.min((i % 4) * 70, 210)}ms`);
+        });
+        if (!('IntersectionObserver' in window)) {
+          targets.forEach((el) => el.classList.add('is-visible'));
+          return;
+        }
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const el = entry.target as HTMLElement;
+                el.classList.add('is-visible');
+                observer.unobserve(el);
+                // Libère transform/transition pour que les effets de survol reprennent la main.
+                setTimeout(() => el.classList.remove('reveal', 'is-visible'), 900);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+        );
+        targets.forEach((el) => observer.observe(el));
+      })();
+    </script>
   </body>
 </html>

@@ -49,9 +49,26 @@ const base = import.meta.env.BASE_URL;
 
 <style>
   .site-footer {
-    padding-block: var(--space-10);
-    background-color: var(--color-surface-soft);
-    border-top: 1px solid var(--color-border);
+    position: relative;
+    margin-top: 1rem;
+    padding-block: var(--space-12) var(--space-10);
+    background-color: var(--basalt-dark);
+    background-image: var(--grain-img);
+    color: var(--on-dark);
+  }
+
+  /* Piquets qui « sortent » du pied de page */
+  .site-footer::before {
+    content: '';
+    display: var(--deco);
+    position: absolute;
+    top: -1rem;
+    left: 0;
+    right: 0;
+    height: 1rem;
+    background: var(--basalt-dark);
+    -webkit-mask: var(--picket-mask) 0 0 / 8px 16px repeat-x;
+    mask: var(--picket-mask) 0 0 / 8px 16px repeat-x;
   }
 
   .footer-inner {
@@ -62,14 +79,16 @@ const base = import.meta.env.BASE_URL;
 
   .footer-name {
     display: block;
-    font-size: var(--text-lg);
-    color: var(--color-heading);
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--on-dark);
     margin-bottom: var(--space-2);
   }
 
   .footer-tagline {
-    color: var(--color-text-muted);
+    color: var(--copper-light);
     font-size: var(--text-sm);
+    letter-spacing: 0.04em;
   }
 
   .footer-links {
@@ -81,15 +100,18 @@ const base = import.meta.env.BASE_URL;
     padding: 0;
   }
 
-  .footer-links a {
-    color: var(--color-text);
+  .footer-links a,
+  .footer-socials a {
+    color: var(--on-dark);
     text-decoration: none;
     font-size: var(--text-sm);
   }
 
-  .footer-links a:hover {
+  .footer-links a:hover,
+  .footer-socials a:hover {
+    color: var(--copper-light);
     text-decoration: underline;
-    color: var(--color-primary);
+    text-underline-offset: 0.2em;
   }
 
   .footer-socials {
@@ -99,12 +121,13 @@ const base = import.meta.env.BASE_URL;
   }
 
   .footer-socials a {
-    font-size: var(--text-sm);
     font-weight: 600;
   }
 
   .footer-legal {
-    color: var(--color-text-muted);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgb(245 242 234 / 0.18);
+    color: rgb(245 242 234 / 0.7);
     font-size: var(--text-sm);
   }
 </style>
