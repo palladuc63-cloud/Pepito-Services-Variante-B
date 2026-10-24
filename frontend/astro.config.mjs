@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import node from '@astrojs/node';
 
 export default defineConfig({
-  site: 'https://pepito-services.fr',
+  site: 'https://www.pepito-services.fr',
   output: 'server',
   adapter: node({ mode: 'standalone' }),
   trailingSlash: 'always',
