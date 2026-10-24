@@ -33,7 +33,9 @@ export async function getSite() {
       baseline: s.baseline || '',
       description: s.description || '',
       logo: s.logo_url || '/logo.svg',
-      siteUrl: (import.meta.env.SITE || 'https://pepito-services.fr').replace(/\/$/, ''),
+      siteUrl:
+        (import.meta.env.SITE || 'https://pepito-services.fr').replace(/\/$/, '') +
+        (import.meta.env.BASE_URL || '/'),
       socials,
       contact: {
         phone: s.phone || null,

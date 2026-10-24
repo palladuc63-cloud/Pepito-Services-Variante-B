@@ -5,6 +5,7 @@ import node from '@astrojs/node';
 
 export default defineConfig({
   site: 'https://www.pepito-services.fr',
+  base: '/test',
   output: 'server',
   adapter: node({ mode: 'standalone' }),
   trailingSlash: 'always',
