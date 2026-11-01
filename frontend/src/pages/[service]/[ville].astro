@@ -2,8 +2,8 @@
 import MainLayout from '../../layouts/MainLayout.astro';
 import ImageCarousel from '../../components/ImageCarousel.astro';
 import CityMap from '../../components/CityMap.astro';
-import { getCityPage, getCityPages, getContent, getProjects } from '../../lib/api.js';
-import type { CityPage, Project, Service } from '../../data/types';
+import { getCityPage, getCityPages, getProjects } from '../../lib/api.js';
+import type { CityPage, Project } from '../../data/types';
 
 const { service = '', ville = '' } = Astro.params;
 const preview = Astro.url.searchParams.get('preview') === '1';
@@ -13,8 +13,8 @@ if (!page) {
   return new Response(null, { status: 404, statusText: 'Page introuvable' });
 }
 
-const [{ services }, allCityPages, projects] = await Promise.all([
-  getContent(), getCityPages(), getProjects(),
+const [allCityPages, projects] = await Promise.all([
+  getCityPages(), getProjects(),
 ]);
 
 // ── Maillage interne ────────────────────────────────────────
@@ -58,7 +58,6 @@ const orderedCityPages = page.lat != null && page.lng != null
       .filter((c) => c.id !== page.id && c.lat != null && c.lng != null)
       .sort((a, b) => haversine(page.lat!, page.lng!, a.lat!, a.lng!) - haversine(page.lat!, page.lng!, b.lat!, b.lng!))
   : (allCityPages as CityPage[]).filter((c) => c.id !== page.id);
-const serviceInfo = (services as Service[]).find((s) => s.slug === service);
 const base = import.meta.env.BASE_URL;
 const pageImage = page.imageUrl
   ? (page.imageUrl.startsWith('http') ? page.imageUrl : `https://www.pepito-services.fr${page.imageUrl}`)
@@ -79,9 +78,7 @@ const pageImage = page.imageUrl
   <article class="section city-page">
     <div class:list={['container article-container', { 'with-carousel': slides.length > 0 }]}>
       <header class="page-header">
-        {serviceInfo && <span class="tag">{serviceInfo.title}</span>}
         <h1 class="section-title">{page.title}</h1>
-        <p class="city-name">📍 {page.city}</p>
       </header>
 
       <div class:list={['city-layout', { 'with-carousel': slides.length > 0 }]}>
@@ -151,11 +148,6 @@ const pageImage = page.imageUrl
 
   .page-header {
     margin-bottom: var(--space-8);
-  }
-
-  .city-name {
-    color: var(--color-text-muted);
-    margin-top: var(--space-2);
   }
 
   .city-layout.with-carousel {
