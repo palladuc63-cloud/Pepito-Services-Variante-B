@@ -44,7 +44,9 @@ import '../../styles/admin.css';
   const form = document.getElementById('login-form');
   const errorEl = document.getElementById('login-error');
 
-  auth.me().then(() => { window.location.href = '/admin/dashboard'; }).catch(() => {});
+  const dashboard = `${import.meta.env.BASE_URL}admin/dashboard`;
+
+  auth.me().then(() => { window.location.href = dashboard; }).catch(() => {});
 
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -52,7 +54,7 @@ import '../../styles/admin.css';
     errorEl.style.display = 'none';
     try {
       await auth.login(data.email, data.password);
-      window.location.href = '/admin/dashboard';
+      window.location.href = dashboard;
     } catch (err) {
       errorEl.textContent = err instanceof ApiError ? err.message : 'Connexion impossible.';
       errorEl.style.display = 'block';

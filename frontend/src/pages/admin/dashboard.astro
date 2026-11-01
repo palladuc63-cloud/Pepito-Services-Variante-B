@@ -1,5 +1,6 @@
 ---
 import '../../styles/admin.css';
+const base = import.meta.env.BASE_URL;
 ---
 <!doctype html>
 <html lang="fr">
@@ -33,7 +34,7 @@ import '../../styles/admin.css';
             <h1 id="page-title">Réalisations</h1>
             <p id="page-sub">Chantiers publiés sur le site</p>
           </div>
-          <a href="/" target="_blank" class="btn btn-sm">Voir le site ↗</a>
+          <a href={base} target="_blank" class="btn btn-sm">Voir le site ↗</a>
         </div>
 
         <p id="global-alert" class="alert" style="display:none"></p>
@@ -210,10 +211,11 @@ import '../../styles/admin.css';
   };
 
   // ── Auth guard ──
-  try { await auth.me(); } catch { window.location.href = '/admin/login'; }
+  const loginUrl = `${import.meta.env.BASE_URL}admin/login`;
+  try { await auth.me(); } catch { window.location.href = loginUrl; }
   $('#btn-logout').addEventListener('click', async () => {
     await auth.logout().catch(() => {});
-    window.location.href = '/admin/login';
+    window.location.href = loginUrl;
   });
 
   // ── Tabs ──
