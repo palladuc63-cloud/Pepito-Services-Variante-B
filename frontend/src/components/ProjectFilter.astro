@@ -5,9 +5,10 @@ import ProjectCard from './ProjectCard.astro';
 export interface Props {
   projects: Project[];
   categories: Category[];
+  preview?: boolean;
 }
 
-const { projects, categories } = Astro.props;
+const { projects, categories, preview = false } = Astro.props;
 ---
 
 <div class="project-filter">
@@ -35,7 +36,7 @@ const { projects, categories } = Astro.props;
   </div>
 
   <div class="project-grid">
-    {projects.map((project) => <ProjectCard project={project} />)}
+    {projects.map((project) => <ProjectCard project={project} showDraft={preview} />)}
   </div>
 
   <p class="filter-empty" id="filter-empty" role="status" hidden>

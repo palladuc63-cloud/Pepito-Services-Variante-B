@@ -199,6 +199,7 @@ const base = import.meta.env.BASE_URL;
   import { api, auth, ApiError } from '../../lib/adminApi.js';
 
   const $ = (s) => document.querySelector(s);
+  const siteBase = import.meta.env.BASE_URL;
   // Échappement HTML systématique — les valeurs issues de la DB (dont les
   // messages du formulaire public) ne doivent JAMAIS entrer en innerHTML brut.
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -329,6 +330,7 @@ const base = import.meta.env.BASE_URL;
         <td>${esc(p.category?.label ?? '—')}</td>
         <td><span class="tag-pill ${p.published ? 'pub' : 'draft'}">${p.published ? 'Publié' : 'Brouillon'}</span></td>
         <td style="text-align:right;white-space:nowrap">
+          <a class="btn btn-sm" href="${siteBase}realisations/?preview=1" target="_blank">Voir</a>
           <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
           <button class="btn btn-sm btn-danger" data-proj-del="${p.id}">✕</button>
         </td>
@@ -461,6 +463,7 @@ const base = import.meta.env.BASE_URL;
         <td>${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('fr-FR') : '—'}</td>
         <td><span class="tag-pill ${a.published ? 'pub' : 'draft'}">${a.published ? 'Publié' : 'Brouillon'}</span></td>
         <td style="text-align:right;white-space:nowrap">
+          <a class="btn btn-sm" href="${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
           <button class="btn btn-sm" data-art-edit="${a.id}">Éditer</button>
           <button class="btn btn-sm btn-danger" data-art-del="${a.id}">✕</button>
         </td>
@@ -574,6 +577,7 @@ const base = import.meta.env.BASE_URL;
         <td><span class="tag-pill ${c.published ? 'pub' : 'draft'}">${c.published ? 'Publié' : 'Brouillon'}</span></td>
         <td style="text-align:right;white-space:nowrap">
           ${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
+          <a class="btn btn-sm" href="${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
           <button class="btn btn-sm" data-city-edit="${c.id}">Éditer</button>
           <button class="btn btn-sm btn-danger" data-city-del="${c.id}">✕</button>
         </td>

@@ -53,6 +53,15 @@ export function authenticateJWT(req, res, next) {
   }
 }
 
+// Vérif non bloquante : true si la requête porte un JWT admin valide.
+// Utilisé par les endpoints publics pour le mode prévisualisation (?preview=1).
+export function isAdminRequest(req) {
+  const token = req.cookies?.[COOKIE_NAME];
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!token || !jwtSecret) return false;
+  try { jwt.verify(token, jwtSecret); return true; } catch { return false; }
+}
+
 export function requireRole(role) {
   return (req, res, next) => {
     if (req.user?.role !== role) {

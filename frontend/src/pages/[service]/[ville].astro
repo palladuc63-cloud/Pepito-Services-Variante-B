@@ -4,7 +4,9 @@ import { getCityPage, getCityPages, getContent, getProjects } from '../../lib/ap
 import type { Service } from '../../data/types';
 
 const { service = '', ville = '' } = Astro.params;
-const page = await getCityPage(service, ville);
+const preview = Astro.url.searchParams.get('preview') === '1';
+const headers = preview ? { cookie: Astro.request.headers.get('cookie') ?? '' } : undefined;
+const page = await getCityPage(service, ville, { preview, headers });
 if (!page) {
   return new Response(null, { status: 404, statusText: 'Page introuvable' });
 }
@@ -48,7 +50,11 @@ const pageImage = page.imageUrl
   image={pageImage}
   canonicalPath={`/${page.serviceSlug}/${page.slug}/`}
   seoMeta={page.seoMeta}
+  noIndex={preview}
 >
+  {preview && (
+    <div class="preview-banner">👁 Prévisualisation — ce brouillon n'est pas publié.</div>
+  )}
   <article class="section city-page">
     <div class="container article-container">
       <header class="page-header">
@@ -100,6 +106,16 @@ const pageImage = page.imageUrl
 </MainLayout>
 
 <style>
+  .preview-banner {
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #92400e;
+    background: #fef3c7;
+    border-bottom: 1px solid #f59e0b;
+  }
+
   .article-container {
     max-width: 70ch;
   }

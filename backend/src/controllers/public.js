@@ -5,6 +5,7 @@ import {
   cityPages, seoMeta, redirects,
 } from '../db/schema.js';
 import { notify } from '../utils/notify.js';
+import { isAdminRequest } from '../utils/auth.js';
 
 async function getSettingsMap() {
   const rows = await db.select().from(settings);
@@ -33,13 +34,15 @@ export async function getContent(_req, res) {
   }
 }
 
-export async function listProjects(_req, res) {
+export async function listProjects(req, res) {
   try {
+    // ?preview=1 + JWT admin → inclut les brouillons
+    const preview = req.query.preview === '1' && isAdminRequest(req);
     const rows = await db
       .select({ project: projects, category: categories })
       .from(projects)
       .leftJoin(categories, eq(projects.categoryId, categories.id))
-      .where(eq(projects.published, true))
+      .where(preview ? undefined : eq(projects.published, true))
       .orderBy(asc(projects.sortOrder), desc(projects.createdAt));
     const ids = rows.map((r) => r.project.id);
     const imgs = ids.length
@@ -75,10 +78,11 @@ export async function listArticles(_req, res) {
 
 export async function getArticle(req, res) {
   try {
+    const preview = req.query.preview === '1' && isAdminRequest(req);
     const [row] = await db
       .select()
       .from(articles)
-      .where(and(eq(articles.slug, req.params.slug), eq(articles.published, true)));
+      .where(and(eq(articles.slug, req.params.slug), ...(preview ? [] : [eq(articles.published, true)])));
     if (!row) return res.status(404).json({ error: 'Article introuvable' });
     const [meta] = await db.select().from(seoMeta)
       .where(and(eq(seoMeta.entityType, 'article'), eq(seoMeta.entityId, row.id)));
@@ -107,8 +111,9 @@ export async function listCityPages(_req, res) {
 export async function getCityPage(req, res) {
   try {
     const { service, slug } = req.params;
+    const preview = req.query.preview === '1' && isAdminRequest(req);
     const [row] = await db.select().from(cityPages)
-      .where(and(eq(cityPages.serviceSlug, service), eq(cityPages.slug, slug), eq(cityPages.published, true)));
+      .where(and(eq(cityPages.serviceSlug, service), eq(cityPages.slug, slug), ...(preview ? [] : [eq(cityPages.published, true)])));
     if (!row) return res.status(404).json({ error: 'Page introuvable' });
     const [meta] = await db.select().from(seoMeta)
       .where(and(eq(seoMeta.entityType, 'city_page'), eq(seoMeta.entityId, row.id)));

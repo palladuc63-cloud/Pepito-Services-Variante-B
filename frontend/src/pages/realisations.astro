@@ -9,7 +9,9 @@ import { getProjects, getCityPages } from '../lib/api.js';
 import type { CityPage } from '../data/types';
 
 const { categories } = await getSite();
-const [projects, cityPagesRaw] = await Promise.all([getProjects(), getCityPages()]);
+const preview = Astro.url.searchParams.get('preview') === '1';
+const headers = preview ? { cookie: Astro.request.headers.get('cookie') ?? '' } : undefined;
+const [projects, cityPagesRaw] = await Promise.all([getProjects({ preview, headers }), getCityPages()]);
 const cityPages = cityPagesRaw as CityPage[];
 const base = import.meta.env.BASE_URL;
 ---
@@ -29,7 +31,10 @@ const base = import.meta.env.BASE_URL;
       <ContentBadge />
     </div>
 
-    <ProjectFilter projects={projects} categories={categories} />
+    {preview && (
+      <div class="preview-banner">👁 Prévisualisation — les brouillons sont visibles.</div>
+    )}
+    <ProjectFilter projects={projects} categories={categories} preview={preview} />
 
     {cityPages.length > 0 && (
       <section class="zone-section">
@@ -73,5 +78,17 @@ const base = import.meta.env.BASE_URL;
     border-radius: 999px;
     text-decoration: none;
     color: inherit;
+  }
+
+  .preview-banner {
+    padding: 10px 16px;
+    margin-bottom: var(--space-6);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: var(--radius-md);
   }
 </style>
