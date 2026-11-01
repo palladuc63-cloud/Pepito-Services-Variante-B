@@ -58,7 +58,7 @@ services:
     networks: [pepito]
 
   # Umami — analytics auto-hébergé (sans cookies), exposé via
-  # stats.pepito-services.fr → 127.0.0.1:8096. API interne pour le BO.
+  # stats.pepito-services.fr → 127.0.0.1:8092. API interne pour le BO.
   umami-db:
     image: postgres:16-alpine
     container_name: pepito-umami-db
@@ -85,7 +85,7 @@ services:
       DATABASE_TYPE: postgresql
       APP_SECRET: ${UMAMI_APP_SECRET}
     ports:
-      - "127.0.0.1:8096:3000"
+      - "127.0.0.1:8092:3000"
     depends_on:
       umami-db:
         condition: service_healthy
