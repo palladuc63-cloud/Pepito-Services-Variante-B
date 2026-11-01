@@ -1,6 +1,7 @@
 ---
 import type { Project } from '../data/types';
 import ContentBadge from './ContentBadge.astro';
+import { getCityPages } from '../lib/api.js';
 
 export interface Props {
   project: Project;
@@ -10,6 +11,15 @@ export interface Props {
 
 const { project, categoryLabel: customCategoryLabel, showDraft = false } = Astro.props;
 const categoryLabel = customCategoryLabel ?? project.category?.label ?? 'Réalisation';
+
+// Badge ville → lien vers la page ville publiée quand elle existe
+const slugify = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const cityPages = project.city ? await getCityPages() : [];
+const cityPage = project.city
+  ? cityPages.find((c: { slug: string; serviceSlug: string }) => c.slug === slugify(project.city!))
+  : null;
+const base = import.meta.env.BASE_URL;
 const gallery = project.images?.length
   ? project.images.map((i) => i.imageUrl)
   : (project.imageUrl ? [project.imageUrl] : []);
@@ -26,6 +36,15 @@ const gallery = project.images?.length
       />
     ))}
     {gallery.length > 1 && <span class="gallery-count" aria-hidden="true">{gallery.length} photos</span>}
+    {project.city && (cityPage ? (
+      <a
+        class="city-badge"
+        href={`${base}${cityPage.serviceSlug}/${cityPage.slug}/`}
+        title={`Nos interventions à ${project.city}`}
+      >📍 {project.city}</a>
+    ) : (
+      <span class="city-badge">📍 {project.city}</span>
+    ))}
     {showDraft && !project.published && <span class="draft-badge">Brouillon</span>}
   </div>
   <div class="card-body">
@@ -122,6 +141,28 @@ const gallery = project.images?.length
     background: #fef3c7;
     border: 1px solid #f59e0b;
     border-radius: 20px;
+  }
+
+  .city-badge {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    padding: 2px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    text-decoration: none;
+  }
+
+  a.city-badge:hover,
+  a.city-badge:focus-visible {
+    background: rgba(0, 0, 0, 0.8);
+    text-decoration: underline;
   }
 
   .gallery-count {
