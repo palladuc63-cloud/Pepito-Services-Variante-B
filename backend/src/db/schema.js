@@ -1,4 +1,4 @@
-import { mysqlTable, serial, varchar, text, timestamp, int, boolean, mysqlEnum, json } from 'drizzle-orm/mysql-core';
+import { mysqlTable, serial, varchar, text, timestamp, int, boolean, mysqlEnum, json, double } from 'drizzle-orm/mysql-core';
 
 // Comptes admin du back-office
 export const users = mysqlTable('users', {
