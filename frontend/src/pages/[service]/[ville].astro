@@ -21,7 +21,7 @@ const pageImage = page.imageUrl
   title={page.title}
   description={page.content?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160)}
   image={pageImage}
-  canonicalPath={`/${page.serviceSlug}/${page.slug}`}
+  canonicalPath={`/${page.serviceSlug}/${page.slug}/`}
   seoMeta={page.seoMeta}
 >
   <article class="section city-page">
