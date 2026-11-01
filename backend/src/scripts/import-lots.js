@@ -35,13 +35,13 @@ const lots = fs.readdirSync(SRC_DIR)
 console.log(`${lots.length} lots détectés dans ${SRC_DIR}${apply ? '' : ' (dry-run)'}`);
 
 // Projets déjà importés (anti-doublon)
-const [existing] = await db
+const existing = await db
   .select({ slug: projects.slug })
   .from(projects)
   .where(like(projects.slug, 'chantier-fb-lot-%'));
 const done = new Set(existing.map(p => p.slug));
 
-const [[{ maxOrder }]] = await db
+const [{ maxOrder }] = await db
   .select({ maxOrder: sql`COALESCE(MAX(sort_order),0)` })
   .from(projects);
 let order = Number(maxOrder) + 1;
