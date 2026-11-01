@@ -672,6 +672,7 @@ const base = import.meta.env.BASE_URL;
       `<strong>${esc(p.title)}</strong>
        <span class="muted">${esc(p.summary ?? '')}</span>
        <div class="item-card-meta"><span class="tag-pill">${esc(p.category?.label ?? '—')}</span>
+         ${p.city ? `<span class="tag-pill">📍 ${esc(p.city)}</span>` : ''}
          <span class="tag-pill ${p.published ? 'pub' : 'draft'}">${p.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(p)}</div>`,
       `<a class="btn btn-sm" href="${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
        <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
