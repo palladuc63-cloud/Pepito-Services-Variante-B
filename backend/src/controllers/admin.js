@@ -5,6 +5,7 @@ import {
   projectImages, cityPages, seoMeta, redirects,
 } from '../db/schema.js';
 import { slugify } from '../utils/slug.js';
+import { ensureCityPage } from '../utils/citygen.js';
 import { buildPostContent, postLink } from '../utils/social.js';
 import { notify } from '../utils/notify.js';
 import { sanitizeRichHtml } from '../utils/sanitize.js';
@@ -135,17 +136,20 @@ export async function listProjects(_req, res) {
 }
 
 export async function createProject(req, res) {
-  const { title, categoryId, summary, description, imageUrl, images, tags, published, sortOrder = 0, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  const { title, categoryId, summary, description, imageUrl, images, city, tags, published, sortOrder = 0, metaTitle, metaDesc, ogImage } = req.body ?? {};
   if (!title) return res.status(400).json({ error: 'Titre requis' });
   const slug = await uniqueSlug(projects, title);
   const cover = imageUrl ?? (Array.isArray(images) && images.length ? images[0] : null);
   const [r] = await db.insert(projects).values({
     slug, title, categoryId: categoryId || null, summary,
-    description: sanitizeRichHtml(description), imageUrl: cover,
+    description: sanitizeRichHtml(description), imageUrl: cover, city: city?.trim() || null,
     tags: Array.isArray(tags) ? tags : [], published: published !== false, sortOrder,
   }).$returningId();
   if (Array.isArray(images)) await replaceProjectImages(r.id, images);
   await upsertSeoMeta('project', r.id, { metaTitle, metaDesc, ogImage });
+  if (city?.trim() && published !== false) {
+    ensureCityPage(city, categoryId).catch((e) => console.error('citygen:', e.message));
+  }
   if (published !== false) {
     const [cat] = categoryId ? await db.select().from(categories).where(eq(categories.id, categoryId)) : [];
     queueSocialPost('project', { id: r.id, slug, title, summary, imageUrl }, cat?.slug);
@@ -155,7 +159,7 @@ export async function createProject(req, res) {
 
 export async function updateProject(req, res) {
   const id = Number(req.params.id);
-  const { title, categoryId, summary, description, imageUrl, images, tags, published, sortOrder, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  const { title, categoryId, summary, description, imageUrl, images, city, tags, published, sortOrder, metaTitle, metaDesc, ogImage } = req.body ?? {};
   const [before] = await db.select().from(projects).where(eq(projects.id, id));
   const cover = imageUrl !== undefined ? imageUrl
     : (Array.isArray(images) ? (images[0] ?? null) : undefined);
@@ -165,6 +169,7 @@ export async function updateProject(req, res) {
     ...(summary !== undefined && { summary }),
     ...(description !== undefined && { description: sanitizeRichHtml(description) }),
     ...(cover !== undefined && { imageUrl: cover }),
+    ...(city !== undefined && { city: city?.trim() || null }),
     ...(tags !== undefined && { tags: Array.isArray(tags) ? tags : [] }),
     ...(published !== undefined && { published }),
     ...(sortOrder !== undefined && { sortOrder }),
@@ -172,6 +177,12 @@ export async function updateProject(req, res) {
   if (Array.isArray(images)) await replaceProjectImages(id, images);
   if (metaTitle !== undefined || metaDesc !== undefined || ogImage !== undefined) {
     await upsertSeoMeta('project', id, { metaTitle, metaDesc, ogImage });
+  }
+  const nowPublished = published !== undefined ? published : before?.published;
+  const finalCity = city !== undefined ? city : before?.city;
+  const finalCategoryId = categoryId !== undefined ? categoryId : before?.categoryId;
+  if (finalCity?.trim() && nowPublished) {
+    ensureCityPage(finalCity, finalCategoryId).catch((e) => console.error('citygen:', e.message));
   }
   // Republication : brouillon FB uniquement si passage brouillon→publié
   if (before && !before.published && published === true) {

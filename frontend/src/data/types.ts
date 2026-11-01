@@ -75,6 +75,9 @@ export interface CityPage {
   title: string;
   content: string | null;
   imageUrl: string | null;
+  lat: number | null;
+  lng: number | null;
+  auto: boolean;
   published: boolean;
   sortOrder: number;
   seoMeta: SeoMeta | null;
@@ -89,6 +92,7 @@ export interface Project {
   summary: string | null;
   description: string | null;
   imageUrl: string | null;
+  city: string | null;
   images: ProjectImage[];
   tags: string[];
   published: boolean;

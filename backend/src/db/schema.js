@@ -41,6 +41,7 @@ export const projects = mysqlTable('projects', {
   summary: varchar('summary', { length: 500 }),
   description: text('description'), // HTML riche
   imageUrl: varchar('image_url', { length: 500 }),
+  city: varchar('city', { length: 120 }),                        // ville du chantier → génère une page ville
   tags: json('tags'),
   published: boolean('published').default(true).notNull(),
   sortOrder: int('sort_order').default(0).notNull(),
@@ -99,6 +100,9 @@ export const cityPages = mysqlTable('city_pages', {
   title: varchar('title', { length: 200 }).notNull(),
   content: text('content'),                                    // HTML riche
   imageUrl: varchar('image_url', { length: 500 }),
+  lat: double('lat'),
+  lng: double('lng'),
+  auto: boolean('auto').default(false).notNull(),               // générée automatiquement depuis une réalisation
   published: boolean('published').default(false).notNull(),
   sortOrder: int('sort_order').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),

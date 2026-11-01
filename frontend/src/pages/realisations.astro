@@ -3,11 +3,15 @@ import MainLayout from '../layouts/MainLayout.astro';
 import Section from '../components/Section.astro';
 import ProjectFilter from '../components/ProjectFilter.astro';
 import ContentBadge from '../components/ContentBadge.astro';
+import CityMap from '../components/CityMap.astro';
 import { getSite } from '../lib/site.js';
-import { getProjects } from '../lib/api.js';
+import { getProjects, getCityPages } from '../lib/api.js';
+import type { CityPage } from '../data/types';
 
 const { categories } = await getSite();
-const projects = await getProjects();
+const [projects, cityPagesRaw] = await Promise.all([getProjects(), getCityPages()]);
+const cityPages = cityPagesRaw as CityPage[];
+const base = import.meta.env.BASE_URL;
 ---
 
 <MainLayout
@@ -26,11 +30,48 @@ const projects = await getProjects();
     </div>
 
     <ProjectFilter projects={projects} categories={categories} />
+
+    {cityPages.length > 0 && (
+      <section class="zone-section">
+        <h2 class="section-title">Nos zones d'intervention</h2>
+        <p class="section-subtitle">
+          Cliquez sur une ville pour découvrir nos réalisations et prestations locales.
+        </p>
+        <CityMap pages={cityPages} />
+        <ul class="zone-links">
+          {cityPages.map((c) => (
+            <li><a href={`${base}${c.serviceSlug}/${c.slug}/`}>{c.city}</a></li>
+          ))}
+        </ul>
+      </section>
+    )}
   </Section>
 </MainLayout>
 
 <style>
   .page-header {
     margin-bottom: var(--space-8);
+  }
+
+  .zone-section {
+    margin-top: var(--space-12);
+  }
+
+  .zone-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-5);
+  }
+
+  .zone-links a {
+    display: inline-block;
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    text-decoration: none;
+    color: inherit;
   }
 </style>

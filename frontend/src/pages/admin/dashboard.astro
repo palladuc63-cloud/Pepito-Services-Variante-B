@@ -354,6 +354,8 @@ const base = import.meta.env.BASE_URL;
         <div><label class="form-label">Ordre</label><input class="form-input" id="p-order" type="number" value="${p.sortOrder ?? 0}" /></div>
       </div>
       <div class="form-row"><label class="form-label">Résumé</label><input class="form-input" id="p-summary" value="${esc(p.summary ?? '')}" /></div>
+      <div class="form-row"><label class="form-label">Ville du chantier</label><input class="form-input" id="p-city" value="${esc(p.city ?? '')}" placeholder="Saint-Étienne" />
+        <p class="form-hint">Génère automatiquement un brouillon de page ville (SEO local) à valider dans l'onglet « Pages villes ».</p></div>
       <div class="form-row"><label class="form-label">Description (HTML accepté)</label><textarea class="form-textarea tall" id="p-desc">${esc(p.description ?? '')}</textarea></div>
       <div class="form-row"><label class="form-label">Photos du chantier (la 1re sert de couverture)</label>
         <div id="p-gallery" class="gallery-list"></div>
@@ -422,6 +424,7 @@ const base = import.meta.env.BASE_URL;
       categoryId: $('#p-cat').value ? Number($('#p-cat').value) : null,
       summary: $('#p-summary').value.trim(),
       description: $('#p-desc').value,
+      city: $('#p-city').value.trim() || null,
       images: galleryUrls,
       tags: $('#p-tags').value.split(',').map((t) => t.trim()).filter(Boolean),
       published: $('#p-published').checked,
@@ -566,14 +569,20 @@ const base = import.meta.env.BASE_URL;
     window._citypages = citypages;
     $('#citypages-body').innerHTML = citypages.length ? citypages.map((c) => `
       <tr>
-        <td><code>/${esc(c.serviceSlug)}/${esc(c.slug)}/</code></td>
+        <td><code>/${esc(c.serviceSlug)}/${esc(c.slug)}/</code>${c.auto ? '<br/><span class="tag-pill">Auto</span>' : ''}</td>
         <td><strong>${esc(c.title)}</strong><br/><span style="color:var(--muted);font-size:12px">${esc(c.city)}</span></td>
         <td><span class="tag-pill ${c.published ? 'pub' : 'draft'}">${c.published ? 'Publié' : 'Brouillon'}</span></td>
         <td style="text-align:right;white-space:nowrap">
+          ${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
           <button class="btn btn-sm" data-city-edit="${c.id}">Éditer</button>
           <button class="btn btn-sm btn-danger" data-city-del="${c.id}">✕</button>
         </td>
       </tr>`).join('') : '<tr><td colspan="4" style="color:var(--muted)">Aucune page ville pour l’instant.</td></tr>';
+    document.querySelectorAll('[data-city-pub]').forEach((b) => b.addEventListener('click', async () => {
+      await api.put(`/api/admin/city-pages/${b.dataset.cityPub}`, { published: true });
+      showAlert('Page ville publiée.');
+      loaders.citypages();
+    }));
     document.querySelectorAll('[data-city-edit]').forEach((b) => b.addEventListener('click', () => editCityPage(b.dataset.cityEdit)));
     document.querySelectorAll('[data-city-del]').forEach((b) => b.addEventListener('click', async () => {
       if (!confirm('Supprimer cette page ville ?')) return;

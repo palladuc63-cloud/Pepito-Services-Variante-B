@@ -3,3 +3,10 @@ dist/
 .astro/
 .env
 .DS_Store
+
+# Assets photo Facebook / traitement local (hors repo)
+fb-photos/
+site-photos/
+site-photos-reframed/
+mockups/
+Logo/Tests-Propositions/

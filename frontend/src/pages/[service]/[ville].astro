@@ -1,6 +1,6 @@
 ---
 import MainLayout from '../../layouts/MainLayout.astro';
-import { getCityPage, getContent } from '../../lib/api.js';
+import { getCityPage, getCityPages, getContent, getProjects } from '../../lib/api.js';
 import type { Service } from '../../data/types';
 
 const { service = '', ville = '' } = Astro.params;
@@ -9,7 +9,32 @@ if (!page) {
   return new Response(null, { status: 404, statusText: 'Page introuvable' });
 }
 
-const { services } = await getContent();
+const [{ services }, allCityPages, projects] = await Promise.all([
+  getContent(), getCityPages(), getProjects(),
+]);
+
+// ── Maillage interne ────────────────────────────────────────
+const slugify = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+// Réalisations dans la même ville
+const localProjects = projects.filter(
+  (p: { city?: string | null }) => p.city && slugify(p.city) === page.slug,
+);
+
+// Pages villes proches (haversine), max 5
+const haversine = (a1: number, o1: number, a2: number, o2: number) => {
+  const R = 6371, d = (x: number) => (x * Math.PI) / 180;
+  const h = Math.sin(d(a2 - a1) / 2) ** 2 + Math.cos(d(a1)) * Math.cos(d(a2)) * Math.sin(d(o2 - o1) / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+};
+const nearby = page.lat != null && page.lng != null
+  ? allCityPages
+      .filter((c: { id: number; lat: number | null; lng: number | null }) => c.id !== page.id && c.lat != null && c.lng != null)
+      .map((c: { id: number; lat: number; lng: number } & Record<string, unknown>) => ({ ...c, d: haversine(page.lat, page.lng, c.lat, c.lng) }))
+      .sort((a: { d: number }, b: { d: number }) => a.d - b.d)
+      .slice(0, 5)
+  : allCityPages.filter((c: { id: number }) => c.id !== page.id).slice(0, 5);
 const serviceInfo = (services as Service[]).find((s) => s.slug === service);
 const base = import.meta.env.BASE_URL;
 const pageImage = page.imageUrl
@@ -37,6 +62,34 @@ const pageImage = page.imageUrl
       )}
 
       <div class="article-content" set:html={page.content ?? ''} />
+
+      {localProjects.length > 0 && (
+        <section class="local-reals">
+          <h2 class="mesh-title">Nos réalisations à {page.city}</h2>
+          <div class="mesh-grid">
+            {localProjects.map((p: { slug: string; title: string; imageUrl: string | null; category?: { label: string } | null }) => (
+              <a href={`${base}realisations/`} class="mesh-card">
+                {p.imageUrl && <img src={p.imageUrl} alt={p.title} loading="lazy" />}
+                <span class="mesh-card-body">
+                  <strong>{p.title}</strong>
+                  {p.category?.label && <small>{p.category.label}</small>}
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {nearby.length > 0 && (
+        <section class="nearby">
+          <h2 class="mesh-title">Nous intervenons aussi à</h2>
+          <ul class="nearby-list">
+            {nearby.map((c: { serviceSlug: string; slug: string; city: string }) => (
+              <li><a href={`${base}${c.serviceSlug}/${c.slug}/`}>{c.city}</a></li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <footer class="article-footer">
         <p>Vous avez un projet à {page.city} ?</p>
@@ -69,6 +122,65 @@ const pageImage = page.imageUrl
   .article-content {
     line-height: var(--leading-relaxed);
     margin-bottom: var(--space-10);
+  }
+
+  .mesh-title {
+    font-size: var(--text-xl, 1.4rem);
+    margin-bottom: var(--space-4);
+  }
+
+  .mesh-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-10);
+  }
+
+  .mesh-card {
+    display: block;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 8px);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .mesh-card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+  }
+
+  .mesh-card-body {
+    display: block;
+    padding: var(--space-3);
+  }
+
+  .mesh-card-body small {
+    display: block;
+    color: var(--color-text-muted);
+  }
+
+  .nearby {
+    margin-bottom: var(--space-10);
+  }
+
+  .nearby-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    list-style: none;
+    padding: 0;
+  }
+
+  .nearby-list a {
+    display: inline-block;
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    text-decoration: none;
+    color: inherit;
   }
 
   .article-footer {
