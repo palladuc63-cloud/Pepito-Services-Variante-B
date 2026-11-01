@@ -43,6 +43,22 @@ export default defineConfig({
       styles: ['normal'],
       subsets: ['latin'],
     },
+    {
+      provider: fontProviders.google(),
+      name: 'Poppins',
+      cssVariable: '--font-poppins',
+      weights: [500, 700, 800],
+      styles: ['normal'],
+      subsets: ['latin'],
+    },
+    {
+      provider: fontProviders.google(),
+      name: 'Lobster',
+      cssVariable: '--font-lobster',
+      weights: [400],
+      styles: ['normal'],
+      subsets: ['latin'],
+    },
   ],
   vite: {
     plugins: [tailwindcss()],

@@ -46,7 +46,8 @@
   --color-success-text: var(--ok);
 
   /* Typography */
-  --font-heading: var(--font-display);
+  --font-heading: var(--font-poppins), 'Poppins', system-ui, sans-serif;
+  --font-accent: var(--font-lobster), 'Lobster', 'Brush Script MT', cursive;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -147,7 +148,7 @@ h2,
 h3,
 h4 {
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.12;
   letter-spacing: -0.015em;
   color: var(--color-heading);
@@ -283,6 +284,8 @@ a:focus-visible {
 }
 
 .section-subtitle {
+  font-family: var(--font-heading);
+  font-weight: 500;
   color: var(--color-text-muted);
   max-width: 60ch;
   margin-bottom: var(--space-8);

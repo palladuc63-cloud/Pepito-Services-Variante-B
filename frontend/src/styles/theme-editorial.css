@@ -680,6 +680,7 @@
 }
 
 :root[data-theme='editorial'] .footer-tagline {
+  font-family: var(--font-body);
   color: var(--forest);
   font-size: 0.72rem;
   font-weight: 600;
