@@ -36,6 +36,7 @@ router.put('/settings', ctrl.updateSettings);
 
 router.get('/city-pages', ctrl.listCityPages);
 router.post('/city-pages', ctrl.createCityPage);
+router.post('/city-pages/schedule-drafts', ctrl.scheduleCityDrafts);
 router.put('/city-pages/:id', ctrl.updateCityPage);
 router.delete('/city-pages/:id', ctrl.deleteCityPage);
 

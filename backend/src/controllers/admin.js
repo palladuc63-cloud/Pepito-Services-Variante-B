@@ -6,7 +6,7 @@ import {
 } from '../db/schema.js';
 import { slugify } from '../utils/slug.js';
 import { ensureCityPage, fetchCityInfo } from '../utils/citygen.js';
-import { nextSlot } from '../utils/schedule.js';
+import { nextSlot, backfillDrafts } from '../utils/schedule.js';
 import { buildPostContent, postLink } from '../utils/social.js';
 import { notify } from '../utils/notify.js';
 import { sanitizeRichHtml } from '../utils/sanitize.js';
@@ -275,6 +275,11 @@ export async function upsertSeoMeta(entityType, entityId, { metaTitle, metaDesc,
 // ─── City pages (SEO local) ─────────────────────────────────
 export const listCityPages = async (_req, res) =>
   res.json(await db.select().from(cityPages).orderBy(asc(cityPages.serviceSlug), asc(cityPages.sortOrder)));
+
+// Met en file les brouillons de pages villes existants (ordre de création)
+export async function scheduleCityDrafts(_req, res) {
+  res.json({ scheduled: await backfillDrafts('city_page', cityPages) });
+}
 
 export async function createCityPage(req, res) {
   const { city, serviceSlug, title, content, imageUrl, published = false, publishedAt, sortOrder = 0, metaTitle, metaDesc, ogImage } = req.body ?? {};

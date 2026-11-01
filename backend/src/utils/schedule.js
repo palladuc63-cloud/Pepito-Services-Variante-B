@@ -2,7 +2,7 @@
 // Config stockée en settings.schedule_config (JSON) :
 // { project|article|city_page: { enabled, intervalDays, weekday, hour } }
 // weekday : 0=dimanche … 6=samedi (getDay() JS)
-import { eq, gt } from 'drizzle-orm';
+import { eq, gt, asc } from 'drizzle-orm';
 import { db } from '../db.js';
 import { settings } from '../db/schema.js';
 
@@ -49,4 +49,30 @@ export async function nextSlot(type, table) {
     cursor.setHours(conf.hour ?? 9, 0, 0, 0);
   }
   return cursor;
+}
+
+// Met en file les brouillons existants (published=false), dans l'ordre
+// de création : chacun prend le créneau libre suivant. Un brouillon qui
+// a déjà une date future est laissé tel quel.
+export async function backfillDrafts(type, table) {
+  const conf = (await getSchedule())[type];
+  if (!conf?.enabled) return 0;
+  const now = new Date();
+  const drafts = await db
+    .select()
+    .from(table)
+    .where(eq(table.published, false))
+    .orderBy(asc(table.id));
+  let n = 0;
+  for (const d of drafts) {
+    if (d.publishedAt && d.publishedAt > now) continue;
+    const slot = await nextSlot(type, table);
+    if (!slot) break;
+    await db
+      .update(table)
+      .set({ published: true, publishedAt: slot })
+      .where(eq(table.id, d.id));
+    n++;
+  }
+  return n;
 }

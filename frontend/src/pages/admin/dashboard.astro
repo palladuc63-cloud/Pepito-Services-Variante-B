@@ -173,6 +173,7 @@ const base = import.meta.env.BASE_URL;
                   <button type="button" data-v="list" title="Affichage liste">☰</button>
                   <button type="button" data-v="cards" title="Affichage cards">▦</button>
                 </div>
+                <button class="btn btn-sm" id="btn-schedule-city-drafts" title="Mettre en file les brouillons dans l'ordre">📅 Planifier les brouillons</button>
                 <button class="btn btn-primary btn-sm" id="btn-new-city">+ Nouvelle page ville</button>
               </div>
             </div>
@@ -959,6 +960,12 @@ const base = import.meta.env.BASE_URL;
       showAlert('Page ville publiée.');
       loaders.citypages();
     }));
+    $('#btn-schedule-city-drafts').onclick = async () => {
+      if (!confirm('Mettre en file tous les brouillons de pages villes, dans l\'ordre de création ?')) return;
+      const r = await api.post('/api/admin/city-pages/schedule-drafts');
+      showAlert(`${r.scheduled} page(s) ville programmée(s) selon la planification.`);
+      loaders.citypages();
+    };
     document.querySelectorAll('[data-city-edit]').forEach((b) => b.addEventListener('click', () => editCityPage(b.dataset.cityEdit)));
     document.querySelectorAll('[data-city-del]').forEach((b) => b.addEventListener('click', async () => {
       if (!confirm('Supprimer cette page ville ?')) return;
