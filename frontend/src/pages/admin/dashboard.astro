@@ -79,12 +79,21 @@ const base = import.meta.env.BASE_URL;
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
               <h2 style="margin:0">Réalisations</h2>
-              <button class="btn btn-primary btn-sm" id="btn-new-project">+ Nouvelle réalisation</button>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div class="view-toggle" data-view-for="projects">
+                  <button type="button" data-v="list" title="Affichage liste">☰</button>
+                  <button type="button" data-v="cards" title="Affichage cards">▦</button>
+                </div>
+                <button class="btn btn-primary btn-sm" id="btn-new-project">+ Nouvelle réalisation</button>
+              </div>
             </div>
-            <table class="admin-table">
-              <thead><tr><th></th><th>Titre</th><th>Catégorie</th><th>Statut</th><th></th></tr></thead>
-              <tbody id="projects-body"></tbody>
-            </table>
+            <div id="projects-table">
+              <table class="admin-table">
+                <thead><tr><th></th><th>Titre</th><th>Catégorie</th><th>Statut</th><th></th></tr></thead>
+                <tbody id="projects-body"></tbody>
+              </table>
+            </div>
+            <div id="projects-cards" class="item-cards" hidden></div>
           </div>
         </section>
 
@@ -93,12 +102,21 @@ const base = import.meta.env.BASE_URL;
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
               <h2 style="margin:0">Articles</h2>
-              <button class="btn btn-primary btn-sm" id="btn-new-article">+ Nouvel article</button>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div class="view-toggle" data-view-for="articles">
+                  <button type="button" data-v="list" title="Affichage liste">☰</button>
+                  <button type="button" data-v="cards" title="Affichage cards">▦</button>
+                </div>
+                <button class="btn btn-primary btn-sm" id="btn-new-article">+ Nouvel article</button>
+              </div>
             </div>
-            <table class="admin-table">
-              <thead><tr><th></th><th>Titre</th><th>Publié le</th><th>Statut</th><th></th></tr></thead>
-              <tbody id="articles-body"></tbody>
-            </table>
+            <div id="articles-table">
+              <table class="admin-table">
+                <thead><tr><th></th><th>Titre</th><th>Publié le</th><th>Statut</th><th></th></tr></thead>
+                <tbody id="articles-body"></tbody>
+              </table>
+            </div>
+            <div id="articles-cards" class="item-cards" hidden></div>
           </div>
         </section>
 
@@ -134,12 +152,21 @@ const base = import.meta.env.BASE_URL;
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
               <h2 style="margin:0">Pages villes (SEO local)</h2>
-              <button class="btn btn-primary btn-sm" id="btn-new-city">+ Nouvelle page ville</button>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div class="view-toggle" data-view-for="citypages">
+                  <button type="button" data-v="list" title="Affichage liste">☰</button>
+                  <button type="button" data-v="cards" title="Affichage cards">▦</button>
+                </div>
+                <button class="btn btn-primary btn-sm" id="btn-new-city">+ Nouvelle page ville</button>
+              </div>
             </div>
-            <table class="admin-table">
-              <thead><tr><th>URL</th><th>Titre</th><th>Statut</th><th></th></tr></thead>
-              <tbody id="citypages-body"></tbody>
-            </table>
+            <div id="citypages-table">
+              <table class="admin-table">
+                <thead><tr><th>URL</th><th>Titre</th><th>Statut</th><th></th></tr></thead>
+                <tbody id="citypages-body"></tbody>
+              </table>
+            </div>
+            <div id="citypages-cards" class="item-cards" hidden></div>
             <p class="form-hint">Chaque page publiée est servie sur /&lt;service&gt;/&lt;ville&gt;/ — ex. /clotures/saint-etienne/</p>
           </div>
         </section>
@@ -278,6 +305,30 @@ const base = import.meta.env.BASE_URL;
     settings: ['Paramètres', 'Coordonnées et contenus du site'],
   };
   const loaders = {};
+
+  // ── Toggle affichage liste ⇄ cards (préférence par onglet) ──
+  const viewKey = (n) => `pepito-view-${n}`;
+  const cardShell = (img, inner, actions) => `
+    <div class="item-card">
+      <div class="item-card-img">${img ? `<img src="${esc(img)}" alt="" loading="lazy" />` : '<span class="item-card-noimg">📷</span>'}</div>
+      <div class="item-card-body">${inner}</div>
+      <div class="item-card-actions">${actions}</div>
+    </div>`;
+  function applyView(name) {
+    const mode = localStorage.getItem(viewKey(name)) || 'list';
+    const table = $(`#${name}-table`), cards = $(`#${name}-cards`);
+    if (!table || !cards) return;
+    table.hidden = mode === 'cards';
+    cards.hidden = mode !== 'cards';
+    document.querySelectorAll(`.view-toggle[data-view-for="${name}"] button`)
+      .forEach((b) => b.classList.toggle('active', b.dataset.v === mode));
+  }
+  document.querySelectorAll('.view-toggle button').forEach((b) => b.addEventListener('click', () => {
+    const name = b.closest('.view-toggle').dataset.viewFor;
+    localStorage.setItem(viewKey(name), b.dataset.v);
+    applyView(name);
+  }));
+
   // ══════════ VUE D'ENSEMBLE ══════════
   loaders.overview = async () => {
     const [projects, articles, citypages, messages, social] = await Promise.all([
@@ -519,6 +570,16 @@ const base = import.meta.env.BASE_URL;
           <button class="btn btn-sm btn-danger" data-proj-del="${p.id}">✕</button>
         </td>
       </tr>`).join('');
+    $('#projects-cards').innerHTML = projects.length ? projects.map((p) => cardShell(p.imageUrl,
+      `<strong>${esc(p.title)}</strong>
+       <span class="muted">${esc(p.summary ?? '')}</span>
+       <div class="item-card-meta"><span class="tag-pill">${esc(p.category?.label ?? '—')}</span>
+         <span class="tag-pill ${p.published ? 'pub' : 'draft'}">${p.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(p)}</div>`,
+      `<a class="btn btn-sm" href="${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
+       <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
+       <button class="btn btn-sm btn-danger" data-proj-del="${p.id}">✕</button>`)).join('')
+      : '<p style="color:var(--muted);margin:0">Aucune réalisation.</p>';
+    applyView('projects');
     window._projects = projects;
     document.querySelectorAll('[data-proj-edit]').forEach((b) => b.addEventListener('click', () => editProject(b.dataset.projEdit)));
     document.querySelectorAll('[data-proj-del]').forEach((b) => b.addEventListener('click', async () => {
@@ -656,6 +717,16 @@ const base = import.meta.env.BASE_URL;
           <button class="btn btn-sm btn-danger" data-art-del="${a.id}">✕</button>
         </td>
       </tr>`).join('');
+    $('#articles-cards').innerHTML = articles.length ? articles.map((a) => cardShell(a.imageUrl,
+      `<strong>${esc(a.title)}</strong>
+       <span class="muted">/${esc(a.slug)}/</span>
+       <div class="item-card-meta"><span class="tag-pill">${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('fr-FR') : '—'}</span>
+         <span class="tag-pill ${a.published ? 'pub' : 'draft'}">${a.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(a)}</div>`,
+      `<a class="btn btn-sm" href="${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
+       <button class="btn btn-sm" data-art-edit="${a.id}">Éditer</button>
+       <button class="btn btn-sm btn-danger" data-art-del="${a.id}">✕</button>`)).join('')
+      : '<p style="color:var(--muted);margin:0">Aucun article.</p>';
+    applyView('articles');
     window._articles = articles;
     document.querySelectorAll('[data-art-edit]').forEach((b) => b.addEventListener('click', () => editArticle(b.dataset.artEdit)));
     document.querySelectorAll('[data-art-del]').forEach((b) => b.addEventListener('click', async () => {
@@ -774,6 +845,17 @@ const base = import.meta.env.BASE_URL;
           <button class="btn btn-sm btn-danger" data-city-del="${c.id}">✕</button>
         </td>
       </tr>`).join('') : '<tr><td colspan="4" style="color:var(--muted)">Aucune page ville pour l’instant.</td></tr>';
+    $('#citypages-cards').innerHTML = citypages.length ? citypages.map((c) => cardShell(c.imageUrl,
+      `<strong>${esc(c.title)}</strong>
+       <span class="muted"><code>/${esc(c.serviceSlug)}/${esc(c.slug)}/</code></span>
+       <div class="item-card-meta">${c.auto ? '<span class="tag-pill">Auto</span>' : ''}
+         <span class="tag-pill ${c.published ? 'pub' : 'draft'}">${c.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(c)}</div>`,
+      `${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
+       <a class="btn btn-sm" href="${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
+       <button class="btn btn-sm" data-city-edit="${c.id}">Éditer</button>
+       <button class="btn btn-sm btn-danger" data-city-del="${c.id}">✕</button>`)).join('')
+      : '<p style="color:var(--muted);margin:0">Aucune page ville pour l’instant.</p>';
+    applyView('citypages');
     document.querySelectorAll('[data-city-pub]').forEach((b) => b.addEventListener('click', async () => {
       await api.put(`/api/admin/city-pages/${b.dataset.cityPub}`, { published: true });
       showAlert('Page ville publiée.');
