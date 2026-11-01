@@ -26,14 +26,26 @@ const localProjects = (projects as Project[]).filter(
   (p) => p.city && slugify(p.city) === page.slug,
 );
 
-// Visuels du carrousel : image de la page puis photos des réalisations locales
-const seen = new Set<string>();
-const slides = [
-  ...(page.imageUrl ? [{ url: page.imageUrl, alt: page.title }] : []),
-  ...localProjects.flatMap((p) =>
-    (p.images ?? []).map((i) => ({ url: i.imageUrl, alt: i.alt ?? p.title })),
-  ),
-].filter((s) => s.url && !seen.has(s.url) && !!seen.add(s.url));
+// Carrousel : 1 image aléatoire par catégorie
+// (priorité aux chantiers de cette ville, sinon n'importe quel chantier)
+const byCat = new Map<number, { local: Project[]; all: Project[] }>();
+for (const p of projects as Project[]) {
+  if (!p.category?.id) continue;
+  const g = byCat.get(p.category.id) ?? { local: [], all: [] };
+  g.all.push(p);
+  if (p.city && slugify(p.city) === page.slug) g.local.push(p);
+  byCat.set(p.category.id, g);
+}
+const pickOne = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+const slides = [...byCat.values()]
+  .map((g) => {
+    const p = pickOne(g.local.length ? g.local : g.all);
+    const imgs = (p.images?.length ? p.images : [{ imageUrl: p.imageUrl, alt: p.title }])
+      .filter((i) => i.imageUrl);
+    const img = imgs.length ? pickOne(imgs) : null;
+    return img ? { url: img.imageUrl as string, alt: img.alt ?? p.title } : null;
+  })
+  .filter((s): s is { url: string; alt: string } => s !== null);
 
 // Pages villes proches (haversine), max 5
 const haversine = (a1: number, o1: number, a2: number, o2: number) => {
