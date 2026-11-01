@@ -3,6 +3,7 @@ import MainLayout from '../../layouts/MainLayout.astro';
 import ImageCarousel from '../../components/ImageCarousel.astro';
 import CityMap from '../../components/CityMap.astro';
 import { getCityPage, getCityPages, getProjects } from '../../lib/api.js';
+import { getSite } from '../../lib/site.js';
 import type { CityPage, Project } from '../../data/types';
 
 const { service = '', ville = '' } = Astro.params;
@@ -13,8 +14,8 @@ if (!page) {
   return new Response(null, { status: 404, statusText: 'Page introuvable' });
 }
 
-const [allCityPages, projects] = await Promise.all([
-  getCityPages(), getProjects(),
+const [allCityPages, projects, { settings, services }] = await Promise.all([
+  getCityPages(), getProjects(), getSite(),
 ]);
 
 // ── Maillage interne ────────────────────────────────────────
@@ -64,6 +65,53 @@ const base = import.meta.env.BASE_URL;
 const pageImage = page.imageUrl
   ? (page.imageUrl.startsWith('http') ? page.imageUrl : `https://www.pepito-services.fr${page.imageUrl}`)
   : undefined;
+
+// ── SEO local : fil d'Ariane + données structurées ──────────
+const svc = (services as { slug: string; title: string }[]).find((s) => s.slug === page.serviceSlug);
+const siteUrl = settings.siteUrl.replace(/\/$/, '');
+const pageUrl = `${siteUrl}/${page.serviceSlug}/${page.slug}/`;
+const serviceUrl = `${siteUrl}/#services`;
+const jsonLd = [{
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'HomeAndConstructionBusiness',
+      '@id': `${siteUrl}/#business`,
+      name: settings.name,
+      url: siteUrl,
+      image: `${siteUrl}/pepito-logo.svg`,
+      ...(settings.contact.phone && { telephone: settings.contact.phone }),
+      ...(settings.contact.email && { email: settings.contact.email }),
+      ...(settings.contact.address && {
+        address: { '@type': 'PostalAddress', streetAddress: settings.contact.address, addressCountry: 'FR' },
+      }),
+      ...(settings.contact.serviceArea && { areaServed: settings.contact.serviceArea }),
+    },
+    {
+      '@type': 'Service',
+      name: page.title,
+      serviceType: svc?.title ?? page.title,
+      provider: { '@id': `${siteUrl}/#business` },
+      areaServed: {
+        '@type': 'City',
+        name: page.city,
+        ...(page.lat != null && page.lng != null && {
+          geo: { '@type': 'GeoCoordinates', latitude: page.lat, longitude: page.lng },
+        }),
+      },
+      url: pageUrl,
+      ...(pageImage && { image: pageImage }),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Accueil', item: `${siteUrl}/` },
+        { '@type': 'ListItem', position: 2, name: svc?.title ?? 'Nos services', item: serviceUrl },
+        { '@type': 'ListItem', position: 3, name: page.city, item: pageUrl },
+      ],
+    },
+  ],
+}];
 ---
 
 <MainLayout
@@ -73,12 +121,20 @@ const pageImage = page.imageUrl
   canonicalPath={`/${page.serviceSlug}/${page.slug}/`}
   seoMeta={page.seoMeta}
   noIndex={preview}
+  jsonLd={jsonLd}
 >
   {preview && (
     <div class="preview-banner">👁 Prévisualisation — ce brouillon n'est pas publié.</div>
   )}
   <article class="section city-page">
     <div class:list={['container article-container', { 'with-carousel': slides.length > 0 }]}>
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href={base}>Accueil</a>
+        <span class="breadcrumb-sep" aria-hidden="true">›</span>
+        <a href={`${base}#services`}>{svc?.title ?? 'Nos services'}</a>
+        <span class="breadcrumb-sep" aria-hidden="true">›</span>
+        <span aria-current="page">{page.city}</span>
+      </nav>
       <header class="page-header">
         <h1 class="section-title">{page.title}</h1>
       </header>
@@ -146,6 +202,28 @@ const pageImage = page.imageUrl
 
   .article-container.with-carousel {
     max-width: var(--max-width);
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm, 0.9rem);
+    margin-bottom: var(--space-4);
+  }
+
+  .breadcrumb a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumb-sep {
+    color: var(--color-text-muted);
   }
 
   .page-header {

@@ -14,9 +14,10 @@ export interface Props {
   canonicalPath?: string;
   noIndex?: boolean;
   seoMeta?: SeoMeta | null;
+  jsonLd?: object[];
 }
 
-const { title, description, image, canonicalPath, noIndex, seoMeta } = Astro.props;
+const { title, description, image, canonicalPath, noIndex, seoMeta, jsonLd } = Astro.props;
 const { settings } = await getSite();
 ---
 
@@ -40,6 +41,7 @@ const { settings } = await getSite();
       canonicalPath={canonicalPath}
       noIndex={noIndex}
       seoMeta={seoMeta}
+      jsonLd={jsonLd}
     />
     <script
       is:inline

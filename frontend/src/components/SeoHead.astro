@@ -11,6 +11,8 @@ export interface Props {
   noIndex?: boolean;
   /** Override issu de seo_meta — prioritaire sur title/description/image. */
   seoMeta?: SeoMeta | null;
+  /** Objets JSON-LD (schema.org) sérialisés dans le head. */
+  jsonLd?: object[];
 }
 
 const {
@@ -21,6 +23,7 @@ const {
   canonicalPath,
   noIndex = false,
   seoMeta,
+  jsonLd,
 } = Astro.props;
 
 const title = seoMeta?.metaTitle ?? rawTitle;
@@ -60,3 +63,7 @@ const canonicalUrl = canonicalPath
 <Font cssVariable="--font-inter" preload />
 <Font cssVariable="--font-poppins" preload />
 <Font cssVariable="--font-lobster" />
+
+{jsonLd?.map((entry) => (
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(entry)} />
+))}

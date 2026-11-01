@@ -1,10 +1,16 @@
 // Génération automatique des pages villes (SEO local).
 // Source descriptive : résumé Wikipédia FR (CC BY-SA — attribution incluse).
 // Géocodage : coordonnées renvoyées par Wikipédia, fallback Nominatim.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { eq, asc, and, like } from 'drizzle-orm';
 import { db } from '../db.js';
-import { cityPages, categories, services } from '../db/schema.js';
+import { cityPages, categories, services, seoMeta } from '../db/schema.js';
 import { slugify } from './slug.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const UPLOAD_DIR = path.join(__dirname, '..', '..', 'storage', 'uploads');
 
 const UA = 'PepitoServices-SiteBuilder/1.0 (contact@pepito-services.fr)';
 
@@ -40,13 +46,68 @@ export async function fetchCityInfo(city) {
   return info;
 }
 
+// Données officielles de la commune (geo.api.gouv.fr) : code postal,
+// département, population — rend le contenu unique par ville.
+export async function fetchCityGeo(city) {
+  try {
+    const res = await fetch(
+      `https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(city.trim())}&fields=nom,code,codesPostaux,population,surface,codeDepartement&boost=population&limit=5`,
+      { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(8000) },
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    const target = slugify(city);
+    const row = rows.find((r) => slugify(r.nom) === target) ?? rows[0];
+    if (!row) return null;
+    return {
+      code: row.code,
+      postal: row.codesPostaux?.[0] ?? null,
+      dept: row.codeDepartement ?? null,
+      population: row.population ?? null,
+      surfaceKm2: row.surface ? Math.round(row.surface / 100) : null,
+    };
+  } catch { return null; }
+}
+
+// Télécharge la photo de la ville en local (version ~1200px quand
+// Wikimedia) pour ne pas servir les originaux lourds en hotlink.
+export async function downloadCityImage(imageUrl, serviceSlug, slug) {
+  const m = imageUrl.match(/upload\.wikimedia\.org\/(wikipedia\/commons)\/([0-9a-f])\/([0-9a-f]{2})\/([^/?]+)/i);
+  const candidates = [];
+  if (m) {
+    candidates.push(`https://upload.wikimedia.org/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/1200px-${m[4].replace(/\.svg$/i, '.svg.png')}`);
+  }
+  candidates.push(imageUrl);
+  for (const url of candidates) {
+    try {
+      const res = await fetch(url, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(15000) });
+      if (!res.ok) continue;
+      const ct = (res.headers.get('content-type') ?? '').toLowerCase();
+      if (!ct.startsWith('image/')) continue;
+      const ext = ct.includes('png') ? '.png' : ct.includes('webp') ? '.webp' : ct.includes('avif') ? '.avif' : '.jpg';
+      const file = `city-${serviceSlug}-${slug}${ext}`;
+      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+      fs.writeFileSync(path.join(UPLOAD_DIR, file), Buffer.from(await res.arrayBuffer()));
+      return `/uploads/${file}`;
+    } catch {}
+  }
+  return imageUrl; // échec réseau : conserve l'URL distante
+}
+
 // Contenu unique par ville : extrait Wikipédia propre à la commune +
-// blocs locaux (chantiers/maillage injectés dynamiquement au rendu).
-function buildCityContent({ city, serviceTitle, extract, wikiUrl }) {
+// données officielles + blocs locaux (chantiers/maillage au rendu).
+function buildCityContent({ city, serviceTitle, extract, wikiUrl, geo }) {
   const svc = esc(serviceTitle);
+  const cp = geo?.postal ? ` (${geo.postal})` : '';
   const paras = [
-    `<p><strong>${svc} à ${esc(city)}</strong> : Pépito Services prend en charge vos projets de ${svc.toLowerCase()} sur ${esc(city)} et ses environs. Devis gratuit, visite technique sur place avant tout chiffrage.</p>`,
+    `<p><strong>${svc} à ${esc(city)}${cp}</strong> : Pépito Services prend en charge vos projets de ${svc.toLowerCase()} sur ${esc(city)} et ses environs. Devis gratuit, visite technique sur place avant tout chiffrage.</p>`,
   ];
+  if (geo?.population) {
+    const bits = [`${esc(city)} compte environ ${geo.population.toLocaleString('fr-FR')} habitants`];
+    if (geo.surfaceKm2) bits.push(`sur un territoire de ${geo.surfaceKm2} km²`);
+    if (geo.dept) bits.push(`, dans le département ${geo.dept}`);
+    paras.push(`<p>${bits.join(' ')} : nos équipes interviennent dans tous les quartiers ainsi que dans les communes voisines, pour les particuliers comme pour les professionnels.</p>`);
+  }
   if (extract) {
     const cleaned = extract.replace(/,\s*,/g, ',');
     const short = cleaned.length > 420 ? `${cleaned.slice(0, 420).replace(/\s+\S*$/, '')}…` : cleaned;
@@ -87,18 +148,27 @@ export async function ensureCityPage(city, categoryId) {
   const exists = await db.select({ id: cityPages.id }).from(cityPages)
     .where(and(eq(cityPages.serviceSlug, svc.slug), eq(cityPages.slug, slug)));
   if (exists.length) return;
-  const info = await fetchCityInfo(name);
-  await db.insert(cityPages).values({
+  const [info, geo] = await Promise.all([fetchCityInfo(name), fetchCityGeo(name)]);
+  const imageUrl = info.image ? await downloadCityImage(info.image, svc.slug, slug) : null;
+  const [{ id }] = await db.insert(cityPages).values({
     slug,
     city: name,
     serviceSlug: svc.slug,
     title: `${svc.title} à ${name}`,
-    content: buildCityContent({ city: name, serviceTitle: svc.title, extract: info.extract, wikiUrl: info.wikiUrl }),
+    content: buildCityContent({ city: name, serviceTitle: svc.title, extract: info.extract, wikiUrl: info.wikiUrl, geo }),
     lat: info.lat,
     lng: info.lng,
-    imageUrl: info.image,
+    imageUrl,
     auto: true,
     published: false,
+  }).$returningId();
+  // Meta SEO pré-remplies (éditables dans le BO) — code postal = signal local fort.
+  const pc = geo?.postal ? ` (${geo.postal})` : '';
+  await db.insert(seoMeta).values({
+    entityType: 'city_page',
+    entityId: id,
+    metaTitle: `${svc.title} à ${name}${pc} — Devis gratuit`,
+    metaDesc: `Pépito Services réalise vos travaux de ${svc.title.toLowerCase()} à ${name}${pc} et alentours. Devis gratuit, visite technique sur place.`,
   });
   console.log(`[citygen] brouillon créé : /${svc.slug}/${slug}/`);
 }
