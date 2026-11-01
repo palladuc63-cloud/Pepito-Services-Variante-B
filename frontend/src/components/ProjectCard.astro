@@ -34,6 +34,7 @@ const gallery = project.images?.length
         src={url}
         alt={i === 0 ? `Aperçu de la réalisation ${project.title}` : ''}
         loading="lazy"
+        transition:name={i === 0 ? `project-cover-${project.slug}` : undefined}
         class:list={[i === 0 && 'is-active']}
       />
     ))}
@@ -207,7 +208,8 @@ const gallery = project.images?.length
 </style>
 
 <script>
-  document.querySelectorAll<HTMLElement>('.card-media[data-gallery]').forEach((media) => {
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLElement>('.card-media[data-gallery]').forEach((media) => {
     const imgs = media.querySelectorAll<HTMLImageElement>('img');
     if (imgs.length < 2) return;
     let idx = 0;
@@ -230,5 +232,6 @@ const gallery = project.images?.length
     media.addEventListener('mouseleave', stop);
     media.addEventListener('focusin', start);
     media.addEventListener('focusout', stop);
+    });
   });
 </script>

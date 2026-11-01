@@ -49,7 +49,7 @@ const { projects, categories, preview = false } = Astro.props;
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     const filterButtons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
     const projectCards = document.querySelectorAll<HTMLElement>('.project-card');
     const emptyMessage = document.getElementById('filter-empty') as HTMLParagraphElement | null;

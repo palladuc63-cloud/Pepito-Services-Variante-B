@@ -91,7 +91,7 @@ const jsonLd = [{
       </header>
 
       <div class:list={['project-layout', { 'with-carousel': slides.length > 0 }]}>
-        {slides.length > 0 && <ImageCarousel images={slides} />}
+        {slides.length > 0 && <ImageCarousel images={slides} coverName={`project-cover-${project.slug}`} />}
         <div class="project-body">
           {project.summary && <p class="project-lead">{project.summary}</p>}
           {project.description && <div class="article-content" set:html={project.description} />}

@@ -3,9 +3,10 @@ import Icon from './Icon.astro';
 
 interface Props {
   images: { url: string; alt: string }[];
+  coverName?: string;
 }
 
-const { images } = Astro.props;
+const { images, coverName } = Astro.props;
 const uid = `car-${Math.random().toString(36).slice(2, 9)}`;
 ---
 
@@ -14,7 +15,7 @@ const uid = `car-${Math.random().toString(36).slice(2, 9)}`;
     <div class="carousel-track" data-track>
       {images.map((img, i) => (
         <figure class="carousel-slide">
-          <img src={img.url} alt={img.alt} loading={i === 0 ? 'eager' : 'lazy'} />
+          <img src={img.url} alt={img.alt} loading={i === 0 ? 'eager' : 'lazy'} transition:name={i === 0 && coverName ? coverName : undefined} />
         </figure>
       ))}
     </div>

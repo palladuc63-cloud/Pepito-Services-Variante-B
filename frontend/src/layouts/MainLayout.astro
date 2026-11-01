@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import SeoHead from '../components/SeoHead.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
@@ -36,6 +37,7 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
         if (themes.indexOf(t) !== -1) document.documentElement.dataset.theme = t;
       } catch (e) {}
     </script>
+    <ClientRouter />
     <SeoHead
       settings={settings}
       title={title}
@@ -66,7 +68,7 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
     <Footer settings={settings} />
     <ThemeSwitcher />
     <script>
-      (function () {
+      document.addEventListener('astro:page-load', () => {
         // Le thème immersif gère ses propres animations (GSAP) — pas de reveal ici.
         if (document.documentElement.dataset.theme === 'immersif') return;
         const targets = document.querySelectorAll<HTMLElement>(
@@ -95,30 +97,43 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
           { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
         );
         targets.forEach((el) => observer.observe(el));
-      })();
+      });
     </script>
     <script>
-      // ── Thème « Immersif » : scroll fluide Lenis + parallaxe GSAP + titres animés.
+      // ── Thème « Immersif — La Galerie » : Lenis persistant + animations GSAP par page.
       // Librairies chargées à la demande, uniquement quand le thème est actif.
-      let __immersifInit = false;
-      async function __initImmersif() {
-        if (__immersifInit || document.documentElement.dataset.theme !== 'immersif') return;
-        __immersifInit = true;
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        try {
-          const [{ default: Lenis }, { gsap }, { ScrollTrigger }, { default: SplitType }] =
-            await Promise.all([
-              import('lenis'),
-              import('gsap'),
-              import('gsap/ScrollTrigger'),
-              import('split-type'),
-            ]);
-          gsap.registerPlugin(ScrollTrigger);
+      let __libs: any = null;
+      let __libsLoading: Promise<any> | null = null;
 
+      function __loadLibs() {
+        if (__libsLoading) return __libsLoading;
+        __libsLoading = Promise.all([
+          import('lenis'),
+          import('gsap'),
+          import('gsap/ScrollTrigger'),
+          import('split-type'),
+        ]).then(([{ default: Lenis }, { gsap }, { ScrollTrigger }, { default: SplitType }]) => {
+          gsap.registerPlugin(ScrollTrigger);
           const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
           lenis.on('scroll', ScrollTrigger.update);
-          gsap.ticker.add((t) => lenis.raf(t * 1000));
+          gsap.ticker.add((t: number) => lenis.raf(t * 1000));
           gsap.ticker.lagSmoothing(0);
+          __libs = { gsap, ScrollTrigger, SplitType, lenis };
+          return __libs;
+        });
+        return __libsLoading;
+      }
+
+      async function __setupImmersifPage() {
+        if (document.documentElement.dataset.theme !== 'immersif') return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        try {
+          const libs = await __loadLibs();
+          if (!libs || document.documentElement.dataset.theme !== 'immersif') return;
+          const { gsap, ScrollTrigger, SplitType } = libs;
+
+          // Nettoie les triggers de la page précédente (DOM remplacé)
+          ScrollTrigger.getAll().forEach((t: any) => t.kill());
 
           // Titres : reveal lettre par lettre
           document.querySelectorAll<HTMLElement>('.section-title').forEach((t) => {
@@ -134,7 +149,7 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
           });
 
           // Cards & blocs : reveal au scroll
-          gsap.utils.toArray<HTMLElement>('.card, .cta-box, .zone-section, .faq-item').forEach((el) => {
+          gsap.utils.toArray('.card, .cta-box, .zone-section, .faq-item').forEach((el: HTMLElement) => {
             gsap.from(el, {
               y: 44,
               opacity: 0,
@@ -145,7 +160,7 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
           });
 
           // Parallaxe sur les médias
-          gsap.utils.toArray<HTMLElement>('.card-media img, .article-image').forEach((img) => {
+          gsap.utils.toArray('.card-media img, .article-image').forEach((img: HTMLElement) => {
             gsap.fromTo(img, { yPercent: -8 }, {
               yPercent: 8,
               ease: 'none',
@@ -163,12 +178,17 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
               scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true },
             });
           }
+          ScrollTrigger.refresh();
         } catch (e) {
           console.warn('Immersif: effets non chargés', e);
         }
       }
-      __initImmersif();
-      window.addEventListener('pepito:theme', __initImmersif);
+
+      document.addEventListener('astro:page-load', __setupImmersifPage);
+      window.addEventListener('pepito:theme', __setupImmersifPage);
+      document.addEventListener('astro:before-swap', () => {
+        if (__libs) __libs.ScrollTrigger.getAll().forEach((t: any) => t.kill());
+      });
     </script>
   </body>
 </html>

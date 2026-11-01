@@ -21,23 +21,29 @@ const themes = [
 
 <script>
   (function () {
-    const buttons = document.querySelectorAll<HTMLButtonElement>('.theme-switcher__btn');
-
     function apply(theme: string) {
       document.documentElement.dataset.theme = theme;
-      buttons.forEach((btn) => btn.setAttribute('aria-pressed', String(btn.dataset.themeId === theme)));
+      syncPressed();
       try {
         localStorage.setItem('pepito-theme', theme);
       } catch (e) {}
       window.dispatchEvent(new CustomEvent('pepito:theme', { detail: theme }));
     }
 
-    apply(document.documentElement.dataset.theme || 'nature');
-    buttons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        if (btn.dataset.themeId) apply(btn.dataset.themeId);
-      });
+    function syncPressed() {
+      const current = document.documentElement.dataset.theme || 'nature';
+      document
+        .querySelectorAll<HTMLButtonElement>('.theme-switcher__btn')
+        .forEach((btn) => btn.setAttribute('aria-pressed', String(btn.dataset.themeId === current)));
+    }
+
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.theme-switcher__btn');
+      if (btn?.dataset.themeId) apply(btn.dataset.themeId);
     });
+
+    document.addEventListener('astro:page-load', syncPressed);
+    apply(document.documentElement.dataset.theme || 'nature');
   })();
 </script>
 

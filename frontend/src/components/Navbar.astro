@@ -107,49 +107,49 @@ const navLinks = settings.nav.map((link) => ({
 
 <script>
   (function () {
-    const toggle = document.querySelector('.mobile-menu-toggle') as HTMLButtonElement | null;
-    const menu = document.getElementById('mobile-menu') as HTMLElement | null;
-    if (!toggle || !menu) return;
-
-    const menuEl = menu;
-    const toggleEl = toggle;
-    const closeBtn = menuEl.querySelector('.mobile-menu__close') as HTMLButtonElement | null;
+    function getMenu() {
+      return {
+        toggle: document.querySelector('.mobile-menu-toggle') as HTMLButtonElement | null,
+        menu: document.getElementById('mobile-menu') as HTMLElement | null,
+      };
+    }
 
     function openMenu() {
-      menuEl.hidden = false;
+      const { toggle, menu } = getMenu();
+      if (!toggle || !menu) return;
+      menu.hidden = false;
       document.body.style.overflow = 'hidden';
-      toggleEl.setAttribute('aria-expanded', 'true');
-      toggleEl.setAttribute('aria-label', 'Fermer le menu');
-      closeBtn?.focus();
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'Fermer le menu');
+      (menu.querySelector('.mobile-menu__close') as HTMLButtonElement | null)?.focus();
     }
 
     function closeMenu() {
-      if (menuEl.hidden) return;
-      menuEl.classList.add('menu-leaving');
+      const { toggle, menu } = getMenu();
+      if (!toggle || !menu || menu.hidden) return;
+      menu.classList.add('menu-leaving');
       setTimeout(() => {
-        menuEl.hidden = true;
-        menuEl.classList.remove('menu-leaving');
+        menu.hidden = true;
+        menu.classList.remove('menu-leaving');
       }, 220);
       document.body.style.overflow = '';
-      toggleEl.setAttribute('aria-expanded', 'false');
-      toggleEl.setAttribute('aria-label', 'Ouvrir le menu');
-      toggleEl.focus();
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Ouvrir le menu');
+      toggle.focus();
     }
 
-    toggleEl.addEventListener('click', () => {
-      menuEl.hidden ? openMenu() : closeMenu();
-    });
-
-    closeBtn?.addEventListener('click', closeMenu);
-
-    menuEl.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', closeMenu);
+    document.addEventListener('click', (e) => {
+      const el = e.target as HTMLElement;
+      if (el.closest('.mobile-menu-toggle')) {
+        const { menu } = getMenu();
+        menu?.hidden ? openMenu() : closeMenu();
+      } else if (el.closest('.mobile-menu__close') || el.closest('.mobile-menu a')) {
+        closeMenu();
+      }
     });
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && !menuEl.hidden) {
-        closeMenu();
-      }
+      if (event.key === 'Escape') closeMenu();
     });
   })();
 </script>

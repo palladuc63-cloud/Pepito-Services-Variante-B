@@ -1,90 +1,96 @@
 /* ───────────────────────────────────────────────────────────────
-   Style « Immersif » : site d'architecte haut de gamme.
-   Fond charbon profond, grande typo serif, bronze, plein cadre.
-   Motion : Lenis (scroll fluide), GSAP ScrollTrigger (parallaxe,
-   reveals), SplitType (titres lettre par lettre) — chargés à la
-   demande dans MainLayout uniquement quand ce thème est actif.
+   Style « Immersif — La Galerie » : portfolio d'artisan haut de
+   gamme. La photo vend, le design s'efface.
+   - Base crème + encre, sections alternées charbon (hero, bandeaux,
+     footer) : rythme magazine clair/sombre.
+   - Grille éditoriale asymétrique pour les réalisations,
+     numérotation « 01. », filets fins, gros espaces.
+   - Hero plein cadre + Ken Burns.
+   Motion : Lenis + GSAP ScrollTrigger + SplitType chargés à la
+   demande dans MainLayout. View Transitions (morphing photo
+   card → page détail) via ClientRouter dans MainLayout.
    Préfixe :root[data-theme='immersif'].
    ─────────────────────────────────────────────────────────────── */
 
 [data-theme='immersif'] {
-  --paper: #101210;
-  --paper-deep: #0b0d0b;
-  --basalt: #161c16;
-  --basalt-dark: #0d110d;
+  --paper: #f4f1ea;
+  --paper-deep: #ece8de;
+  --basalt: #1c211c;
+  --basalt-dark: #111511;
 
-  --ink: #eae7de;
-  --stone: #a09b8d;
-  --stone-light: #b5b0a3;
-  --line: #2b2f29;
+  --ink: #191b18;
+  --stone: #6a665b;
+  --stone-light: #857f72;
+  --line: #d8d2c4;
 
-  --forest: #7ba37b;
-  --forest-dark: #eae7de;
-  --forest-soft: #1e261e;
+  --forest: #2e4630;
+  --forest-dark: #1e2e20;
+  --forest-soft: #e3e8dc;
 
-  --copper: #c98a4b;
-  --copper-dark: #b57a3e;
+  --copper: #a55e2d;
+  --copper-dark: #8a4c22;
   --copper-light: #d9a96c;
-  --copper-soft: #2a241c;
+  --copper-soft: #f0e4d6;
 
-  --steel: #eae7de;
-  --steel-light: #3a3f38;
+  --steel: #2b2f2e;
+  --steel-light: #cfd3d1;
 
-  --cta: #c98a4b;
-  --cta-dark: #a96f36;
-  --cta-text: #101210;
-  --panel: #171a16;
+  --cta: #191b18;
+  --cta-dark: #000000;
+  --cta-text: #f4f1ea;
+  --panel: #ffffff;
   --on-dark: #eae7de;
-  --ring: rgb(201 138 75 / 0.45);
+  --ring: rgb(25 27 24 / 0.35);
 
-  --radius: 0.25rem;
-  --radius-sm: 0.1875rem;
-  --radius-md: 0.25rem;
-  --radius-lg: 0.375rem;
-  --radius-xl: 0.5rem;
-  --r-btn: 999px;
-  --r-card: 0.375rem;
+  --radius: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --r-btn: 0;
+  --r-card: 0;
   --card-border-bottom: 1px solid var(--line);
-  --card-hover-border: var(--copper);
+  --card-hover-border: var(--ink);
   --hero-radius: 0;
-  --btn-ls: 0.14em;
+  --btn-ls: 0.16em;
 
-  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.55);
-  --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.7);
+  --shadow-sm: none;
+  --shadow-md: 0 10px 30px -12px rgb(25 27 24 / 0.18);
+  --shadow-lg: 0 30px 60px -20px rgb(25 27 24 / 0.28);
 
-  --deco: block;
-  --grain-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
-  --cta-img: linear-gradient(160deg, rgb(201 138 75 / 0.12), transparent 60%);
+  --deco: none;
+  --grain-img: none;
+  --cta-img: none;
 
   --tag-bg: transparent;
-  --tag-color: var(--copper-light);
+  --tag-color: var(--copper-dark);
   --tag-border: var(--copper);
-  --tag-radius: 999px;
-  --tag-ls: 0.16em;
-  --tag-pad: 0.25rem 0.95rem;
+  --tag-radius: 0;
+  --tag-ls: 0.18em;
+  --tag-pad: 0.25rem 0.9rem;
   --tag-shadow: none;
   --tag-rivet: none;
 
-  --nav-active-shadow: inset 0 -1px 0 var(--copper);
+  --nav-active-shadow: inset 0 -1px 0 var(--ink);
   --nav-active-bg: transparent;
-  --header-top-border: 1px solid var(--copper);
-  --hero-rgb: 16 18 16;
+  --header-top-border: 1px solid var(--ink);
+  --hero-rgb: 17 21 17;
 
   --font-display: var(--font-fraunces), 'Fraunces', Georgia, 'Times New Roman', serif;
 }
 
-/* ═══ Base ═══ */
+/* ═══ Base : magazine ═══ */
 
 :root[data-theme='immersif'] body {
-  background:
-    var(--grain-img),
-    radial-gradient(120% 60% at 50% -10%, #1b211b 0%, var(--paper) 60%);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.008em;
 }
 
 :root[data-theme='immersif'] .container {
-  max-width: 76rem;
+  max-width: 80rem;
+}
+
+:root[data-theme='immersif'] main {
+  counter-reset: galerie;
 }
 
 /* ═══ Typographie ═══ */
@@ -93,19 +99,33 @@
 :root[data-theme='immersif'] h1,
 :root[data-theme='immersif'] h2 {
   font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.08;
+  letter-spacing: -0.025em;
+  line-height: 1.04;
 }
 
 :root[data-theme='immersif'] .section-title {
-  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-size: clamp(2.1rem, 5vw, 3.75rem);
+}
+
+/* Numérotation éditoriale des grandes sections */
+:root[data-theme='immersif'] .section-header .section-title::before {
+  counter-increment: galerie;
+  content: counter(galerie, decimal-leading-zero) '.';
+  display: block;
+  margin-bottom: var(--space-3);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--copper);
 }
 
 :root[data-theme='immersif'] .section-subtitle,
 :root[data-theme='immersif'] .page-header p {
   color: var(--stone);
   font-size: 1.05rem;
-  max-width: 62ch;
+  max-width: 60ch;
+  line-height: 1.7;
 }
 
 :root[data-theme='immersif'] .label,
@@ -114,7 +134,6 @@
   letter-spacing: 0.18em;
 }
 
-/* SplitType : évite les sauts de ligne indésirables sur les caractères */
 :root[data-theme='immersif'] .section-title .char {
   display: inline-block;
 }
@@ -122,31 +141,30 @@
 /* ═══ Header / nav ═══ */
 
 :root[data-theme='immersif'] .site-header {
-  --paper: rgb(16 18 16 / 0.92);
+  --paper: rgb(244 241 234 / 0.92);
 }
 
 :root[data-theme='immersif'] .nav-link {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 600;
 }
 
-/* ═══ Hero ═══ */
+/* ═══ Hero : plein cadre ═══ */
 
 :root[data-theme='immersif'] .hero-slideshow {
-  min-height: 78vh;
+  min-height: 92vh;
 }
 
 :root[data-theme='immersif'] .hero-slideshow::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgb(11 13 11 / 0.55) 0%, transparent 35%, rgb(11 13 11 / 0.85) 100%);
+  background: linear-gradient(180deg, rgb(17 21 17 / 0.25) 0%, transparent 40%, rgb(17 21 17 / 0.82) 100%);
   pointer-events: none;
 }
 
-/* Ken Burns : chaque slide active zoome lentement, effet cinéma */
 :root[data-theme='immersif'] .hero-slideshow .slide.is-active .slide-image {
   animation: immersif-kenburns 14s ease-out forwards;
 }
@@ -162,61 +180,226 @@
   }
 }
 
-/* ═══ Cards ═══ */
+/* ═══ Grille éditoriale asymétrique des réalisations ═══ */
+
+@media (min-width: 760px) {
+  :root[data-theme='immersif'] .project-grid,
+  :root[data-theme='immersif'] .projects-grid-preview {
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--space-8) var(--space-6);
+  }
+
+  /* Une œuvre majeure puis deux vignettes, en alternance */
+  :root[data-theme='immersif'] .project-grid > .project-card:nth-child(6n + 1),
+  :root[data-theme='immersif'] .projects-grid-preview > .project-card:nth-child(3n + 1) {
+    grid-column: span 7;
+  }
+  :root[data-theme='immersif'] .project-grid > .project-card:nth-child(6n + 2),
+  :root[data-theme='immersif'] .project-grid > .project-card:nth-child(6n + 3),
+  :root[data-theme='immersif'] .projects-grid-preview > .project-card:nth-child(3n + 2),
+  :root[data-theme='immersif'] .projects-grid-preview > .project-card:nth-child(3n + 3) {
+    grid-column: span 5;
+    align-self: end;
+  }
+  :root[data-theme='immersif'] .project-grid > .project-card:nth-child(6n + 4),
+  :root[data-theme='immersif'] .project-grid > .project-card:nth-child(6n + 5) {
+    grid-column: span 5;
+  }
+  :root[data-theme='immersif'] .project-grid > .project-card:nth-child(6n + 6) {
+    grid-column: span 7;
+    align-self: end;
+  }
+}
+
+/* ═══ Cards : la photo d'abord ═══ */
 
 :root[data-theme='immersif'] .card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  overflow: hidden;
+  background: transparent;
+  border: 0;
+  overflow: visible;
 }
 
 :root[data-theme='immersif'] .card:hover {
-  border-color: var(--card-hover-border);
-  transform: translateY(-4px);
+  transform: none;
+}
+
+:root[data-theme='immersif'] .card .card-media {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
 }
 
 :root[data-theme='immersif'] .card-media img {
-  filter: saturate(0.92) contrast(1.04);
-  transition: filter 0.6s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: saturate(0.95) contrast(1.03);
+  transition: filter 0.6s ease, transform 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root[data-theme='immersif'] .card:hover .card-media img {
-  filter: saturate(1.05) contrast(1.06);
-  transform: scale(1.04);
+  filter: saturate(1.05);
+  transform: scale(1.045);
 }
 
-/* ═══ Boutons ═══ */
+:root[data-theme='immersif'] .card .card-body {
+  padding-inline: 0;
+}
+
+:root[data-theme='immersif'] .card-title {
+  font-size: 1.25rem;
+}
+
+/* Filet au-dessus du corps de card, filet de signature */
+:root[data-theme='immersif'] .card .card-body::before {
+  content: '';
+  display: block;
+  width: 2.5rem;
+  height: 2px;
+  margin-bottom: var(--space-3);
+  background: var(--copper);
+}
+
+/* ═══ Sections : alternance clair/sombre ═══ */
+
+:root[data-theme='immersif'] .section {
+  padding-block: var(--space-16, 6rem);
+}
+
+/* Bandeaux alternés : charbon profond */
+:root[data-theme='immersif'] .section-cream {
+  background: var(--basalt);
+  color: var(--on-dark);
+}
+
+:root[data-theme='immersif'] .section-cream .section-title,
+:root[data-theme='immersif'] .section-cream h2,
+:root[data-theme='immersif'] .section-cream h3 {
+  color: var(--on-dark);
+}
+
+:root[data-theme='immersif'] .section-cream .section-subtitle,
+:root[data-theme='immersif'] .section-cream .card-text {
+  color: rgb(234 231 222 / 0.72);
+}
+
+:root[data-theme='immersif'] .section-cream .card {
+  background: transparent;
+}
+
+:root[data-theme='immersif'] .section-cream .card .card-media {
+  border-color: rgb(234 231 222 / 0.18);
+}
+
+:root[data-theme='immersif'] .section-cream .card-title,
+:root[data-theme='immersif'] .section-cream .card-title-link {
+  color: var(--on-dark);
+}
+
+:root[data-theme='immersif'] .section-cream .service-link {
+  color: var(--copper-light);
+  border-bottom-color: var(--copper-light);
+}
+
+:root[data-theme='immersif'] .section-cream .service-icon {
+  color: var(--copper-light);
+}
+
+:root[data-theme='immersif'] .section-cream .service-number {
+  display: block;
+  border-bottom-color: rgb(234 231 222 / 0.18);
+  color: var(--copper-light);
+}
+
+:root[data-theme='immersif'] .section-cream .btn-secondary {
+  border-color: var(--on-dark);
+  color: var(--on-dark);
+}
+
+:root[data-theme='immersif'] .section-cream .btn-secondary:hover {
+  border-color: var(--copper-light);
+  color: var(--copper-light);
+}
+
+/* Hors section sombre : numérotation des services visible (éditorial) */
+:root[data-theme='immersif'] .service-number {
+  display: block;
+}
+
+/* ═══ CTA ═══ */
+
+:root[data-theme='immersif'] .cta-box {
+  background: var(--basalt-dark);
+  color: var(--on-dark);
+  border: 0;
+  padding-block: var(--space-12);
+}
+
+:root[data-theme='immersif'] .cta-box .section-title {
+  color: var(--on-dark);
+}
+
+:root[data-theme='immersif'] .cta-box .btn-primary {
+  background: var(--copper);
+  color: #fff;
+}
+
+/* ═══ Boutons : net, letterspacé ═══ */
 
 :root[data-theme='immersif'] .btn {
   text-transform: uppercase;
   letter-spacing: var(--btn-ls);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
+  padding: 0.95em 1.8em;
+}
+
+:root[data-theme='immersif'] .btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+:root[data-theme='immersif'] .btn-primary:hover {
+  background: var(--copper);
+  color: #fff;
 }
 
 :root[data-theme='immersif'] .btn-secondary {
-  border: 1px solid var(--line);
+  border: 1px solid var(--ink);
   background: transparent;
   color: var(--ink);
 }
 
 :root[data-theme='immersif'] .btn-secondary:hover {
   border-color: var(--copper);
-  color: var(--copper-light);
+  color: var(--copper-dark);
 }
 
 /* ═══ Filtres / pills ═══ */
 
-:root[data-theme='immersif'] .filter-btn,
-:root[data-theme='immersif'] .zone-links a {
-  border-radius: 999px;
-  letter-spacing: 0.06em;
+:root[data-theme='immersif'] .filter-bar {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: var(--space-5);
+}
+
+:root[data-theme='immersif'] .filter-btn {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  padding: 0.4rem 0.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
 }
 
 :root[data-theme='immersif'] .filter-btn.is-active {
-  background: var(--copper);
-  border-color: var(--copper);
-  color: var(--cta-text);
+  background: transparent;
+  border-color: transparent;
+  border-bottom-color: var(--copper);
+  color: var(--ink);
+}
+
+:root[data-theme='immersif'] .zone-links a {
+  border-radius: 0;
+  letter-spacing: 0.06em;
 }
 
 /* ═══ Formulaire ═══ */
@@ -225,38 +408,35 @@
 :root[data-theme='immersif'] .form-textarea,
 :root[data-theme='immersif'] input,
 :root[data-theme='immersif'] textarea {
-  background: var(--panel);
-  border-color: var(--line);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
   color: var(--ink);
+  padding-inline: 0;
 }
 
-:root[data-theme='immersif'] input::placeholder,
-:root[data-theme='immersif'] textarea::placeholder {
-  color: var(--stone);
+:root[data-theme='immersif'] input:focus,
+:root[data-theme='immersif'] textarea:focus {
+  border-bottom-color: var(--copper);
+  outline: none;
 }
 
-/* ═══ Sections alternées ═══ */
+/* ═══ Divers ═══ */
 
-:root[data-theme='immersif'] .section-cream {
-  background: var(--paper-deep);
+:root[data-theme='immersif'] .breadcrumb {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-:root[data-theme='immersif'] .cta-box {
-  background:
-    var(--cta-img),
-    linear-gradient(150deg, #1c211c, #141914);
-  border: 1px solid var(--line);
+:root[data-theme='immersif'] details.faq-item summary::-webkit-details-marker {
+  display: none;
 }
 
-/* ═══ Scrollbar discrète ═══ */
-
-:root[data-theme='immersif'] ::-webkit-scrollbar {
-  width: 10px;
-}
-:root[data-theme='immersif'] ::-webkit-scrollbar-thumb {
-  background: var(--line);
-  border-radius: 8px;
-}
-:root[data-theme='immersif'] ::-webkit-scrollbar-track {
-  background: var(--paper-deep);
+/* View Transitions : léger fondu de page (le morphing des photos
+   est assuré par view-transition-name sur les covers) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
 }

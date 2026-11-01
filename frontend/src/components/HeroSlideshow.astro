@@ -92,9 +92,10 @@ const slides = projects.slice(0, 6).map((project) => ({
 </section>
 
 <script>
-  (function initSlideshow() {
+  function initSlideshow() {
     const slideshow = document.querySelector('[data-hero-slideshow]') as HTMLElement | null;
-    if (!slideshow) return;
+    if (!slideshow || slideshow.dataset.bound === '1') return;
+    slideshow.dataset.bound = '1';
 
     const slides = Array.from(slideshow.querySelectorAll('[data-slide]')) as HTMLElement[];
     const dots = Array.from(slideshow.querySelectorAll('[data-dot]')) as HTMLElement[];
@@ -203,7 +204,8 @@ const slides = projects.slice(0, 6).map((project) => ({
 
     update();
     start();
-  })();
+  }
+  document.addEventListener('astro:page-load', initSlideshow);
 </script>
 
 <style>
