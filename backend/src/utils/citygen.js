@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { eq, asc, and, like } from 'drizzle-orm';
 import { db } from '../db.js';
 import { cityPages, categories, services, seoMeta } from '../db/schema.js';
+import { nextSlot } from './schedule.js';
 import { slugify } from './slug.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -180,6 +181,9 @@ export async function ensureCityPage(city, categoryId) {
   if (exists.length) return;
   const [info, geo] = await Promise.all([fetchCityInfo(name), fetchCityGeo(name)]);
   const imageUrl = info.image ? await downloadCityImage(info.image, svc.slug, slug) : null;
+  // Entre dans la file de publication si la planification est activée,
+  // sinon reste un brouillon à publier manuellement.
+  const slot = await nextSlot('city_page', cityPages).catch(() => null);
   const [{ id }] = await db.insert(cityPages).values({
     slug,
     city: name,
@@ -190,7 +194,8 @@ export async function ensureCityPage(city, categoryId) {
     lng: info.lng,
     imageUrl,
     auto: true,
-    published: false,
+    published: !!slot,
+    publishedAt: slot,
   }).$returningId();
   // Meta SEO pré-remplies (éditables dans le BO) — code postal = signal local fort.
   const pc = geo?.postal ? ` (${geo.postal})` : '';

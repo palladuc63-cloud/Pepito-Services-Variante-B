@@ -257,6 +257,15 @@ const base = import.meta.env.BASE_URL;
               <button class="btn btn-primary" type="submit">Enregistrer</button>
             </form>
           </div>
+          <div class="card" style="margin-top:16px">
+            <h2>📅 Planification automatique</h2>
+            <p class="form-hint">
+              Les contenus créés sans date rejoignent la file et sont publiés automatiquement
+              au prochain créneau, dans l'ordre. Une date saisie manuellement est toujours respectée.
+            </p>
+            <div id="schedule-rows"></div>
+            <button class="btn btn-primary" id="btn-save-schedule" type="button">Enregistrer la planification</button>
+          </div>
         </section>
       </main>
     </div>
@@ -1213,6 +1222,40 @@ const base = import.meta.env.BASE_URL;
   };
 
   // ══════════ PARAMÈTRES ══════════
+  const SCHED_TYPES = [
+    ['project', 'Réalisations'],
+    ['article', 'Articles'],
+    ['city_page', 'Pages villes'],
+  ];
+  const SCHED_DAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  const SCHED_DEFAULTS = {
+    project: { enabled: true, intervalDays: 30, weekday: 2, hour: 9 },
+    article: { enabled: true, intervalDays: 30, weekday: 4, hour: 9 },
+    city_page: { enabled: true, intervalDays: 7, weekday: 2, hour: 9 },
+  };
+
+  function renderScheduleRows(conf) {
+    $('#schedule-rows').innerHTML = SCHED_TYPES.map(([type, label]) => {
+      const c = conf[type] ?? SCHED_DEFAULTS[type];
+      return `
+        <div class="sched-row" data-sched="${type}">
+          <label class="switch-row" style="margin:0;min-width:150px">
+            <input type="checkbox" data-f="enabled" ${c.enabled ? 'checked' : ''} />
+            <strong>${label}</strong>
+          </label>
+          <span class="muted">tous les</span>
+          <input class="form-input sched-num" type="number" min="1" max="90" data-f="intervalDays" value="${c.intervalDays}" />
+          <span class="muted">jours, le</span>
+          <select class="form-select sched-day" data-f="weekday">
+            ${SCHED_DAYS.map((d, i) => `<option value="${i}" ${i === c.weekday ? 'selected' : ''}>${d}</option>`).join('')}
+          </select>
+          <span class="muted">à</span>
+          <input class="form-input sched-num" type="number" min="0" max="23" data-f="hour" value="${c.hour}" />
+          <span class="muted">h</span>
+        </div>`;
+    }).join('');
+  }
+
   loaders.settings = async () => {
     const s = await api.get('/api/admin/settings');
     const form = $('#settings-form');
@@ -1220,7 +1263,25 @@ const base = import.meta.env.BASE_URL;
       const field = form.querySelector(`[name="${key}"]`);
       if (field && value !== null) field.value = value;
     }
+    let conf = {};
+    try { conf = s.schedule_config ? JSON.parse(s.schedule_config) : {}; } catch {}
+    renderScheduleRows(conf);
   };
+
+  $('#btn-save-schedule').addEventListener('click', async () => {
+    const conf = {};
+    document.querySelectorAll('.sched-row').forEach((row) => {
+      const get = (f) => row.querySelector(`[data-f="${f}"]`);
+      conf[row.dataset.sched] = {
+        enabled: get('enabled').checked,
+        intervalDays: Math.max(1, Number(get('intervalDays').value) || 7),
+        weekday: Number(get('weekday').value),
+        hour: Math.min(23, Math.max(0, Number(get('hour').value) || 9)),
+      };
+    });
+    await api.put('/api/admin/settings', { schedule_config: JSON.stringify(conf) });
+    showAlert('Planification enregistrée — elle s’applique aux prochaines créations.');
+  });
   $('#settings-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const body = Object.fromEntries(new FormData(e.target).entries());

@@ -6,6 +6,7 @@ import {
 } from '../db/schema.js';
 import { slugify } from '../utils/slug.js';
 import { ensureCityPage, fetchCityInfo } from '../utils/citygen.js';
+import { nextSlot } from '../utils/schedule.js';
 import { buildPostContent, postLink } from '../utils/social.js';
 import { notify } from '../utils/notify.js';
 import { sanitizeRichHtml } from '../utils/sanitize.js';
@@ -140,18 +141,20 @@ export async function createProject(req, res) {
   if (!title) return res.status(400).json({ error: 'Titre requis' });
   const slug = await uniqueSlug(projects, title);
   const cover = imageUrl ?? (Array.isArray(images) && images.length ? images[0] : null);
+  // Auto-planification : « Publié » sans date → prochain créneau du planning.
+  const autoAt = !publishedAt && published !== false ? await nextSlot('project', projects) : null;
   const [r] = await db.insert(projects).values({
     slug, title, categoryId: categoryId || null, summary,
     description: sanitizeRichHtml(description), imageUrl: cover, city: city?.trim() || null,
     tags: Array.isArray(tags) ? tags : [], published: published !== false,
-    publishedAt: publishedAt ? new Date(publishedAt) : null, sortOrder,
+    publishedAt: publishedAt ? new Date(publishedAt) : autoAt, sortOrder,
   }).$returningId();
   if (Array.isArray(images)) await replaceProjectImages(r.id, images);
   await upsertSeoMeta('project', r.id, { metaTitle, metaDesc, ogImage });
   if (city?.trim() && published !== false) {
     ensureCityPage(city, categoryId).catch((e) => console.error('citygen:', e.message));
   }
-  if (published !== false) {
+  if (published !== false && !autoAt) {
     const [cat] = categoryId ? await db.select().from(categories).where(eq(categories.id, categoryId)) : [];
     queueSocialPost('project', { id: r.id, slug, title, summary, imageUrl }, cat?.slug);
   }
@@ -174,6 +177,8 @@ export async function updateProject(req, res) {
     ...(tags !== undefined && { tags: Array.isArray(tags) ? tags : [] }),
     ...(published !== undefined && { published }),
     ...(publishedAt !== undefined && { publishedAt: publishedAt ? new Date(publishedAt) : null }),
+    // « Publier » seul (sans date) = mise en ligne immédiate : lève la programmation
+    ...(published === true && publishedAt === undefined && { publishedAt: null }),
     ...(sortOrder !== undefined && { sortOrder }),
   }).where(eq(projects.id, id));
   if (Array.isArray(images)) await replaceProjectImages(id, images);
@@ -209,12 +214,13 @@ export async function createArticle(req, res) {
   const { title, summary, content, imageUrl, published = false, publishedAt, metaTitle, metaDesc, ogImage } = req.body ?? {};
   if (!title) return res.status(400).json({ error: 'Titre requis' });
   const slug = await uniqueSlug(articles, title);
+  const autoAt = !publishedAt && published ? await nextSlot('article', articles) : null;
   const [r] = await db.insert(articles).values({
     slug, title, summary, content: sanitizeRichHtml(content), imageUrl, published,
-    publishedAt: published ? (publishedAt ? new Date(publishedAt) : new Date()) : null,
+    publishedAt: published ? (publishedAt ? new Date(publishedAt) : (autoAt ?? new Date())) : null,
   }).$returningId();
   await upsertSeoMeta('article', r.id, { metaTitle, metaDesc, ogImage });
-  if (published) queueSocialPost('article', { id: r.id, slug, title, summary, imageUrl });
+  if (published && !autoAt) queueSocialPost('article', { id: r.id, slug, title, summary, imageUrl });
   res.status(201).json({ id: r.id, slug });
 }
 
@@ -278,10 +284,11 @@ export async function createCityPage(req, res) {
     .where(and(eq(cityPages.serviceSlug, serviceSlug), eq(cityPages.slug, slug)));
   if (dup.length) return res.status(409).json({ error: `La page /${serviceSlug}/${slug}/ existe déjà.` });
   const geo = await fetchCityInfo(city).catch(() => ({ lat: null, lng: null }));
+  const autoAt = !publishedAt && published ? await nextSlot('city_page', cityPages) : null;
   const [r] = await db.insert(cityPages).values({
     slug, city, serviceSlug, title, content: sanitizeRichHtml(content), imageUrl,
     lat: geo.lat, lng: geo.lng, published,
-    publishedAt: publishedAt ? new Date(publishedAt) : null, sortOrder,
+    publishedAt: publishedAt ? new Date(publishedAt) : autoAt, sortOrder,
   }).$returningId();
   await upsertSeoMeta('city_page', r.id, { metaTitle, metaDesc, ogImage });
   res.status(201).json({ id: r.id, slug });
@@ -306,6 +313,7 @@ export async function updateCityPage(req, res) {
     ...(imageUrl !== undefined && { imageUrl }),
     ...(published !== undefined && { published }),
     ...(publishedAt !== undefined && { publishedAt: publishedAt ? new Date(publishedAt) : null }),
+    ...(published === true && publishedAt === undefined && { publishedAt: null }),
     ...(sortOrder !== undefined && { sortOrder }),
   }).where(eq(cityPages.id, id));
   if (metaTitle !== undefined || metaDesc !== undefined || ogImage !== undefined) {

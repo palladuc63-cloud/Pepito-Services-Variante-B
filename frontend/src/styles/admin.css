@@ -253,6 +253,13 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .item-card-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
 .item-card-actions { display: flex; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--line, #2a332c); flex-wrap: wrap; }
 
+/* Planification automatique */
+.sched-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px solid var(--line, #2a332c); }
+.sched-row:last-child { border-bottom: 0; }
+.sched-num { width: 64px; text-align: center; }
+.sched-day { width: auto; }
+.sched-row .muted { font-size: 13px; }
+
 /* Carte des pages villes */
 #city-map { height: 340px; border-radius: 10px; margin-bottom: 18px; border: 1px solid var(--line, #2a332c); overflow: hidden; }
 #city-map .leaflet-popup-content a { color: #2563eb; }
