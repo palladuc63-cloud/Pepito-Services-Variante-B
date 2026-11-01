@@ -44,11 +44,21 @@ export async function getAnalytics(req, res) {
   const q = `startAt=${start}&endAt=${end}`;
   const base = `/api/websites/${WEBSITE_ID}`;
   try {
-    const [stats, topPages, referrers] = await Promise.all([
+    const [raw, topPages, referrers] = await Promise.all([
       umamiGet(`${base}/stats?${q}`),
-      umamiGet(`${base}/metrics?type=url&limit=10&${q}`),
+      umamiGet(`${base}/metrics?type=path&limit=10&${q}`),
       umamiGet(`${base}/metrics?type=referrer&limit=10&${q}`),
     ]);
+    const cmp = raw.comparison ?? {};
+    const stats = Object.fromEntries(
+      Object.entries(raw)
+        .filter(([k, val]) => k !== 'comparison' && typeof val === 'number')
+        .map(([k, val]) => {
+          const prev = Number(cmp[k] ?? 0);
+          const change = prev > 0 ? Math.round(((val - prev) / prev) * 100) : 0;
+          return [k, { value: val, change }];
+        }),
+    );
     res.json({ configured: true, days, dashboardUrl: DASHBOARD_URL || null, stats, topPages, referrers });
   } catch (err) {
     res.status(502).json({ configured: true, error: 'Umami injoignable', detail: err.message });
