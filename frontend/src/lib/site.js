@@ -1,4 +1,5 @@
 import { getContent } from './api.js';
+import { categoryIcon } from './icons.ts';
 
 // Transforme le contenu API (clé/valeur + catégories) en objet "settings"
 // compatible avec les composants existants.
@@ -10,19 +11,21 @@ export async function getSite() {
   if (s.instagram_url) socials.push({ name: 'Instagram', url: s.instagram_url });
 
   const nav = [
-    { label: 'Accueil', href: '/' },
-    { label: 'A propos', href: '/a-propos/' },
+    { label: 'Accueil', href: '/', icon: 'home' },
+    { label: 'A propos', href: '/a-propos/', icon: 'artisan' },
     {
       label: 'Réalisations',
       href: '/realisations/',
+      icon: 'images',
       children: categories.map((c) => ({
         label: c.label,
         href: `/realisations/?categorie=${c.slug}`,
         image: c.imageUrl || undefined,
+        icon: categoryIcon(c.slug),
       })),
     },
-    { label: 'Actualités', href: '/actualites/' },
-    { label: 'Contact', href: '/contact/' },
+    { label: 'Actualités', href: '/actualites/', icon: 'news' },
+    { label: 'Contact', href: '/contact/', icon: 'mail' },
   ];
 
   return {

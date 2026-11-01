@@ -1,6 +1,8 @@
 ---
 import MainLayout from '../../layouts/MainLayout.astro';
 import ImageCarousel from '../../components/ImageCarousel.astro';
+import Icon from '../../components/Icon.astro';
+import { categoryIcon } from '../../lib/icons';
 import { getProject, getCityPages } from '../../lib/api.js';
 import { getSite } from '../../lib/site.js';
 
@@ -77,12 +79,14 @@ const jsonLd = [{
       </nav>
 
       <header class="page-header">
-        {project.category?.label && <span class="tag">{project.category.label}</span>}
+        {project.category?.label && (
+          <span class="tag"><Icon name={categoryIcon(project.category?.slug)} size={13} /> {project.category.label}</span>
+        )}
         <h1 class="section-title">{project.title}</h1>
         {project.city && (cityPage ? (
-          <a class="project-city" href={`${base}${cityPage.serviceSlug}/${cityPage.slug}/`}>📍 {project.city}</a>
+          <a class="project-city" href={`${base}${cityPage.serviceSlug}/${cityPage.slug}/`}><Icon name="pin" size={14} /> {project.city}</a>
         ) : (
-          <span class="project-city">📍 {project.city}</span>
+          <span class="project-city"><Icon name="pin" size={14} /> {project.city}</span>
         ))}
       </header>
 
@@ -95,7 +99,7 @@ const jsonLd = [{
       </div>
 
       <footer class="article-footer">
-        <a href={`${base}realisations/`} class="btn btn-secondary">← Toutes nos réalisations</a>
+        <a href={`${base}realisations/`} class="btn btn-secondary"><Icon name="arrow-left" size={15} /> Toutes nos réalisations</a>
         <a href={`${base}contact/`} class="btn btn-primary">Un projet similaire ? Devis gratuit</a>
       </footer>
     </div>
@@ -140,10 +144,18 @@ const jsonLd = [{
   }
 
   .project-city {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
     color: var(--color-text-muted);
     text-decoration: none;
     margin-top: var(--space-2);
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
   }
 
   a.project-city:hover {

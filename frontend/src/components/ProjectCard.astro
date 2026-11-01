@@ -1,6 +1,8 @@
 ---
 import type { Project } from '../data/types';
 import ContentBadge from './ContentBadge.astro';
+import Icon from './Icon.astro';
+import { categoryIcon } from '../lib/icons';
 import { getCityPages } from '../lib/api.js';
 
 export interface Props {
@@ -41,14 +43,14 @@ const gallery = project.images?.length
         class="city-badge"
         href={`${base}${cityPage.serviceSlug}/${cityPage.slug}/`}
         title={`Nos interventions à ${project.city}`}
-      >📍 {project.city}</a>
+      ><Icon name="pin" size={12} /> {project.city}</a>
     ) : (
-      <span class="city-badge">📍 {project.city}</span>
+      <span class="city-badge"><Icon name="pin" size={12} /> {project.city}</span>
     ))}
     {showDraft && !project.published && <span class="draft-badge">Brouillon</span>}
   </div>
   <div class="card-body">
-    <span class="project-category">{categoryLabel}</span>
+    <span class="project-category"><Icon name={categoryIcon(project.category?.slug)} size={14} /> {categoryLabel}</span>
     <h3 class="card-title">
       <a href={`${base}realisations/${project.slug}/`} class="card-title-link">{project.title}</a>
     </h3>
@@ -74,7 +76,9 @@ const gallery = project.images?.length
 
   .project-category {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     width: fit-content;
     padding: var(--tag-pad);
     margin-bottom: var(--space-3);
@@ -156,6 +160,9 @@ const gallery = project.images?.length
 
   .city-badge {
     position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     left: 8px;
     bottom: 8px;
     padding: 2px 10px;

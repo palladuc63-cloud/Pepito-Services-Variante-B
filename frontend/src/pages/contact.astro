@@ -3,6 +3,7 @@ import MainLayout from '../layouts/MainLayout.astro';
 import Section from '../components/Section.astro';
 import ContactForm from '../components/ContactForm.astro';
 import ContentBadge from '../components/ContentBadge.astro';
+import Icon from '../components/Icon.astro';
 import { getSite } from '../lib/site.js';
 
 const { settings } = await getSite();
@@ -33,13 +34,13 @@ const { settings } = await getSite();
 
         <ul class="contact-list">
           <li>
-            <span class="contact-label">Entreprise</span>
+            <span class="contact-label"><Icon name="building" size={16} /> Entreprise</span>
             <span>{settings.name}</span>
           </li>
           {
             settings.contact.phone && (
               <li>
-                <span class="contact-label">Téléphone</span>
+                <span class="contact-label"><Icon name="phone" size={16} /> Téléphone</span>
                 <a href={`tel:${settings.contact.phone.replace(/\s+/g, '')}`}>
                   {settings.contact.phone}
                 </a>
@@ -49,7 +50,7 @@ const { settings } = await getSite();
           {
             settings.contact.email && (
               <li>
-                <span class="contact-label">Email</span>
+                <span class="contact-label"><Icon name="mail" size={16} /> Email</span>
                 <a href={`mailto:${settings.contact.email}`}>
                   {settings.contact.email}
                 </a>
@@ -59,7 +60,7 @@ const { settings } = await getSite();
           {
             settings.contact.address && (
               <li>
-                <span class="contact-label">Adresse</span>
+                <span class="contact-label"><Icon name="pin" size={16} /> Adresse</span>
                 <span>{settings.contact.address}</span>
               </li>
             )
@@ -67,7 +68,7 @@ const { settings } = await getSite();
           {
             settings.contact.serviceArea && (
               <li>
-                <span class="contact-label">Zone d’intervention</span>
+                <span class="contact-label"><Icon name="map" size={16} /> Zone d’intervention</span>
                 <span>{settings.contact.serviceArea}</span>
               </li>
             )
@@ -75,7 +76,7 @@ const { settings } = await getSite();
           {
             settings.contact.hours && (
               <li>
-                <span class="contact-label">Horaires</span>
+                <span class="contact-label"><Icon name="clock" size={16} /> Horaires</span>
                 <span>{settings.contact.hours}</span>
               </li>
             )
@@ -94,7 +95,7 @@ const { settings } = await getSite();
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {social.name}
+                      <Icon name={social.name.toLowerCase()} size={16} /> {social.name}
                     </a>
                   </li>
                 ))}
@@ -159,9 +160,18 @@ const { settings } = await getSite();
   }
 
   .contact-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
     font-size: var(--text-sm);
     font-weight: 600;
     color: var(--color-text-muted);
+  }
+
+  .social-list a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
   }
 
   .contact-socials {

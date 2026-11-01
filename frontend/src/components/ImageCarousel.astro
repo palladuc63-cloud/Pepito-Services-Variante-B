@@ -1,4 +1,6 @@
 ---
+import Icon from './Icon.astro';
+
 interface Props {
   images: { url: string; alt: string }[];
 }
@@ -18,8 +20,8 @@ const uid = `car-${Math.random().toString(36).slice(2, 9)}`;
     </div>
     {images.length > 1 && (
       <>
-        <button type="button" class="carousel-btn carousel-prev" data-prev aria-label="Photo précédente">‹</button>
-        <button type="button" class="carousel-btn carousel-next" data-next aria-label="Photo suivante">›</button>
+        <button type="button" class="carousel-btn carousel-prev" data-prev aria-label="Photo précédente"><Icon name="chevron-left" size={22} /></button>
+        <button type="button" class="carousel-btn carousel-next" data-next aria-label="Photo suivante"><Icon name="chevron-right" size={22} /></button>
         <div class="carousel-dots" data-dots aria-hidden="true"></div>
       </>
     )}

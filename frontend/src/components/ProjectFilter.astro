@@ -1,6 +1,8 @@
 ---
 import type { Project, Category } from '../data/types';
 import ProjectCard from './ProjectCard.astro';
+import Icon from './Icon.astro';
+import { categoryIcon } from '../lib/icons';
 
 export interface Props {
   projects: Project[];
@@ -19,6 +21,7 @@ const { projects, categories, preview = false } = Astro.props;
       data-filter="all"
       aria-pressed="true"
     >
+      <Icon name="grid" size={15} />
       Toutes
     </button>
     {
@@ -29,6 +32,7 @@ const { projects, categories, preview = false } = Astro.props;
           data-filter={category.slug}
           aria-pressed="false"
         >
+          <Icon name={categoryIcon(category.slug)} size={15} />
           {category.label}
         </button>
       ))
@@ -94,6 +98,9 @@ const { projects, categories, preview = false } = Astro.props;
   }
 
   .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
     padding: var(--space-2) var(--space-4);
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);

@@ -1,6 +1,7 @@
 ---
 import type { SiteSettings } from '../data/types';
 import logo from '../assets/pepito-logo.svg';
+import Icon from './Icon.astro';
 
 export interface Props {
   settings: SiteSettings;
@@ -49,6 +50,7 @@ const navLinks = settings.nav.map((link) => ({
                 aria-current={link.isActive ? 'page' : undefined}
                 role="menuitem"
               >
+                {link.icon && <Icon name={link.icon} size={15} class="nav-icon" />}
                 {link.label}
               </a>
             </li>
@@ -94,6 +96,7 @@ const navLinks = settings.nav.map((link) => ({
             aria-current={link.isActive ? 'page' : undefined}
             role="menuitem"
           >
+            {link.icon && <Icon name={link.icon} size={20} class="mobile-nav-icon" />}
             {link.label}
           </a>
         </li>
@@ -170,6 +173,17 @@ const navLinks = settings.nav.map((link) => ({
     width: 11.25rem;
     height: 5.25rem;
     object-fit: contain;
+  }
+
+  :global(.nav-icon) {
+    margin-right: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  :global(.mobile-menu__link) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
 
   @media (max-width: 420px) {

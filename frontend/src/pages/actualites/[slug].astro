@@ -1,6 +1,7 @@
 ---
 import MainLayout from '../../layouts/MainLayout.astro';
 import { getArticle } from '../../lib/api.js';
+import Icon from '../../components/Icon.astro';
 
 const preview = Astro.url.searchParams.get('preview') === '1';
 const headers = preview ? { cookie: Astro.request.headers.get('cookie') ?? '' } : undefined;
@@ -46,7 +47,7 @@ const articleImage = article.imageUrl
       <div class="article-content" set:html={article.content ?? ''} />
 
       <footer class="article-footer">
-        <a href={`${base}actualites/`} class="btn btn-secondary">← Retour aux actualités</a>
+        <a href={`${base}actualites/`} class="btn btn-secondary"><Icon name="arrow-left" size={15} /> Retour aux actualités</a>
       </footer>
     </div>
   </article>

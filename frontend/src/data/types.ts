@@ -6,7 +6,8 @@ export interface SocialLink {
 export interface NavLink {
   label: string;
   href: string;
-  children?: { label: string; href: string; image?: string }[];
+  icon?: string;
+  children?: { label: string; href: string; image?: string; icon?: string }[];
 }
 
 export interface SiteSettings {
