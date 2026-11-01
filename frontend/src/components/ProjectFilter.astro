@@ -54,6 +54,21 @@ const { projects, categories, preview = false } = Astro.props;
     const projectCards = document.querySelectorAll<HTMLElement>('.project-card');
     const emptyMessage = document.getElementById('filter-empty') as HTMLParagraphElement | null;
 
+    // Renumérote les cards visibles : :nth-child compte aussi les
+    // cards masquées par le filtre, ce qui déséquilibrait la grille.
+    const renumber = () => {
+      const visible = Array.from(
+        document.querySelectorAll<HTMLElement>('.project-grid > .project-card:not([hidden])')
+      );
+      if (!visible.length) return;
+      const grid = visible[0].closest('.project-grid');
+      grid?.classList.add('pg-numbered');
+      document
+        .querySelectorAll<HTMLElement>('.project-grid > .project-card')
+        .forEach((c) => c.classList.remove('pg1', 'pg2', 'pg3', 'pg4', 'pg5', 'pg6'));
+      visible.forEach((c, i) => c.classList.add(`pg${(i % 6) + 1}`));
+    };
+
     const updateEmptyState = () => {
       if (!emptyMessage) return;
       const visibleCards = document.querySelectorAll('.project-card:not([hidden])');
@@ -75,6 +90,7 @@ const { projects, categories, preview = false } = Astro.props;
           card.hidden = !shouldShow;
         });
 
+        renumber();
         updateEmptyState();
       });
     });

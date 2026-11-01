@@ -31,10 +31,20 @@ const themes = [
     }
 
     function syncPressed() {
-      const current = document.documentElement.dataset.theme || 'nature';
+      // Ré-applique le thème sauvegardé : le swap de navigation peut
+      // réinitialiser data-theme sur <html>.
+      const known = ['nature', 'immersif', 'bento', 'editorial', 'blason'];
+      let saved = document.documentElement.dataset.theme || 'nature';
+      try {
+        const stored = localStorage.getItem('pepito-theme');
+        if (stored && known.includes(stored)) saved = stored;
+      } catch (e) {}
+      if (document.documentElement.dataset.theme !== saved) {
+        document.documentElement.dataset.theme = saved;
+      }
       document
         .querySelectorAll<HTMLButtonElement>('.theme-switcher__btn')
-        .forEach((btn) => btn.setAttribute('aria-pressed', String(btn.dataset.themeId === current)));
+        .forEach((btn) => btn.setAttribute('aria-pressed', String(btn.dataset.themeId === saved)));
     }
 
     document.addEventListener('click', (e) => {

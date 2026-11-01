@@ -187,7 +187,9 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
       document.addEventListener('astro:page-load', __setupImmersifPage);
       window.addEventListener('pepito:theme', __setupImmersifPage);
       document.addEventListener('astro:before-swap', () => {
-        if (__libs) __libs.ScrollTrigger.getAll().forEach((t: any) => t.kill());
+        if (!__libs) return;
+        __libs.ScrollTrigger.getAll().forEach((t: any) => t.kill());
+        __libs.lenis?.scrollTo(0, { immediate: true, force: true });
       });
     </script>
   </body>

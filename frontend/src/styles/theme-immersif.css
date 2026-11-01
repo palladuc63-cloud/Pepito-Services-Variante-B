@@ -209,6 +209,26 @@
     grid-column: span 7;
     align-self: end;
   }
+
+  /* Renumérotation JS après filtrage (les cards masquées ne comptent plus) */
+  :root[data-theme='immersif'] .project-grid.pg-numbered > .project-card.pg1,
+  :root[data-theme='immersif'] .project-grid.pg-numbered > .project-card.pg6 {
+    grid-column: span 7;
+    align-self: auto;
+  }
+  :root[data-theme='immersif'] .project-grid.pg-numbered > .project-card.pg6 {
+    align-self: end;
+  }
+  :root[data-theme='immersif'] .project-grid.pg-numbered > .project-card.pg2,
+  :root[data-theme='immersif'] .project-grid.pg-numbered > .project-card.pg3 {
+    grid-column: span 5;
+    align-self: end;
+  }
+  :root[data-theme='immersif'] .project-grid.pg-numbered > .project-card.pg4,
+  :root[data-theme='immersif'] .project-grid.pg-numbered > .project-card.pg5 {
+    grid-column: span 5;
+    align-self: auto;
+  }
 }
 
 /* ═══ Cards : la photo d'abord ═══ */
@@ -436,7 +456,9 @@
 
 /* View Transitions : léger fondu de page (le morphing des photos
    est assuré par view-transition-name sur les covers) */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.35s;
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.35s;
+  }
 }
