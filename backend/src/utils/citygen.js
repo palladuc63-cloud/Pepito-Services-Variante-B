@@ -69,13 +69,13 @@ export async function fetchCityGeo(city) {
   } catch { return null; }
 }
 
-// Télécharge la photo de la ville en local (version ~1200px quand
+// Télécharge la photo de la ville en local (version ~800px quand
 // Wikimedia) pour ne pas servir les originaux lourds en hotlink.
 export async function downloadCityImage(imageUrl, serviceSlug, slug) {
   const m = imageUrl.match(/upload\.wikimedia\.org\/(wikipedia\/commons)\/([0-9a-f])\/([0-9a-f]{2})\/([^/?]+)/i);
   const candidates = [];
   if (m) {
-    candidates.push(`https://upload.wikimedia.org/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/1200px-${m[4].replace(/\.svg$/i, '.svg.png')}`);
+    candidates.push(`https://upload.wikimedia.org/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/800px-${m[4].replace(/\.svg$/i, '.svg.png')}`);
   }
   candidates.push(imageUrl);
   for (const url of candidates) {
