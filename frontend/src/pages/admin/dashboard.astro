@@ -17,7 +17,6 @@ const base = import.meta.env.BASE_URL;
       <aside class="admin-side">
         <img class="admin-logo" src={`${base}pepito-logo-white.svg`} alt="Pépito Services — clôtures et portails" width="553" height="256" />
         <button class="admin-nav-link active" data-tab="overview">📊 Vue d'ensemble</button>
-        <button class="admin-nav-link" data-tab="calendar">📅 Calendrier</button>
         <button class="admin-nav-link" data-tab="projects">🚧 Réalisations</button>
         <button class="admin-nav-link" data-tab="articles">📰 Articles</button>
         <button class="admin-nav-link" data-tab="services">🛠️ Services</button>
@@ -56,6 +55,21 @@ const base = import.meta.env.BASE_URL;
             </div>
           </div>
           <div class="card" style="margin-top:16px">
+            <div class="cal-header">
+              <button class="btn btn-sm" id="cal-prev">‹ Préc.</button>
+              <h2 id="cal-title" style="margin:0;flex:1;text-align:center"></h2>
+              <button class="btn btn-sm" id="cal-next">Suiv. ›</button>
+            </div>
+            <div id="calendar-alerts"></div>
+            <div id="calendar-grid" class="cal-grid"></div>
+            <div class="cal-legend">
+              <span><i class="dot" style="background:#4ade80"></i>Réalisation</span>
+              <span><i class="dot" style="background:#93c5fd"></i>Article</span>
+              <span><i class="dot" style="background:#fbbf24"></i>Page ville</span>
+              <span><i class="dot dot-sched"></i>Programmé</span>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
               <h2 style="margin:0">📈 Statistiques de visite</h2>
               <div style="display:flex;gap:6px">
@@ -71,25 +85,6 @@ const base = import.meta.env.BASE_URL;
             <div class="grid-2">
               <div id="analytics-pages"></div>
               <div id="analytics-refs"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- CALENDRIER -->
-        <section id="tab-calendar" hidden>
-          <div class="card">
-            <div class="cal-header">
-              <button class="btn btn-sm" id="cal-prev">‹ Préc.</button>
-              <h2 id="cal-title" style="margin:0;flex:1;text-align:center"></h2>
-              <button class="btn btn-sm" id="cal-next">Suiv. ›</button>
-            </div>
-            <div id="calendar-alerts"></div>
-            <div id="calendar-grid" class="cal-grid"></div>
-            <div class="cal-legend">
-              <span><i class="dot" style="background:#4ade80"></i>Réalisation</span>
-              <span><i class="dot" style="background:#93c5fd"></i>Article</span>
-              <span><i class="dot" style="background:#fbbf24"></i>Page ville</span>
-              <span><i class="dot dot-sched"></i>Programmé</span>
             </div>
           </div>
         </section>
@@ -321,7 +316,6 @@ const base = import.meta.env.BASE_URL;
     messages: ['Messages', 'Demandes reçues via le formulaire et Janus'],
     social: ['Réseaux sociaux', 'Posts Facebook générés automatiquement'],
     overview: ["Vue d'ensemble", "L'essentiel du site en un coup d'œil"],
-    calendar: ['Calendrier', 'Publications passées et programmées'],
     seo: ['SEO / Redirections', 'Overrides meta et redirections 301/302'],
     settings: ['Paramètres', 'Coordonnées et contenus du site'],
   };
@@ -403,6 +397,7 @@ const base = import.meta.env.BASE_URL;
       document.querySelector(`.admin-nav-link[data-tab="${b.dataset.goto}"]`)?.click();
     }));
     loaders.analytics();
+    loaders.calendar();
     checkGuardrails();
   };
 
@@ -449,7 +444,9 @@ const base = import.meta.env.BASE_URL;
   let calCursor = new Date();
   loaders.calendar = async () => {
     const [projects, articles, citypages] = await Promise.all([
-      api.get('/api/admin/projects'), api.get('/api/admin/articles'), api.get('/api/admin/city-pages'),
+      window._projects ? Promise.resolve(window._projects) : api.get('/api/admin/projects'),
+      window._articles ? Promise.resolve(window._articles) : api.get('/api/admin/articles'),
+      window._citypages ? Promise.resolve(window._citypages) : api.get('/api/admin/city-pages'),
     ]);
     const now = new Date();
     const mk = (arr, type, cls, tab) => arr
