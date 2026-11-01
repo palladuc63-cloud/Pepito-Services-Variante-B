@@ -29,7 +29,7 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
   <head>
     <script is:inline>
       try {
-        var themes = ['nature', 'artisan', 'bento', 'editorial', 'blason'];
+        var themes = ['nature', 'immersif', 'bento', 'editorial', 'blason'];
         var fromUrl = new URLSearchParams(location.search).get('theme');
         if (themes.indexOf(fromUrl) !== -1) localStorage.setItem('pepito-theme', fromUrl);
         var t = localStorage.getItem('pepito-theme');
@@ -67,6 +67,8 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
     <ThemeSwitcher />
     <script>
       (function () {
+        // Le thème immersif gère ses propres animations (GSAP) — pas de reveal ici.
+        if (document.documentElement.dataset.theme === 'immersif') return;
         const targets = document.querySelectorAll<HTMLElement>(
           '.section-header, .about-content, .cta-box, .page-header, .card'
         );
@@ -94,6 +96,79 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
         );
         targets.forEach((el) => observer.observe(el));
       })();
+    </script>
+    <script>
+      // ── Thème « Immersif » : scroll fluide Lenis + parallaxe GSAP + titres animés.
+      // Librairies chargées à la demande, uniquement quand le thème est actif.
+      let __immersifInit = false;
+      async function __initImmersif() {
+        if (__immersifInit || document.documentElement.dataset.theme !== 'immersif') return;
+        __immersifInit = true;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        try {
+          const [{ default: Lenis }, { gsap }, { ScrollTrigger }, { default: SplitType }] =
+            await Promise.all([
+              import('lenis'),
+              import('gsap'),
+              import('gsap/ScrollTrigger'),
+              import('split-type'),
+            ]);
+          gsap.registerPlugin(ScrollTrigger);
+
+          const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
+          lenis.on('scroll', ScrollTrigger.update);
+          gsap.ticker.add((t) => lenis.raf(t * 1000));
+          gsap.ticker.lagSmoothing(0);
+
+          // Titres : reveal lettre par lettre
+          document.querySelectorAll<HTMLElement>('.section-title').forEach((t) => {
+            const split = new SplitType(t, { types: 'chars' });
+            gsap.from(split.chars ?? [], {
+              yPercent: 115,
+              opacity: 0,
+              stagger: 0.018,
+              duration: 0.7,
+              ease: 'power4.out',
+              scrollTrigger: { trigger: t, start: 'top 90%', once: true },
+            });
+          });
+
+          // Cards & blocs : reveal au scroll
+          gsap.utils.toArray<HTMLElement>('.card, .cta-box, .zone-section, .faq-item').forEach((el) => {
+            gsap.from(el, {
+              y: 44,
+              opacity: 0,
+              duration: 0.9,
+              ease: 'power3.out',
+              scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+            });
+          });
+
+          // Parallaxe sur les médias
+          gsap.utils.toArray<HTMLElement>('.card-media img, .article-image').forEach((img) => {
+            gsap.fromTo(img, { yPercent: -8 }, {
+              yPercent: 8,
+              ease: 'none',
+              scrollTrigger: { trigger: img, start: 'top bottom', end: 'bottom top', scrub: 0.6 },
+            });
+          });
+
+          // Hero : parallaxe + légère réduction en sortie d'écran
+          const hero = document.querySelector('.hero-slideshow');
+          if (hero) {
+            gsap.to(hero, {
+              yPercent: 12,
+              opacity: 0.75,
+              ease: 'none',
+              scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true },
+            });
+          }
+        } catch (e) {
+          console.warn('Immersif: effets non chargés', e);
+        }
+      }
+      __initImmersif();
+      window.addEventListener('pepito:theme', __initImmersif);
     </script>
   </body>
 </html>

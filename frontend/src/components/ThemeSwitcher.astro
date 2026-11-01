@@ -1,7 +1,7 @@
 ---
 const themes = [
   { id: 'nature', label: 'Nature' },
-  { id: 'artisan', label: 'Artisan' },
+  { id: 'immersif', label: 'Immersif' },
   { id: 'bento', label: 'Bento' },
   { id: 'editorial', label: 'Éditorial' },
   { id: 'blason', label: 'Blason' },
@@ -29,6 +29,7 @@ const themes = [
       try {
         localStorage.setItem('pepito-theme', theme);
       } catch (e) {}
+      window.dispatchEvent(new CustomEvent('pepito:theme', { detail: theme }));
     }
 
     apply(document.documentElement.dataset.theme || 'nature');

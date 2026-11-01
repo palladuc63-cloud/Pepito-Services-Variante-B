@@ -1,0 +1,262 @@
+/* ───────────────────────────────────────────────────────────────
+   Style « Immersif » : site d'architecte haut de gamme.
+   Fond charbon profond, grande typo serif, bronze, plein cadre.
+   Motion : Lenis (scroll fluide), GSAP ScrollTrigger (parallaxe,
+   reveals), SplitType (titres lettre par lettre) — chargés à la
+   demande dans MainLayout uniquement quand ce thème est actif.
+   Préfixe :root[data-theme='immersif'].
+   ─────────────────────────────────────────────────────────────── */
+
+[data-theme='immersif'] {
+  --paper: #101210;
+  --paper-deep: #0b0d0b;
+  --basalt: #161c16;
+  --basalt-dark: #0d110d;
+
+  --ink: #eae7de;
+  --stone: #a09b8d;
+  --stone-light: #b5b0a3;
+  --line: #2b2f29;
+
+  --forest: #7ba37b;
+  --forest-dark: #eae7de;
+  --forest-soft: #1e261e;
+
+  --copper: #c98a4b;
+  --copper-dark: #b57a3e;
+  --copper-light: #d9a96c;
+  --copper-soft: #2a241c;
+
+  --steel: #eae7de;
+  --steel-light: #3a3f38;
+
+  --cta: #c98a4b;
+  --cta-dark: #a96f36;
+  --cta-text: #101210;
+  --panel: #171a16;
+  --on-dark: #eae7de;
+  --ring: rgb(201 138 75 / 0.45);
+
+  --radius: 0.25rem;
+  --radius-sm: 0.1875rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --r-btn: 999px;
+  --r-card: 0.375rem;
+  --card-border-bottom: 1px solid var(--line);
+  --card-hover-border: var(--copper);
+  --hero-radius: 0;
+  --btn-ls: 0.14em;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.55);
+  --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.7);
+
+  --deco: block;
+  --grain-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+  --cta-img: linear-gradient(160deg, rgb(201 138 75 / 0.12), transparent 60%);
+
+  --tag-bg: transparent;
+  --tag-color: var(--copper-light);
+  --tag-border: var(--copper);
+  --tag-radius: 999px;
+  --tag-ls: 0.16em;
+  --tag-pad: 0.25rem 0.95rem;
+  --tag-shadow: none;
+  --tag-rivet: none;
+
+  --nav-active-shadow: inset 0 -1px 0 var(--copper);
+  --nav-active-bg: transparent;
+  --header-top-border: 1px solid var(--copper);
+  --hero-rgb: 16 18 16;
+
+  --font-display: var(--font-fraunces), 'Fraunces', Georgia, 'Times New Roman', serif;
+}
+
+/* ═══ Base ═══ */
+
+:root[data-theme='immersif'] body {
+  background:
+    var(--grain-img),
+    radial-gradient(120% 60% at 50% -10%, #1b211b 0%, var(--paper) 60%);
+  letter-spacing: 0.01em;
+}
+
+:root[data-theme='immersif'] .container {
+  max-width: 76rem;
+}
+
+/* ═══ Typographie ═══ */
+
+:root[data-theme='immersif'] .section-title,
+:root[data-theme='immersif'] h1,
+:root[data-theme='immersif'] h2 {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+:root[data-theme='immersif'] .section-title {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+}
+
+:root[data-theme='immersif'] .section-subtitle,
+:root[data-theme='immersif'] .page-header p {
+  color: var(--stone);
+  font-size: 1.05rem;
+  max-width: 62ch;
+}
+
+:root[data-theme='immersif'] .label,
+:root[data-theme='immersif'] .project-category,
+:root[data-theme='immersif'] .service-number {
+  letter-spacing: 0.18em;
+}
+
+/* SplitType : évite les sauts de ligne indésirables sur les caractères */
+:root[data-theme='immersif'] .section-title .char {
+  display: inline-block;
+}
+
+/* ═══ Header / nav ═══ */
+
+:root[data-theme='immersif'] .site-header {
+  --paper: rgb(16 18 16 / 0.92);
+}
+
+:root[data-theme='immersif'] .nav-link {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* ═══ Hero ═══ */
+
+:root[data-theme='immersif'] .hero-slideshow {
+  min-height: 78vh;
+}
+
+:root[data-theme='immersif'] .hero-slideshow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(11 13 11 / 0.55) 0%, transparent 35%, rgb(11 13 11 / 0.85) 100%);
+  pointer-events: none;
+}
+
+/* Ken Burns : chaque slide active zoome lentement, effet cinéma */
+:root[data-theme='immersif'] .hero-slideshow .slide.is-active .slide-image {
+  animation: immersif-kenburns 14s ease-out forwards;
+}
+
+@keyframes immersif-kenburns {
+  from { transform: scale(1.12) translate(1.5%, -1%); }
+  to { transform: scale(1) translate(0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme='immersif'] .hero-slideshow .slide.is-active .slide-image {
+    animation: none;
+  }
+}
+
+/* ═══ Cards ═══ */
+
+:root[data-theme='immersif'] .card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+:root[data-theme='immersif'] .card:hover {
+  border-color: var(--card-hover-border);
+  transform: translateY(-4px);
+}
+
+:root[data-theme='immersif'] .card-media img {
+  filter: saturate(0.92) contrast(1.04);
+  transition: filter 0.6s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root[data-theme='immersif'] .card:hover .card-media img {
+  filter: saturate(1.05) contrast(1.06);
+  transform: scale(1.04);
+}
+
+/* ═══ Boutons ═══ */
+
+:root[data-theme='immersif'] .btn {
+  text-transform: uppercase;
+  letter-spacing: var(--btn-ls);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+:root[data-theme='immersif'] .btn-secondary {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+}
+
+:root[data-theme='immersif'] .btn-secondary:hover {
+  border-color: var(--copper);
+  color: var(--copper-light);
+}
+
+/* ═══ Filtres / pills ═══ */
+
+:root[data-theme='immersif'] .filter-btn,
+:root[data-theme='immersif'] .zone-links a {
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+}
+
+:root[data-theme='immersif'] .filter-btn.is-active {
+  background: var(--copper);
+  border-color: var(--copper);
+  color: var(--cta-text);
+}
+
+/* ═══ Formulaire ═══ */
+
+:root[data-theme='immersif'] .form-input,
+:root[data-theme='immersif'] .form-textarea,
+:root[data-theme='immersif'] input,
+:root[data-theme='immersif'] textarea {
+  background: var(--panel);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+:root[data-theme='immersif'] input::placeholder,
+:root[data-theme='immersif'] textarea::placeholder {
+  color: var(--stone);
+}
+
+/* ═══ Sections alternées ═══ */
+
+:root[data-theme='immersif'] .section-cream {
+  background: var(--paper-deep);
+}
+
+:root[data-theme='immersif'] .cta-box {
+  background:
+    var(--cta-img),
+    linear-gradient(150deg, #1c211c, #141914);
+  border: 1px solid var(--line);
+}
+
+/* ═══ Scrollbar discrète ═══ */
+
+:root[data-theme='immersif'] ::-webkit-scrollbar {
+  width: 10px;
+}
+:root[data-theme='immersif'] ::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 8px;
+}
+:root[data-theme='immersif'] ::-webkit-scrollbar-track {
+  background: var(--paper-deep);
+}
