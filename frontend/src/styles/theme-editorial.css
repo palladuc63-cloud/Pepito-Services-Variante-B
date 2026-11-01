@@ -672,11 +672,10 @@
   text-align: left;
 }
 
-:root[data-theme='editorial'] .footer-name {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  color: var(--ink);
+:root[data-theme='editorial'] .footer-logo {
+  filter: none;
+  width: 15rem;
+  margin: 0;
 }
 
 :root[data-theme='editorial'] .footer-tagline {

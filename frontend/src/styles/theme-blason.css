@@ -490,7 +490,6 @@
   border-radius: 2.5rem 2.5rem 0 0;
 }
 
-:root[data-theme='blason'] .footer-name,
 :root[data-theme='blason'] .footer-heading,
 :root[data-theme='blason'] .site-footer h2,
 :root[data-theme='blason'] .site-footer h3 {

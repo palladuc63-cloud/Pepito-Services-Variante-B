@@ -291,6 +291,17 @@ a:focus-visible {
   margin-bottom: var(--space-8);
 }
 
+/* Le logo couleur passe en blanc sur les surfaces sombres */
+.section-cta .site-logo,
+.section-cta .about-logo,
+.site-footer .site-logo,
+.site-footer .about-logo,
+.site-footer .footer-logo,
+.mobile-menu .site-logo,
+.logo--invert {
+  filter: brightness(0) invert(1);
+}
+
 /* ─── Buttons ─── */
 .btn {
   display: inline-flex;
