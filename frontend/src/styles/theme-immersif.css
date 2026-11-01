@@ -161,7 +161,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgb(17 21 17 / 0.25) 0%, transparent 40%, rgb(17 21 17 / 0.82) 100%);
+  background: linear-gradient(180deg, transparent 55%, rgb(17 21 17 / 0.45) 100%);
   pointer-events: none;
 }
 
