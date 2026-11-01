@@ -11,7 +11,7 @@ const UA = 'PepitoServices-SiteBuilder/1.0 (contact@pepito-services.fr)';
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export async function fetchCityInfo(city) {
-  const info = { extract: null, lat: null, lng: null, wikiUrl: null };
+  const info = { extract: null, lat: null, lng: null, wikiUrl: null, image: null };
   try {
     const title = encodeURIComponent(city.trim().replace(/ /g, '_'));
     const res = await fetch(`https://fr.wikipedia.org/api/rest_v1/page/summary/${title}`, {
@@ -22,6 +22,7 @@ export async function fetchCityInfo(city) {
       if (j.extract && j.type !== 'disambiguation') {
         info.extract = j.extract;
         info.wikiUrl = j.content_urls?.desktop?.page ?? null;
+        info.image = j.originalimage?.source ?? j.thumbnail?.source ?? null;
       }
       if (j.coordinates) { info.lat = j.coordinates.lat; info.lng = j.coordinates.lon; }
     }
@@ -95,6 +96,7 @@ export async function ensureCityPage(city, categoryId) {
     content: buildCityContent({ city: name, serviceTitle: svc.title, extract: info.extract, wikiUrl: info.wikiUrl }),
     lat: info.lat,
     lng: info.lng,
+    imageUrl: info.image,
     auto: true,
     published: false,
   });

@@ -37,7 +37,7 @@ for (const p of projects as Project[]) {
   byCat.set(p.category.id, g);
 }
 const pickOne = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
-const slides = [...byCat.values()]
+const catSlides = [...byCat.values()]
   .map((g) => {
     const p = pickOne(g.local.length ? g.local : g.all);
     const imgs = (p.images?.length ? p.images : [{ imageUrl: p.imageUrl, alt: p.title }])
@@ -46,6 +46,8 @@ const slides = [...byCat.values()]
     return img ? { url: img.imageUrl as string, alt: img.alt ?? p.title } : null;
   })
   .filter((s): s is { url: string; alt: string } => s !== null);
+// Premier slide : photo de la ville (Wikipédia) quand disponible
+const slides = page.imageUrl ? [{ url: page.imageUrl, alt: page.city }, ...catSlides] : catSlides;
 
 // Liens villes sous la carte : triés par proximité (haversine)
 const haversine = (a1: number, o1: number, a2: number, o2: number) => {
