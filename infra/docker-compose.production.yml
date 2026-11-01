@@ -57,9 +57,44 @@ services:
       - backend
     networks: [pepito]
 
+  # Umami — analytics auto-hébergé (sans cookies), exposé via
+  # stats.pepito-services.fr → 127.0.0.1:8096. API interne pour le BO.
+  umami-db:
+    image: postgres:16-alpine
+    container_name: pepito-umami-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD}
+    volumes:
+      - pepito_umami_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami -d umami"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+    networks: [pepito]
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: pepito-umami
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD}@umami-db:5432/umami
+      DATABASE_TYPE: postgresql
+      APP_SECRET: ${UMAMI_APP_SECRET}
+    ports:
+      - "127.0.0.1:8096:3000"
+    depends_on:
+      umami-db:
+        condition: service_healthy
+    networks: [pepito]
+
 volumes:
   pepito_db_data:
   pepito_storage:
+  pepito_umami_data:
 
 networks:
   pepito:
