@@ -1,0 +1,183 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import ImageCarousel from '../../components/ImageCarousel.astro';
+import { getProject, getCityPages } from '../../lib/api.js';
+import { getSite } from '../../lib/site.js';
+
+const preview = Astro.url.searchParams.get('preview') === '1';
+const headers = preview ? { cookie: Astro.request.headers.get('cookie') ?? '' } : undefined;
+const project = await getProject(Astro.params.slug ?? '', { preview, headers });
+if (!project) {
+  return new Response(null, { status: 404, statusText: 'Réalisation introuvable' });
+}
+
+const [{ settings }, cityPages] = await Promise.all([getSite(), getCityPages()]);
+const base = import.meta.env.BASE_URL;
+
+// Lien vers la page ville publiée si elle existe
+const slugify = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const cityPage = project.city
+  ? cityPages.find((c: { slug: string; serviceSlug: string }) => c.slug === slugify(project.city))
+  : null;
+
+const slides = (project.images?.length ? project.images : [{ imageUrl: project.imageUrl, alt: project.title }])
+  .filter((i: { imageUrl?: string }) => i.imageUrl)
+  .map((i: { imageUrl: string; alt?: string }) => ({ url: i.imageUrl, alt: i.alt ?? project.title }));
+
+const siteUrl = settings.siteUrl.replace(/\/$/, '');
+const pageUrl = `${siteUrl}/realisations/${project.slug}/`;
+const projectImage = project.imageUrl
+  ? (project.imageUrl.startsWith('http') ? project.imageUrl : `${siteUrl}${project.imageUrl}`)
+  : undefined;
+const jsonLd = [{
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Accueil', item: `${siteUrl}/` },
+        { '@type': 'ListItem', position: 2, name: 'Réalisations', item: `${siteUrl}/realisations/` },
+        { '@type': 'ListItem', position: 3, name: project.title, item: pageUrl },
+      ],
+    },
+    {
+      '@type': 'CreativeWork',
+      name: project.title,
+      description: project.summary ?? undefined,
+      url: pageUrl,
+      image: slides.map((s: { url: string }) => s.url),
+      creator: { '@id': `${siteUrl}/#business` },
+      ...(project.city && { contentLocation: { '@type': 'City', name: project.city } }),
+    },
+  ],
+}];
+---
+
+<MainLayout
+  title={project.title}
+  description={project.summary ?? undefined}
+  image={projectImage}
+  canonicalPath={`/realisations/${project.slug}/`}
+  seoMeta={project.seoMeta}
+  noIndex={preview}
+  jsonLd={jsonLd}
+>
+  {preview && (
+    <div class="preview-banner">👁 Prévisualisation — ce brouillon n'est pas publié.</div>
+  )}
+  <article class="section">
+    <div class="container article-container">
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href={base}>Accueil</a>
+        <span class="breadcrumb-sep" aria-hidden="true">›</span>
+        <a href={`${base}realisations/`}>Réalisations</a>
+        <span class="breadcrumb-sep" aria-hidden="true">›</span>
+        <span aria-current="page">{project.title}</span>
+      </nav>
+
+      <header class="page-header">
+        {project.category?.label && <span class="tag">{project.category.label}</span>}
+        <h1 class="section-title">{project.title}</h1>
+        {project.city && (cityPage ? (
+          <a class="project-city" href={`${base}${cityPage.serviceSlug}/${cityPage.slug}/`}>📍 {project.city}</a>
+        ) : (
+          <span class="project-city">📍 {project.city}</span>
+        ))}
+      </header>
+
+      <div class:list={['project-layout', { 'with-carousel': slides.length > 0 }]}>
+        {slides.length > 0 && <ImageCarousel images={slides} />}
+        <div class="project-body">
+          {project.summary && <p class="project-lead">{project.summary}</p>}
+          {project.description && <div class="article-content" set:html={project.description} />}
+        </div>
+      </div>
+
+      <footer class="article-footer">
+        <a href={`${base}realisations/`} class="btn btn-secondary">← Toutes nos réalisations</a>
+        <a href={`${base}contact/`} class="btn btn-primary">Un projet similaire ? Devis gratuit</a>
+      </footer>
+    </div>
+  </article>
+</MainLayout>
+
+<style>
+  .preview-banner {
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #92400e;
+    background: #fef3c7;
+    border-bottom: 1px solid #f59e0b;
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm, 0.9rem);
+    margin-bottom: var(--space-4);
+  }
+
+  .breadcrumb a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumb-sep {
+    color: var(--color-text-muted);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .project-city {
+    display: inline-block;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    margin-top: var(--space-2);
+  }
+
+  a.project-city:hover {
+    text-decoration: underline;
+  }
+
+  .project-layout.with-carousel {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--space-8);
+    align-items: start;
+    margin-bottom: var(--space-10);
+  }
+
+  .project-lead {
+    font-size: var(--text-lg, 1.15rem);
+    color: var(--color-text-muted);
+    margin-top: 0;
+    line-height: var(--leading-relaxed);
+  }
+
+  .article-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    justify-content: center;
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+  }
+
+  @media (width <= 900px) {
+    .project-layout.with-carousel {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -79,6 +79,7 @@ export interface CityPage {
   lng: number | null;
   auto: boolean;
   published: boolean;
+  publishedAt: string | null;
   sortOrder: number;
   seoMeta: SeoMeta | null;
 }
@@ -96,6 +97,7 @@ export interface Project {
   images: ProjectImage[];
   tags: string[];
   published: boolean;
+  publishedAt: string | null;
   sortOrder: number;
   createdAt: string;
   seoMeta?: SeoMeta | null;

@@ -1,4 +1,4 @@
-import { getArticles, getCityPages } from '../lib/api.js';
+import { getArticles, getCityPages, getProjects } from '../lib/api.js';
 
 // Sitemap dynamique — les routes SSR ne sont pas couvertes par @astrojs/sitemap.
 const STATIC_PATHS = [
@@ -20,8 +20,9 @@ export async function GET() {
   const urls = [...STATIC_PATHS.map(url)];
 
   try {
-    const [articles, cityPages] = await Promise.all([getArticles(), getCityPages()]);
+    const [articles, cityPages, projects] = await Promise.all([getArticles(), getCityPages(), getProjects()]);
     for (const a of articles) urls.push(url(`/actualites/${a.slug}/`));
+    for (const p of projects) urls.push(url(`/realisations/${p.slug}/`));
     for (const c of cityPages) urls.push(url(`/${c.serviceSlug}/${c.slug}/`));
   } catch (err) {
     console.error('sitemap:', err.message);

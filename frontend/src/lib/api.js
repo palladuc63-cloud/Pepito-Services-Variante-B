@@ -33,6 +33,19 @@ export async function getProjects({ preview = false, headers } = {}) {
   return fetchJson(`/api/public/projects${preview ? '?preview=1' : ''}`, { headers });
 }
 
+/**
+ * @param {string} slug
+ * @param {{ preview?: boolean, headers?: Record<string, string> }} [opts]
+ */
+export async function getProject(slug, { preview = false, headers } = {}) {
+  try {
+    return await fetchJson(`/api/public/projects/${slug}${preview ? '?preview=1' : ''}`, { headers });
+  } catch (err) {
+    if (err.status === 404) return null;
+    throw err;
+  }
+}
+
 export async function getArticles() {
   return fetchJson('/api/public/articles', { ttl: 10_000 });
 }

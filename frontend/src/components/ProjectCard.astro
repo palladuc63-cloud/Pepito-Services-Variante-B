@@ -49,7 +49,9 @@ const gallery = project.images?.length
   </div>
   <div class="card-body">
     <span class="project-category">{categoryLabel}</span>
-    <h3 class="card-title">{project.title}</h3>
+    <h3 class="card-title">
+      <a href={`${base}realisations/${project.slug}/`} class="card-title-link">{project.title}</a>
+    </h3>
     <p class="card-text">{project.summary}</p>
     <div class="project-footer">
       <ContentBadge />
@@ -106,6 +108,15 @@ const gallery = project.images?.length
 
   .project-category::after {
     right: 5px;
+  }
+
+  .card-title-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .card-title-link:hover {
+    text-decoration: underline;
   }
 
   .project-footer {

@@ -189,7 +189,7 @@ jsonLd[0]['@graph'].push({
           <h2 class="mesh-title">Nos réalisations à {page.city}</h2>
           <div class="mesh-grid">
             {localProjects.map((p: { slug: string; title: string; imageUrl: string | null; category?: { label: string } | null }) => (
-              <a href={`${base}realisations/`} class="mesh-card">
+              <a href={`${base}realisations/${p.slug}/`} class="mesh-card">
                 {p.imageUrl && <img src={p.imageUrl} alt={p.title} loading="lazy" />}
                 <span class="mesh-card-body">
                   <strong>{p.title}</strong>

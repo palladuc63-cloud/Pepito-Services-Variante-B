@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.get('/content', ctrl.getContent);
 router.get('/projects', ctrl.listProjects);
+router.get('/projects/:slug', ctrl.getProject);
 router.get('/articles', ctrl.listArticles);
 router.get('/articles/:slug', ctrl.getArticle);
 router.get('/city-pages', ctrl.listCityPages);

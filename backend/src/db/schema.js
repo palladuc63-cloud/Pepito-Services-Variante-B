@@ -44,6 +44,7 @@ export const projects = mysqlTable('projects', {
   city: varchar('city', { length: 120 }),                        // ville du chantier → génère une page ville
   tags: json('tags'),
   published: boolean('published').default(true).notNull(),
+  publishedAt: timestamp('published_at'),                    // date de mise en ligne (NULL = immédiate)
   sortOrder: int('sort_order').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
@@ -104,6 +105,7 @@ export const cityPages = mysqlTable('city_pages', {
   lng: double('lng'),
   auto: boolean('auto').default(false).notNull(),               // générée automatiquement depuis une réalisation
   published: boolean('published').default(false).notNull(),
+  publishedAt: timestamp('published_at'),                    // publication programmée (NULL = immédiate)
   sortOrder: int('sort_order').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),

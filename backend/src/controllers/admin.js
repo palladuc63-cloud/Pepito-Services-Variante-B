@@ -136,14 +136,15 @@ export async function listProjects(_req, res) {
 }
 
 export async function createProject(req, res) {
-  const { title, categoryId, summary, description, imageUrl, images, city, tags, published, sortOrder = 0, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  const { title, categoryId, summary, description, imageUrl, images, city, tags, published, publishedAt, sortOrder = 0, metaTitle, metaDesc, ogImage } = req.body ?? {};
   if (!title) return res.status(400).json({ error: 'Titre requis' });
   const slug = await uniqueSlug(projects, title);
   const cover = imageUrl ?? (Array.isArray(images) && images.length ? images[0] : null);
   const [r] = await db.insert(projects).values({
     slug, title, categoryId: categoryId || null, summary,
     description: sanitizeRichHtml(description), imageUrl: cover, city: city?.trim() || null,
-    tags: Array.isArray(tags) ? tags : [], published: published !== false, sortOrder,
+    tags: Array.isArray(tags) ? tags : [], published: published !== false,
+    publishedAt: publishedAt ? new Date(publishedAt) : null, sortOrder,
   }).$returningId();
   if (Array.isArray(images)) await replaceProjectImages(r.id, images);
   await upsertSeoMeta('project', r.id, { metaTitle, metaDesc, ogImage });
@@ -159,7 +160,7 @@ export async function createProject(req, res) {
 
 export async function updateProject(req, res) {
   const id = Number(req.params.id);
-  const { title, categoryId, summary, description, imageUrl, images, city, tags, published, sortOrder, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  const { title, categoryId, summary, description, imageUrl, images, city, tags, published, publishedAt, sortOrder, metaTitle, metaDesc, ogImage } = req.body ?? {};
   const [before] = await db.select().from(projects).where(eq(projects.id, id));
   const cover = imageUrl !== undefined ? imageUrl
     : (Array.isArray(images) ? (images[0] ?? null) : undefined);
@@ -172,6 +173,7 @@ export async function updateProject(req, res) {
     ...(city !== undefined && { city: city?.trim() || null }),
     ...(tags !== undefined && { tags: Array.isArray(tags) ? tags : [] }),
     ...(published !== undefined && { published }),
+    ...(publishedAt !== undefined && { publishedAt: publishedAt ? new Date(publishedAt) : null }),
     ...(sortOrder !== undefined && { sortOrder }),
   }).where(eq(projects.id, id));
   if (Array.isArray(images)) await replaceProjectImages(id, images);
@@ -204,12 +206,12 @@ export const listArticles = async (_req, res) =>
   res.json(await db.select().from(articles).orderBy(desc(articles.createdAt)));
 
 export async function createArticle(req, res) {
-  const { title, summary, content, imageUrl, published = false, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  const { title, summary, content, imageUrl, published = false, publishedAt, metaTitle, metaDesc, ogImage } = req.body ?? {};
   if (!title) return res.status(400).json({ error: 'Titre requis' });
   const slug = await uniqueSlug(articles, title);
   const [r] = await db.insert(articles).values({
     slug, title, summary, content: sanitizeRichHtml(content), imageUrl, published,
-    publishedAt: published ? new Date() : null,
+    publishedAt: published ? (publishedAt ? new Date(publishedAt) : new Date()) : null,
   }).$returningId();
   await upsertSeoMeta('article', r.id, { metaTitle, metaDesc, ogImage });
   if (published) queueSocialPost('article', { id: r.id, slug, title, summary, imageUrl });
@@ -218,7 +220,7 @@ export async function createArticle(req, res) {
 
 export async function updateArticle(req, res) {
   const id = Number(req.params.id);
-  const { title, summary, content, imageUrl, published, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  const { title, summary, content, imageUrl, published, publishedAt, metaTitle, metaDesc, ogImage } = req.body ?? {};
   const [before] = await db.select().from(articles).where(eq(articles.id, id));
   const publishNow = before && !before.published && published === true;
   await db.update(articles).set({
@@ -228,6 +230,7 @@ export async function updateArticle(req, res) {
     ...(imageUrl !== undefined && { imageUrl }),
     ...(published !== undefined && { published }),
     ...(publishNow && { publishedAt: new Date() }),
+    ...(publishedAt !== undefined && { publishedAt: publishedAt ? new Date(publishedAt) : null }),
   }).where(eq(articles.id, id));
   if (metaTitle !== undefined || metaDesc !== undefined || ogImage !== undefined) {
     await upsertSeoMeta('article', id, { metaTitle, metaDesc, ogImage });
@@ -268,7 +271,7 @@ export const listCityPages = async (_req, res) =>
   res.json(await db.select().from(cityPages).orderBy(asc(cityPages.serviceSlug), asc(cityPages.sortOrder)));
 
 export async function createCityPage(req, res) {
-  const { city, serviceSlug, title, content, imageUrl, published = false, sortOrder = 0, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  const { city, serviceSlug, title, content, imageUrl, published = false, publishedAt, sortOrder = 0, metaTitle, metaDesc, ogImage } = req.body ?? {};
   if (!city || !serviceSlug || !title) return res.status(400).json({ error: 'Ville, service et titre requis' });
   const slug = slugify(city);
   const dup = await db.select().from(cityPages)
@@ -277,7 +280,8 @@ export async function createCityPage(req, res) {
   const geo = await fetchCityInfo(city).catch(() => ({ lat: null, lng: null }));
   const [r] = await db.insert(cityPages).values({
     slug, city, serviceSlug, title, content: sanitizeRichHtml(content), imageUrl,
-    lat: geo.lat, lng: geo.lng, published, sortOrder,
+    lat: geo.lat, lng: geo.lng, published,
+    publishedAt: publishedAt ? new Date(publishedAt) : null, sortOrder,
   }).$returningId();
   await upsertSeoMeta('city_page', r.id, { metaTitle, metaDesc, ogImage });
   res.status(201).json({ id: r.id, slug });
@@ -285,7 +289,7 @@ export async function createCityPage(req, res) {
 
 export async function updateCityPage(req, res) {
   const id = Number(req.params.id);
-  const { city, serviceSlug, title, content, imageUrl, published, sortOrder, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  const { city, serviceSlug, title, content, imageUrl, published, publishedAt, sortOrder, metaTitle, metaDesc, ogImage } = req.body ?? {};
   // Géocodage si la page n'a pas encore de coordonnées
   const [cur] = await db.select().from(cityPages).where(eq(cityPages.id, id));
   let geo = {};
@@ -301,6 +305,7 @@ export async function updateCityPage(req, res) {
     ...(content !== undefined && { content: sanitizeRichHtml(content) }),
     ...(imageUrl !== undefined && { imageUrl }),
     ...(published !== undefined && { published }),
+    ...(publishedAt !== undefined && { publishedAt: publishedAt ? new Date(publishedAt) : null }),
     ...(sortOrder !== undefined && { sortOrder }),
   }).where(eq(cityPages.id, id));
   if (metaTitle !== undefined || metaDesc !== undefined || ogImage !== undefined) {
