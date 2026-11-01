@@ -4,6 +4,24 @@ Période : novembre 2026 → janvier 2027 (3 mois)
 Principe : croissance naturelle — **une page ville = au moins un vrai chantier** dans cette ville.
 Google pénalise les pages villes créées en masse sans contenu réel derrière (« doorway pages »).
 
+## Volume cible (cadre sur 12 mois)
+
+| Contenu | Vitesse | Plafond | Logique |
+|---|---|---|---|
+| Pages villes | 1-2/sem au démarrage | **25-30 max** | une commune = au moins un chantier réel |
+| Réalisations | 1-2/mois | **18-24/an** | photos réelles à chaque fois |
+| Articles | 1/mois | **12/an** | les 10-15 requêtes longue traîne du métier |
+| **Total** | — | **~60-70 URLs** | bonne échelle pour un artisan local |
+
+Phases :
+- **Mois 1-4** : remplir la couverture (1-2 villes/sem jusqu'à ~15-20 villes)
+- **Mois 5+** : croisière — 1-2 réalisations/mois + villes seulement si nouveau secteur
+- **En continu** : enrichir les pages existantes (chantier récent, avis, photo) — une mise à jour vaut souvent autant qu'une nouvelle page
+
+⚠️ Gardes-fous intégrés au BO : le dashboard affiche un bandeau « Rythme de publication »
+qui alerte si >2 pages villes programmées/semaine, >30 villes publiées,
+>8 sorties programmées, ou aucune publication sous 30 jours.
+
 ## Rythme cible
 
 | Contenu | Cadence | Outil |

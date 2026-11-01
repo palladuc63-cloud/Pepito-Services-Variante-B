@@ -38,6 +38,7 @@ const base = import.meta.env.BASE_URL;
         </div>
 
         <p id="global-alert" class="alert" style="display:none"></p>
+        <div id="guardrails"></div>
 
         <!-- RÉALISATIONS -->
         <section id="tab-projects">
@@ -255,6 +256,50 @@ const base = import.meta.env.BASE_URL;
     });
   });
 
+  // ── Gardes-fous rythme de publication ──
+  // Règles SEO local : max ~2 pages villes/semaine, ~30 villes total,
+  // 1-2 publications/mois minimum. Recalculé à chaque chargement d'onglet.
+  function checkGuardrails() {
+    const el = $('#guardrails');
+    if (!el) return;
+    const projs = window._projects ?? [];
+    const arts = window._articles ?? [];
+    const cps = window._citypages ?? [];
+    const now = Date.now(), D = 864e5;
+    const all = [...projs, ...arts, ...cps];
+    const warns = [];
+
+    const lastPub = all
+      .filter((e) => e.publishedAt ? new Date(e.publishedAt) <= now : e.published && e.createdAt)
+      .map((e) => new Date(e.publishedAt ?? e.createdAt))
+      .sort((a, b) => b - a)[0];
+    const scheduled = all.filter((e) => e.publishedAt && new Date(e.publishedAt) > now);
+
+    // Trop : villes programmées en rafale
+    const byWeek = {};
+    cps.filter((c) => c.publishedAt && new Date(c.publishedAt) > now)
+      .forEach((c) => { const w = Math.floor(+new Date(c.publishedAt) / (7 * D)); byWeek[w] = (byWeek[w] || 0) + 1; });
+    const maxW = Math.max(0, ...Object.values(byWeek));
+    if (maxW > 2) warns.push(`${maxW} pages villes programmées la même semaine — maximum conseillé : 2/semaine.`);
+    const totalCities = cps.filter((c) => c.published).length;
+    if (totalCities > 30) warns.push(`${totalCities} pages villes publiées — plafond recommandé ~30 (risque « doorway pages »).`);
+    if (scheduled.length > 8) warns.push(`${scheduled.length} publications programmées — étale-les sur plusieurs semaines.`);
+
+    // Pas assez : inactivité + file vide
+    const nothingScheduled30 = scheduled.every((e) => new Date(e.publishedAt) > now + 30 * D);
+    if (lastPub && now - lastPub > 30 * D && (scheduled.length === 0 || nothingScheduled30)) {
+      warns.push(`Aucune publication depuis ${Math.floor((now - lastPub) / D)} jours et rien de programmé sous 30 jours — cadence cible : 1-2 réalisations/mois.`);
+    } else if (scheduled.length === 0 && lastPub) {
+      warns.push(`Aucune publication programmée — pense à planifier les prochaines sorties.`);
+    } else if (!lastPub) {
+      warns.push(`Aucun contenu publié pour l'instant — commence par une réalisation.`);
+    }
+
+    el.innerHTML = warns.length
+      ? `<div class="guardrails-box"><strong>📊 Rythme de publication</strong><ul>${warns.map((w) => `<li>${esc(w)}</li>`).join('')}</ul></div>`
+      : '';
+  }
+
   // ── Modal générique ──
   const backdrop = $('#modal-backdrop');
   let onSave = null;
@@ -352,6 +397,7 @@ const base = import.meta.env.BASE_URL;
       await api.del(`/api/admin/projects/${b.dataset.projDel}`);
       loaders.projects();
     }));
+    checkGuardrails();
   };
 
   function projectForm(p = {}, meta = {}) {
@@ -488,6 +534,7 @@ const base = import.meta.env.BASE_URL;
       await api.del(`/api/admin/articles/${b.dataset.artDel}`);
       loaders.articles();
     }));
+    checkGuardrails();
   };
 
   function articleForm(a = {}, meta = {}) {
@@ -609,6 +656,7 @@ const base = import.meta.env.BASE_URL;
       await api.del(`/api/admin/city-pages/${b.dataset.cityDel}`);
       loaders.citypages();
     }));
+    checkGuardrails();
   };
 
   function cityPageForm(c = {}, meta = {}) {
@@ -828,8 +876,10 @@ const base = import.meta.env.BASE_URL;
     showAlert('Paramètres enregistrés.');
   });
 
-  // Chargement initial
+  // Chargement initial — les 3 listes nourrissent les gardes-fous
   loaders.projects();
+  api.get('/api/admin/articles').then((a) => { window._articles = a; checkGuardrails(); }).catch(() => {});
+  api.get('/api/admin/city-pages').then((c) => { window._citypages = c; checkGuardrails(); }).catch(() => {});
 </script>
   </body>
 </html>
