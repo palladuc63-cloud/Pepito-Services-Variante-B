@@ -559,9 +559,11 @@ const base = import.meta.env.BASE_URL;
       .forEach((c) => { const w = Math.floor(+new Date(c.publishedAt) / (7 * D)); byWeek[w] = (byWeek[w] || 0) + 1; });
     const maxW = Math.max(0, ...Object.values(byWeek));
     if (maxW > 2) warns.push(`${maxW} pages villes programmées la même semaine — maximum conseillé : 2/semaine.`);
-    const totalCities = cps.filter((c) => c.published).length;
-    if (totalCities > 30) warns.push(`${totalCities} pages villes publiées — plafond recommandé ~30 (risque « doorway pages »).`);
-    if (scheduled.length > 8) warns.push(`${scheduled.length} publications programmées — étale-les sur plusieurs semaines.`);
+    const liveCities = cps.filter((c) => c.published && !(c.publishedAt && new Date(c.publishedAt) > now)).length;
+    const schedCities = cps.filter((c) => c.publishedAt && new Date(c.publishedAt) > now).length;
+    if (liveCities + schedCities > 30) warns.push(`${liveCities + schedCities} pages villes au total (${liveCities} en ligne, ${schedCities} programmées) — plafond recommandé ~30 (risque « doorway pages »).`);
+    const scheduled30 = scheduled.filter((e) => new Date(e.publishedAt) <= now + 30 * D).length;
+    if (scheduled30 > 15) warns.push(`${scheduled30} publications sur les 30 prochains jours (>3/semaine) — ralentis le rythme.`);
 
     // Pas assez : inactivité + file vide
     const nothingScheduled30 = scheduled.every((e) => new Date(e.publishedAt) > now + 30 * D);
