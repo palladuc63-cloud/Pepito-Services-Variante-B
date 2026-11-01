@@ -54,6 +54,24 @@ const base = import.meta.env.BASE_URL;
               <div id="overview-messages"></div>
             </div>
           </div>
+          <div class="card" style="margin-top:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <h2 style="margin:0">📈 Statistiques de visite</h2>
+              <div style="display:flex;gap:6px">
+                <select id="analytics-days" class="input" style="padding:4px 8px;width:auto">
+                  <option value="7">7 jours</option>
+                  <option value="30" selected>30 jours</option>
+                  <option value="90">90 jours</option>
+                </select>
+                <a id="umami-link" class="btn btn-sm" href="#" target="_blank" rel="noopener" hidden>Umami ↗</a>
+              </div>
+            </div>
+            <div id="analytics-stats" class="stat-grid" style="margin-bottom:12px"></div>
+            <div class="grid-2">
+              <div id="analytics-pages"></div>
+              <div id="analytics-refs"></div>
+            </div>
+          </div>
         </section>
 
         <!-- RÉALISATIONS -->
@@ -312,8 +330,48 @@ const base = import.meta.env.BASE_URL;
     document.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => {
       document.querySelector(`.admin-nav-link[data-tab="${b.dataset.goto}"]`)?.click();
     }));
+    loaders.analytics();
     checkGuardrails();
   };
+
+  // ── Statistiques Umami ──
+  loaders.analytics = async () => {
+    const statsEl = $('#analytics-stats');
+    const pagesEl = $('#analytics-pages');
+    const refsEl = $('#analytics-refs');
+    statsEl.innerHTML = '<p style="color:var(--muted);margin:0">Chargement…</p>';
+    pagesEl.innerHTML = ''; refsEl.innerHTML = '';
+    let a;
+    try { a = await api.get(`/api/admin/analytics?days=${$('#analytics-days').value}`); }
+    catch { statsEl.innerHTML = '<p style="color:var(--muted);margin:0">Statistiques indisponibles — Umami ne répond pas.</p>'; return; }
+    if (!a.configured) {
+      statsEl.innerHTML = '<p style="color:var(--muted);margin:0">Statistiques non configurées.</p>';
+      return;
+    }
+    if (a.dashboardUrl) {
+      const link = $('#umami-link');
+      link.href = a.dashboardUrl;
+      link.hidden = false;
+    }
+    const s = a.stats ?? {};
+    const v = (x) => Number(x?.value ?? x ?? 0);
+    const delta = (x) => {
+      const c = Number(x?.change ?? 0);
+      return c ? `<span class="delta ${c > 0 ? 'up' : 'down'}">${c > 0 ? '+' : ''}${c}%</span>` : '';
+    };
+    statsEl.innerHTML = [
+      `<div class="stat-card"><strong>${v(s.visitors)}${delta(s.visitors)}</strong><span>visiteurs</span></div>`,
+      `<div class="stat-card"><strong>${v(s.pageviews)}${delta(s.pageviews)}</strong><span>pages vues</span></div>`,
+      `<div class="stat-card"><strong>${v(s.visits)}${delta(s.visits)}</strong><span>visites</span></div>`,
+      `<div class="stat-card"><strong>${v(s.bounces)}${delta(s.bounces)}</strong><span>rebonds</span></div>`,
+    ].join('');
+    const list = (rows, empty) => rows?.length
+      ? `<ul class="ov-list">${rows.map((r) => `<li>${esc(String(r.x))}<time>${r.y}</time></li>`).join('')}</ul>`
+      : `<p style="color:var(--muted);margin:0">${empty}</p>`;
+    pagesEl.innerHTML = `<h3 style="margin:0 0 8px;font-size:.9rem">Pages les plus vues</h3>` + list(a.topPages, 'Pas encore de données.');
+    refsEl.innerHTML = `<h3 style="margin:0 0 8px;font-size:.9rem">Sources de trafic</h3>` + list(a.referrers, 'Pas encore de données.');
+  };
+  $('#analytics-days').addEventListener('change', () => loaders.analytics());
   document.querySelectorAll('.admin-nav-link[data-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.admin-nav-link').forEach((b) => b.classList.remove('active'));

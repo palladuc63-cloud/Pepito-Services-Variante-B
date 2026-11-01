@@ -2,6 +2,7 @@ import express from 'express';
 import { authenticateJWT } from '../utils/auth.js';
 import * as ctrl from '../controllers/admin.js';
 import * as social from '../controllers/social.js';
+import * as analytics from '../controllers/analytics.js';
 
 const router = express.Router();
 router.use(authenticateJWT);
@@ -45,6 +46,8 @@ router.delete('/redirects/:id', ctrl.deleteRedirect);
 
 router.get('/seo-meta', ctrl.listSeoMeta);
 router.delete('/seo-meta/:id', ctrl.deleteSeoMeta);
+
+router.get('/analytics', analytics.getAnalytics);
 
 router.get('/social-posts', social.listPosts);
 router.put('/social-posts/:id', social.updatePost);

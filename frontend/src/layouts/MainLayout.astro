@@ -19,6 +19,8 @@ export interface Props {
 
 const { title, description, image, canonicalPath, noIndex, seoMeta, jsonLd } = Astro.props;
 const { settings } = await getSite();
+const umamiSrc = process.env.UMAMI_SCRIPT_URL || import.meta.env.UMAMI_SCRIPT_URL;
+const umamiId = process.env.UMAMI_WEBSITE_ID || import.meta.env.UMAMI_WEBSITE_ID;
 ---
 
 <!doctype html>
@@ -50,6 +52,9 @@ const { settings } = await getSite();
       data-color="#16a34a"
       async
     ></script>
+    {umamiSrc && umamiId && (
+      <script is:inline defer src={umamiSrc} data-website-id={umamiId}></script>
+    )}
   </head>
   <body>
     <a href="#main-content" class="skip-link">Aller au contenu principal</a>

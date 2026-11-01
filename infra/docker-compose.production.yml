@@ -49,6 +49,8 @@ services:
     restart: unless-stopped
     environment:
       API_INTERNAL_URL: http://pepito-backend:3002
+      UMAMI_SCRIPT_URL: ${UMAMI_SCRIPT_URL:-}
+      UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID:-}
       HOST: 0.0.0.0
       PORT: 4321
     ports:
