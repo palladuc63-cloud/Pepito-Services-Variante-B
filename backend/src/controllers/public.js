@@ -1,12 +1,22 @@
 import { eq, asc, desc, and } from 'drizzle-orm';
 import { db } from '../db.js';
-import { settings, categories, services, projects, articles, messages, projectImages } from '../db/schema.js';
+import {
+  settings, categories, services, projects, articles, messages, projectImages,
+  cityPages, seoMeta, redirects,
+} from '../db/schema.js';
 import { notify } from '../utils/notify.js';
 
 async function getSettingsMap() {
   const rows = await db.select().from(settings);
   return Object.fromEntries(rows.map((r) => [r.key, r.value]));
 }
+
+// Attache les overrides SEO (entityId -> {metaTitle, metaDesc, ogImage})
+async function seoMetaMap(entityType) {
+  const rows = await db.select().from(seoMeta).where(eq(seoMeta.entityType, entityType));
+  return new Map(rows.map((r) => [r.entityId, r]));
+}
+const withSeo = (map) => (row) => ({ ...row, seoMeta: map.get(row.id) ?? null });
 
 // GET /api/public/content — tout ce dont le frontend a besoin pour le layout + homepage
 export async function getContent(_req, res) {
@@ -35,10 +45,12 @@ export async function listProjects(_req, res) {
     const imgs = ids.length
       ? await db.select().from(projectImages).orderBy(asc(projectImages.sortOrder))
       : [];
+    const seo = await seoMetaMap('project');
     res.json(rows.map((r) => ({
       ...r.project,
       category: r.category,
       images: imgs.filter((i) => i.projectId === r.project.id),
+      seoMeta: seo.get(r.project.id) ?? null,
     })));
   } catch (err) {
     console.error('GET /public/projects:', err.message);
@@ -53,7 +65,8 @@ export async function listArticles(_req, res) {
       .from(articles)
       .where(eq(articles.published, true))
       .orderBy(desc(articles.publishedAt), desc(articles.createdAt));
-    res.json(rows);
+    const seo = await seoMetaMap('article');
+    res.json(rows.map((r) => ({ ...r, seoMeta: seo.get(r.id) ?? null })));
   } catch (err) {
     console.error('GET /public/articles:', err.message);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -67,9 +80,51 @@ export async function getArticle(req, res) {
       .from(articles)
       .where(and(eq(articles.slug, req.params.slug), eq(articles.published, true)));
     if (!row) return res.status(404).json({ error: 'Article introuvable' });
-    res.json(row);
+    const [meta] = await db.select().from(seoMeta)
+      .where(and(eq(seoMeta.entityType, 'article'), eq(seoMeta.entityId, row.id)));
+    res.json({ ...row, seoMeta: meta ?? null });
   } catch (err) {
     console.error('GET /public/articles/:slug:', err.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+// ─── City pages (SEO local) ─────────────────────────────────
+export async function listCityPages(_req, res) {
+  try {
+    const [rows, seo] = await Promise.all([
+      db.select().from(cityPages).where(eq(cityPages.published, true))
+        .orderBy(asc(cityPages.serviceSlug), asc(cityPages.sortOrder)),
+      seoMetaMap('city_page'),
+    ]);
+    res.json(rows.map(withSeo(seo)));
+  } catch (err) {
+    console.error('GET /public/city-pages:', err.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+export async function getCityPage(req, res) {
+  try {
+    const { service, slug } = req.params;
+    const [row] = await db.select().from(cityPages)
+      .where(and(eq(cityPages.serviceSlug, service), eq(cityPages.slug, slug), eq(cityPages.published, true)));
+    if (!row) return res.status(404).json({ error: 'Page introuvable' });
+    const [meta] = await db.select().from(seoMeta)
+      .where(and(eq(seoMeta.entityType, 'city_page'), eq(seoMeta.entityId, row.id)));
+    res.json({ ...row, seoMeta: meta ?? null });
+  } catch (err) {
+    console.error('GET /public/city-pages/:service/:slug:', err.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+// ─── Redirects (lookup pour le front avant 404) ─────────────
+export async function listRedirects(_req, res) {
+  try {
+    res.json(await db.select().from(redirects));
+  } catch (err) {
+    console.error('GET /public/redirects:', err.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 }

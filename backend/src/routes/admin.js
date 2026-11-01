@@ -33,6 +33,19 @@ router.delete('/messages/:id', ctrl.deleteMessage);
 router.get('/settings', ctrl.getSettings);
 router.put('/settings', ctrl.updateSettings);
 
+router.get('/city-pages', ctrl.listCityPages);
+router.post('/city-pages', ctrl.createCityPage);
+router.put('/city-pages/:id', ctrl.updateCityPage);
+router.delete('/city-pages/:id', ctrl.deleteCityPage);
+
+router.get('/redirects', ctrl.listRedirects);
+router.post('/redirects', ctrl.createRedirect);
+router.put('/redirects/:id', ctrl.updateRedirect);
+router.delete('/redirects/:id', ctrl.deleteRedirect);
+
+router.get('/seo-meta', ctrl.listSeoMeta);
+router.delete('/seo-meta/:id', ctrl.deleteSeoMeta);
+
 router.get('/social-posts', social.listPosts);
 router.put('/social-posts/:id', social.updatePost);
 router.post('/social-posts/:id/publish', social.publishPost);

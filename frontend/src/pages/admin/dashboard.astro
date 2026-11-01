@@ -19,8 +19,10 @@ import '../../styles/admin.css';
         <button class="admin-nav-link" data-tab="articles">📰 Articles</button>
         <button class="admin-nav-link" data-tab="services">🛠️ Services</button>
         <button class="admin-nav-link" data-tab="categories">🗂️ Catégories</button>
+        <button class="admin-nav-link" data-tab="citypages">📍 Pages villes</button>
         <button class="admin-nav-link" data-tab="messages">📩 Messages</button>
         <button class="admin-nav-link" data-tab="social">📣 Réseaux</button>
+        <button class="admin-nav-link" data-tab="seo">🔗 SEO / Redirections</button>
         <button class="admin-nav-link" data-tab="settings">⚙️ Paramètres</button>
         <button class="admin-nav-link" id="btn-logout" style="margin-top:auto">🚪 Déconnexion</button>
       </aside>
@@ -88,6 +90,44 @@ import '../../styles/admin.css';
               <div><label class="form-label">Ordre</label><input class="form-input" id="cat-order" type="number" value="0" /></div>
               <button class="btn btn-primary" type="submit">+ Ajouter</button>
             </form>
+          </div>
+        </section>
+
+        <!-- PAGES VILLES -->
+        <section id="tab-citypages" hidden>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <h2 style="margin:0">Pages villes (SEO local)</h2>
+              <button class="btn btn-primary btn-sm" id="btn-new-city">+ Nouvelle page ville</button>
+            </div>
+            <table class="admin-table">
+              <thead><tr><th>URL</th><th>Titre</th><th>Statut</th><th></th></tr></thead>
+              <tbody id="citypages-body"></tbody>
+            </table>
+            <p class="form-hint">Chaque page publiée est servie sur /&lt;service&gt;/&lt;ville&gt;/ — ex. /clotures/saint-etienne/</p>
+          </div>
+        </section>
+
+        <!-- SEO / REDIRECTIONS -->
+        <section id="tab-seo" hidden>
+          <div class="card" style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <h2 style="margin:0">Redirections</h2>
+              <button class="btn btn-primary btn-sm" id="btn-new-redirect">+ Nouvelle redirection</button>
+            </div>
+            <table class="admin-table">
+              <thead><tr><th>Ancien chemin</th><th>Nouveau chemin</th><th>Code</th><th></th></tr></thead>
+              <tbody id="redirects-body"></tbody>
+            </table>
+            <p class="form-hint">Chemins relatifs au site, sans le préfixe /test — ex. /ancienne-page/ → /realisations/</p>
+          </div>
+          <div class="card">
+            <h2>Overrides SEO</h2>
+            <table class="admin-table">
+              <thead><tr><th>Type</th><th>Entité</th><th>Meta title</th><th></th></tr></thead>
+              <tbody id="seometa-body"></tbody>
+            </table>
+            <p class="form-hint">Les champs « SEO » des formulaires (réalisation, article, page ville) créent ces overrides automatiquement.</p>
           </div>
         </section>
 
@@ -182,8 +222,10 @@ import '../../styles/admin.css';
     articles: ['Articles', 'Actualités du blog'],
     services: ['Services', 'Services affichés sur la homepage'],
     categories: ['Catégories', 'Catégories de réalisations'],
+    citypages: ['Pages villes', 'Pages SEO local « service + ville »'],
     messages: ['Messages', 'Demandes reçues via le formulaire et Janus'],
     social: ['Réseaux sociaux', 'Posts Facebook générés automatiquement'],
+    seo: ['SEO / Redirections', 'Overrides meta et redirections 301/302'],
     settings: ['Paramètres', 'Coordonnées et contenus du site'],
   };
   const loaders = {};
@@ -228,6 +270,22 @@ import '../../styles/admin.css';
     });
   }
 
+  // ── SEO meta (overrides par entité) ──
+  let seoIndex = [];
+  async function refreshSeo() { seoIndex = await api.get('/api/admin/seo-meta'); }
+  const seoFor = (type, id) => seoIndex.find((m) => m.entityType === type && Number(m.entityId) === Number(id));
+  const seoFields = (m, pfx) => `
+    <div class="form-row cols-2">
+      <div><label class="form-label">Meta title SEO</label><input class="form-input" id="${pfx}-meta-title" value="${esc(m?.metaTitle ?? '')}" /></div>
+      <div><label class="form-label">Image OG (URL)</label><input class="form-input" id="${pfx}-og-image" value="${esc(m?.ogImage ?? '')}" /></div>
+    </div>
+    <div class="form-row"><label class="form-label">Meta description SEO</label><textarea class="form-textarea" id="${pfx}-meta-desc" placeholder="Laisse vide pour la description automatique">${esc(m?.metaDesc ?? '')}</textarea></div>`;
+  const readSeoFields = (pfx) => ({
+    metaTitle: $(`#${pfx}-meta-title`).value.trim() || null,
+    metaDesc: $(`#${pfx}-meta-desc`).value.trim() || null,
+    ogImage: $(`#${pfx}-og-image`).value.trim() || null,
+  });
+
   // ══════════ RÉALISATIONS ══════════
   let categories = [];
   loaders.categories = async () => {
@@ -261,7 +319,7 @@ import '../../styles/admin.css';
 
   loaders.projects = async () => {
     if (!categories.length) categories = await api.get('/api/admin/categories');
-    const projects = await api.get('/api/admin/projects');
+    const [projects] = await Promise.all([api.get('/api/admin/projects'), refreshSeo()]);
     $('#projects-body').innerHTML = projects.map((p) => `
       <tr>
         <td>${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="" />` : ''}</td>
@@ -282,7 +340,7 @@ import '../../styles/admin.css';
     }));
   };
 
-  function projectForm(p = {}) {
+  function projectForm(p = {}, meta = {}) {
     return `
       <div class="form-row"><label class="form-label">Titre *</label><input class="form-input" id="p-title" value="${esc(p.title ?? '')}" /></div>
       <div class="form-row cols-2">
@@ -301,6 +359,7 @@ import '../../styles/admin.css';
         <p class="form-hint">Sélectionne plusieurs fichiers ou colle des URLs (/uploads/…). Flèches pour réordonner.</p>
       </div>
       <div class="form-row"><label class="form-label">Tags (séparés par des virgules)</label><input class="form-input" id="p-tags" value="${esc((p.tags ?? []).join(', '))}" /></div>
+      ${seoFields(meta, 'p')}
       <div class="switch-row"><input type="checkbox" id="p-published" ${p.published !== false ? 'checked' : ''} /><label for="p-published">Publié sur le site</label></div>
       <p class="form-hint">Une publication crée automatiquement un brouillon de post Facebook (onglet Réseaux).</p>`;
   }
@@ -365,6 +424,7 @@ import '../../styles/admin.css';
       tags: $('#p-tags').value.split(',').map((t) => t.trim()).filter(Boolean),
       published: $('#p-published').checked,
       sortOrder: Number($('#p-order').value) || 0,
+      ...readSeoFields('p'),
     };
     if (!body.title) return showAlert('Titre requis.', false);
     if (id) await api.put(`/api/admin/projects/${id}`, body);
@@ -376,7 +436,7 @@ import '../../styles/admin.css';
 
   function editProject(id) {
     const p = window._projects.find((x) => String(x.id) === String(id));
-    openModal('Éditer la réalisation', projectForm(p), () => saveProject(p.id));
+    openModal('Éditer la réalisation', projectForm(p, seoFor('project', p.id)), () => saveProject(p.id));
     initGallery(p);
   }
 
@@ -388,7 +448,7 @@ import '../../styles/admin.css';
 
   // ══════════ ARTICLES ══════════
   loaders.articles = async () => {
-    const articles = await api.get('/api/admin/articles');
+    const [articles] = await Promise.all([api.get('/api/admin/articles'), refreshSeo()]);
     $('#articles-body').innerHTML = articles.map((a) => `
       <tr>
         <td>${a.imageUrl ? `<img src="${esc(a.imageUrl)}" alt="" />` : ''}</td>
@@ -409,7 +469,7 @@ import '../../styles/admin.css';
     }));
   };
 
-  function articleForm(a = {}) {
+  function articleForm(a = {}, meta = {}) {
     return `
       <div class="form-row"><label class="form-label">Titre *</label><input class="form-input" id="a-title" value="${esc(a.title ?? '')}" /></div>
       <div class="form-row"><label class="form-label">Résumé</label><input class="form-input" id="a-summary" value="${esc(a.summary ?? '')}" /></div>
@@ -418,6 +478,7 @@ import '../../styles/admin.css';
         <div><label class="form-label">Image (URL)</label><input class="form-input" id="a-image" value="${esc(a.imageUrl ?? '')}" /></div>
         <div><label class="form-label">ou upload</label><input class="form-input" id="a-image-file" type="file" accept="image/*" /></div>
       </div>
+      ${seoFields(meta, 'a')}
       <div class="switch-row"><input type="checkbox" id="a-published" ${a.published ? 'checked' : ''} /><label for="a-published">Publié</label></div>`;
   }
 
@@ -428,6 +489,7 @@ import '../../styles/admin.css';
       content: $('#a-content').value,
       imageUrl: $('#a-image').value.trim() || null,
       published: $('#a-published').checked,
+      ...readSeoFields('a'),
     };
     if (!body.title) return showAlert('Titre requis.', false);
     if (id) await api.put(`/api/admin/articles/${id}`, body);
@@ -439,7 +501,7 @@ import '../../styles/admin.css';
 
   function editArticle(id) {
     const a = window._articles.find((x) => String(x.id) === String(id));
-    openModal('Éditer l’article', articleForm(a), () => saveArticle(a.id));
+    openModal('Éditer l’article', articleForm(a, seoFor('article', a.id)), () => saveArticle(a.id));
     bindUpload('a-image');
   }
 
@@ -493,6 +555,160 @@ import '../../styles/admin.css';
     });
     bindUpload('s-image');
   }
+
+  // ══════════ PAGES VILLES ══════════
+  let servicesList = [];
+  loaders.citypages = async () => {
+    if (!servicesList.length) servicesList = await api.get('/api/admin/services');
+    const [citypages] = await Promise.all([api.get('/api/admin/city-pages'), refreshSeo()]);
+    window._citypages = citypages;
+    $('#citypages-body').innerHTML = citypages.length ? citypages.map((c) => `
+      <tr>
+        <td><code>/${esc(c.serviceSlug)}/${esc(c.slug)}/</code></td>
+        <td><strong>${esc(c.title)}</strong><br/><span style="color:var(--muted);font-size:12px">${esc(c.city)}</span></td>
+        <td><span class="tag-pill ${c.published ? 'pub' : 'draft'}">${c.published ? 'Publié' : 'Brouillon'}</span></td>
+        <td style="text-align:right;white-space:nowrap">
+          <button class="btn btn-sm" data-city-edit="${c.id}">Éditer</button>
+          <button class="btn btn-sm btn-danger" data-city-del="${c.id}">✕</button>
+        </td>
+      </tr>`).join('') : '<tr><td colspan="4" style="color:var(--muted)">Aucune page ville pour l’instant.</td></tr>';
+    document.querySelectorAll('[data-city-edit]').forEach((b) => b.addEventListener('click', () => editCityPage(b.dataset.cityEdit)));
+    document.querySelectorAll('[data-city-del]').forEach((b) => b.addEventListener('click', async () => {
+      if (!confirm('Supprimer cette page ville ?')) return;
+      await api.del(`/api/admin/city-pages/${b.dataset.cityDel}`);
+      loaders.citypages();
+    }));
+  };
+
+  function cityPageForm(c = {}, meta = {}) {
+    return `
+      <div class="form-row cols-2">
+        <div><label class="form-label">Ville *</label><input class="form-input" id="cp-city" value="${esc(c.city ?? '')}" placeholder="Saint-Étienne" /></div>
+        <div><label class="form-label">Service *</label>
+          <select class="form-select" id="cp-service">
+            ${servicesList.map((s) => `<option value="${esc(s.slug)}" ${s.slug === c.serviceSlug ? 'selected' : ''}>${esc(s.title)}</option>`).join('')}
+          </select></div>
+      </div>
+      <div class="form-row"><label class="form-label">Titre *</label><input class="form-input" id="cp-title" value="${esc(c.title ?? '')}" placeholder="Pose de clôtures à Saint-Étienne" /></div>
+      <div class="form-row"><label class="form-label">Contenu (HTML accepté)</label><textarea class="form-textarea tall" id="cp-content">${esc(c.content ?? '')}</textarea></div>
+      <div class="form-row cols-2">
+        <div><label class="form-label">Image (URL)</label><input class="form-input" id="cp-image" value="${esc(c.imageUrl ?? '')}" /></div>
+        <div><label class="form-label">ou upload</label><input class="form-input" id="cp-image-file" type="file" accept="image/*" /></div>
+      </div>
+      <div class="form-row cols-2">
+        <div><label class="form-label">Ordre</label><input class="form-input" id="cp-order" type="number" value="${c.sortOrder ?? 0}" /></div>
+        <div class="switch-row" style="align-items:end"><input type="checkbox" id="cp-published" ${c.published ? 'checked' : ''} /><label for="cp-published">Publié</label></div>
+      </div>
+      ${seoFields(meta, 'cp')}`;
+  }
+
+  async function saveCityPage(id) {
+    const body = {
+      city: $('#cp-city').value.trim(),
+      serviceSlug: $('#cp-service').value,
+      title: $('#cp-title').value.trim(),
+      content: $('#cp-content').value,
+      imageUrl: $('#cp-image').value.trim() || null,
+      sortOrder: Number($('#cp-order').value) || 0,
+      published: $('#cp-published').checked,
+      ...readSeoFields('cp'),
+    };
+    if (!body.city || !body.title) return showAlert('Ville et titre requis.', false);
+    try {
+      if (id) await api.put(`/api/admin/city-pages/${id}`, body);
+      else await api.post('/api/admin/city-pages', body);
+    } catch (err) { return showAlert(err.message, false); }
+    backdrop.style.display = 'none';
+    showAlert('Page ville enregistrée.');
+    loaders.citypages();
+  }
+
+  function editCityPage(id) {
+    const c = window._citypages.find((x) => String(x.id) === String(id));
+    openModal('Éditer la page ville', cityPageForm(c, seoFor('city_page', c.id)), () => saveCityPage(c.id));
+    bindUpload('cp-image');
+  }
+
+  $('#btn-new-city').addEventListener('click', async () => {
+    if (!servicesList.length) servicesList = await api.get('/api/admin/services');
+    openModal('Nouvelle page ville', cityPageForm(), () => saveCityPage(null));
+    bindUpload('cp-image');
+  });
+
+  // ══════════ SEO / REDIRECTIONS ══════════
+  const entityLabel = (m) => {
+    const pools = { project: window._projects, article: window._articles, city_page: window._citypages, service: window._services };
+    const row = (pools[m.entityType] ?? []).find((x) => Number(x.id) === Number(m.entityId));
+    return row ? (row.title ?? row.label ?? `#${m.entityId}`) : `#${m.entityId}`;
+  };
+
+  function redirectForm(r = {}) {
+    return `
+      <div class="form-row"><label class="form-label">Ancien chemin *</label><input class="form-input" id="r-old" value="${esc(r.oldPath ?? '')}" placeholder="/ancienne-page/" /></div>
+      <div class="form-row"><label class="form-label">Nouveau chemin *</label><input class="form-input" id="r-new" value="${esc(r.newPath ?? '')}" placeholder="/realisations/" /></div>
+      <div class="form-row"><label class="form-label">Code HTTP</label>
+        <select class="form-select" id="r-status">
+          <option value="301" ${r.status !== 302 ? 'selected' : ''}>301 — permanent</option>
+          <option value="302" ${r.status === 302 ? 'selected' : ''}>302 — temporaire</option>
+        </select></div>`;
+  }
+
+  async function saveRedirect(id) {
+    const body = {
+      oldPath: $('#r-old').value.trim(),
+      newPath: $('#r-new').value.trim(),
+      status: Number($('#r-status').value),
+    };
+    if (!body.oldPath || !body.newPath) return showAlert('Les deux chemins sont requis.', false);
+    try {
+      if (id) await api.put(`/api/admin/redirects/${id}`, body);
+      else await api.post('/api/admin/redirects', body);
+    } catch (err) { return showAlert(err.message, false); }
+    backdrop.style.display = 'none';
+    showAlert('Redirection enregistrée — active sous ~30 s.');
+    loaders.seo();
+  }
+
+  loaders.seo = async () => {
+    const [redirects] = await Promise.all([api.get('/api/admin/redirects'), refreshSeo()]);
+    window._redirects = redirects;
+    $('#redirects-body').innerHTML = redirects.length ? redirects.map((r) => `
+      <tr>
+        <td><code>${esc(r.oldPath)}</code></td>
+        <td><code>${esc(r.newPath)}</code></td>
+        <td><span class="tag-pill">${r.status}</span></td>
+        <td style="text-align:right;white-space:nowrap">
+          <button class="btn btn-sm" data-red-edit="${r.id}">Éditer</button>
+          <button class="btn btn-sm btn-danger" data-red-del="${r.id}">✕</button>
+        </td>
+      </tr>`).join('') : '<tr><td colspan="4" style="color:var(--muted)">Aucune redirection.</td></tr>';
+    document.querySelectorAll('[data-red-edit]').forEach((b) => b.addEventListener('click', () => {
+      const r = window._redirects.find((x) => String(x.id) === b.dataset.redEdit);
+      openModal('Éditer la redirection', redirectForm(r), () => saveRedirect(r.id));
+    }));
+    document.querySelectorAll('[data-red-del]').forEach((b) => b.addEventListener('click', async () => {
+      if (!confirm('Supprimer cette redirection ?')) return;
+      await api.del(`/api/admin/redirects/${b.dataset.redDel}`);
+      loaders.seo();
+    }));
+
+    $('#seometa-body').innerHTML = seoIndex.length ? seoIndex.map((m) => `
+      <tr>
+        <td><span class="tag-pill">${esc(m.entityType)}</span></td>
+        <td>${esc(entityLabel(m))}</td>
+        <td>${esc(m.metaTitle ?? '—')}</td>
+        <td style="text-align:right"><button class="btn btn-sm btn-danger" data-meta-del="${m.id}">✕</button></td>
+      </tr>`).join('') : '<tr><td colspan="4" style="color:var(--muted)">Aucun override — les metas sont générées automatiquement.</td></tr>';
+    document.querySelectorAll('[data-meta-del]').forEach((b) => b.addEventListener('click', async () => {
+      if (!confirm('Supprimer cet override SEO ?')) return;
+      await api.del(`/api/admin/seo-meta/${b.dataset.metaDel}`);
+      loaders.seo();
+    }));
+  };
+
+  $('#btn-new-redirect').addEventListener('click', () => {
+    openModal('Nouvelle redirection', redirectForm(), () => saveRedirect(null));
+  });
 
   // ══════════ MESSAGES ══════════
   loaders.messages = async () => {

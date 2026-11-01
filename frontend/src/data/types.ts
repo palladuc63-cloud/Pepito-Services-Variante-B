@@ -58,6 +58,28 @@ export interface ProjectImage {
   sortOrder: number;
 }
 
+export interface SeoMeta {
+  id: number;
+  entityType: 'page' | 'project' | 'article' | 'city_page' | 'service';
+  entityId: number;
+  metaTitle: string | null;
+  metaDesc: string | null;
+  ogImage: string | null;
+}
+
+export interface CityPage {
+  id: number;
+  slug: string;
+  city: string;
+  serviceSlug: string;
+  title: string;
+  content: string | null;
+  imageUrl: string | null;
+  published: boolean;
+  sortOrder: number;
+  seoMeta: SeoMeta | null;
+}
+
 export interface Project {
   id: number;
   slug: string;
@@ -72,6 +94,7 @@ export interface Project {
   published: boolean;
   sortOrder: number;
   createdAt: string;
+  seoMeta?: SeoMeta | null;
 }
 
 export interface Article {
@@ -84,4 +107,5 @@ export interface Article {
   published: boolean;
   publishedAt: string | null;
   createdAt: string;
+  seoMeta?: SeoMeta | null;
 }

@@ -90,6 +90,39 @@ export const settings = mysqlTable('settings', {
   value: text('value'),
 });
 
+// Pages SEO local « service + ville » → /<service>/<ville>/
+export const cityPages = mysqlTable('city_pages', {
+  id: serial('id').primaryKey(),
+  slug: varchar('slug', { length: 160 }).notNull(),           // slug de la ville
+  city: varchar('city', { length: 120 }).notNull(),
+  serviceSlug: varchar('service_slug', { length: 80 }).notNull(),
+  title: varchar('title', { length: 200 }).notNull(),
+  content: text('content'),                                    // HTML riche
+  imageUrl: varchar('image_url', { length: 500 }),
+  published: boolean('published').default(false).notNull(),
+  sortOrder: int('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+});
+
+// Overrides SEO par entité (fallback auto sinon)
+export const seoMeta = mysqlTable('seo_meta', {
+  id: serial('id').primaryKey(),
+  entityType: mysqlEnum('entity_type', ['page', 'project', 'article', 'city_page', 'service']).notNull(),
+  entityId: int('entity_id').notNull(),
+  metaTitle: varchar('meta_title', { length: 200 }),
+  metaDesc: varchar('meta_desc', { length: 300 }),
+  ogImage: varchar('og_image', { length: 500 }),
+});
+
+// Redirections 301/302 (migrations, anciennes URLs)
+export const redirects = mysqlTable('redirects', {
+  id: serial('id').primaryKey(),
+  oldPath: varchar('old_path', { length: 500 }).notNull().unique(),
+  newPath: varchar('new_path', { length: 500 }).notNull(),
+  status: int('status').default(301).notNull(),
+});
+
 // File de posts réseaux sociaux (Facebook d'abord)
 export const socialPosts = mysqlTable('social_posts', {
   id: serial('id').primaryKey(),

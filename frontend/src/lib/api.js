@@ -40,3 +40,22 @@ export async function getArticle(slug) {
     throw err;
   }
 }
+
+// Pages villes (SEO local) — /<service>/<ville>/
+export async function getCityPages() {
+  return fetchJson('/api/public/city-pages');
+}
+
+export async function getCityPage(service, slug) {
+  try {
+    return await fetchJson(`/api/public/city-pages/${service}/${slug}`);
+  } catch (err) {
+    if (err.status === 404) return null;
+    throw err;
+  }
+}
+
+// Redirections — lookup pour le middleware avant 404
+export async function getRedirects() {
+  return fetchJson('/api/public/redirects');
+}

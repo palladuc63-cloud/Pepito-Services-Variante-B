@@ -1,6 +1,6 @@
 ---
 import { Font } from 'astro:assets';
-import type { SiteSettings } from '../data/types';
+import type { SiteSettings, SeoMeta } from '../data/types';
 
 export interface Props {
   settings: SiteSettings;
@@ -9,16 +9,23 @@ export interface Props {
   image?: string;
   canonicalPath?: string;
   noIndex?: boolean;
+  /** Override issu de seo_meta — prioritaire sur title/description/image. */
+  seoMeta?: SeoMeta | null;
 }
 
 const {
   settings,
-  title,
-  description = settings.description,
-  image,
+  title: rawTitle,
+  description: rawDescription,
+  image: rawImage,
   canonicalPath,
   noIndex = false,
+  seoMeta,
 } = Astro.props;
+
+const title = seoMeta?.metaTitle ?? rawTitle;
+const description = seoMeta?.metaDesc ?? rawDescription ?? settings.description;
+const image = seoMeta?.ogImage ?? rawImage;
 
 const base = import.meta.env.BASE_URL;
 const siteTitle = title ? `${title} — ${settings.name}` : settings.name;

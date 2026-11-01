@@ -61,6 +61,34 @@ const DDL = [
     alt VARCHAR(255),
     sort_order INT NOT NULL DEFAULT 0
   )`,
+  `CREATE TABLE IF NOT EXISTS city_pages (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    slug VARCHAR(160) NOT NULL,
+    city VARCHAR(120) NOT NULL,
+    service_slug VARCHAR(80) NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    content TEXT,
+    image_url VARCHAR(500),
+    published TINYINT(1) NOT NULL DEFAULT 0,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_city_page (service_slug, slug)
+  )`,
+  `CREATE TABLE IF NOT EXISTS seo_meta (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    entity_type ENUM('page','project','article','city_page','service') NOT NULL,
+    entity_id BIGINT NOT NULL,
+    meta_title VARCHAR(200),
+    meta_desc VARCHAR(300),
+    og_image VARCHAR(500)
+  )`,
+  `CREATE TABLE IF NOT EXISTS redirects (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    old_path VARCHAR(500) NOT NULL UNIQUE,
+    new_path VARCHAR(500) NOT NULL,
+    status INT NOT NULL DEFAULT 301
+  )`,
   `CREATE TABLE IF NOT EXISTS articles (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     slug VARCHAR(160) NOT NULL UNIQUE,

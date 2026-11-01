@@ -1,0 +1,83 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getCityPage, getContent } from '../../lib/api.js';
+import type { Service } from '../../data/types';
+
+const { service = '', ville = '' } = Astro.params;
+const page = await getCityPage(service, ville);
+if (!page) {
+  return new Response(null, { status: 404, statusText: 'Page introuvable' });
+}
+
+const { services } = await getContent();
+const serviceInfo = (services as Service[]).find((s) => s.slug === service);
+const base = import.meta.env.BASE_URL;
+const pageImage = page.imageUrl
+  ? (page.imageUrl.startsWith('http') ? page.imageUrl : `https://www.pepito-services.fr${page.imageUrl}`)
+  : undefined;
+---
+
+<MainLayout
+  title={page.title}
+  description={page.content?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160)}
+  image={pageImage}
+  canonicalPath={`/${page.serviceSlug}/${page.slug}`}
+  seoMeta={page.seoMeta}
+>
+  <article class="section city-page">
+    <div class="container article-container">
+      <header class="page-header">
+        {serviceInfo && <span class="tag">{serviceInfo.title}</span>}
+        <h1 class="section-title">{page.title}</h1>
+        <p class="city-name">📍 {page.city}</p>
+      </header>
+
+      {page.imageUrl && (
+        <img src={page.imageUrl} alt={page.title} class="article-image" />
+      )}
+
+      <div class="article-content" set:html={page.content ?? ''} />
+
+      <footer class="article-footer">
+        <p>Vous avez un projet à {page.city} ?</p>
+        <a href={`${base}contact/`} class="btn btn-primary">Demander un devis gratuit</a>
+      </footer>
+    </div>
+  </article>
+</MainLayout>
+
+<style>
+  .article-container {
+    max-width: 70ch;
+  }
+
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .city-name {
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+  }
+
+  .article-image {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-8);
+  }
+
+  .article-content {
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-10);
+  }
+
+  .article-footer {
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+  }
+
+  .article-footer .btn {
+    margin-top: var(--space-4);
+  }
+</style>

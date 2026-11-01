@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import ThemeSwitcher from '../components/ThemeSwitcher.astro';
 import { getSite } from '../lib/site.js';
+import type { SeoMeta } from '../data/types';
 
 export interface Props {
   title?: string;
@@ -12,9 +13,10 @@ export interface Props {
   image?: string;
   canonicalPath?: string;
   noIndex?: boolean;
+  seoMeta?: SeoMeta | null;
 }
 
-const { title, description, image, canonicalPath, noIndex } = Astro.props;
+const { title, description, image, canonicalPath, noIndex, seoMeta } = Astro.props;
 const { settings } = await getSite();
 ---
 
@@ -37,6 +39,7 @@ const { settings } = await getSite();
       image={image}
       canonicalPath={canonicalPath}
       noIndex={noIndex}
+      seoMeta={seoMeta}
     />
     <script
       is:inline

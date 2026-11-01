@@ -1,7 +1,8 @@
-import { eq, asc, desc } from 'drizzle-orm';
+import { eq, asc, desc, and } from 'drizzle-orm';
 import { db } from '../db.js';
 import {
-  categories, services, projects, articles, messages, settings, socialPosts, projectImages,
+  categories, services, projects, articles, messages, settings, socialPosts,
+  projectImages, cityPages, seoMeta, redirects,
 } from '../db/schema.js';
 import { slugify } from '../utils/slug.js';
 import { buildPostContent, postLink } from '../utils/social.js';
@@ -134,7 +135,7 @@ export async function listProjects(_req, res) {
 }
 
 export async function createProject(req, res) {
-  const { title, categoryId, summary, description, imageUrl, images, tags, published, sortOrder = 0 } = req.body ?? {};
+  const { title, categoryId, summary, description, imageUrl, images, tags, published, sortOrder = 0, metaTitle, metaDesc, ogImage } = req.body ?? {};
   if (!title) return res.status(400).json({ error: 'Titre requis' });
   const slug = await uniqueSlug(projects, title);
   const cover = imageUrl ?? (Array.isArray(images) && images.length ? images[0] : null);
@@ -144,6 +145,7 @@ export async function createProject(req, res) {
     tags: Array.isArray(tags) ? tags : [], published: published !== false, sortOrder,
   }).$returningId();
   if (Array.isArray(images)) await replaceProjectImages(r.id, images);
+  await upsertSeoMeta('project', r.id, { metaTitle, metaDesc, ogImage });
   if (published !== false) {
     const [cat] = categoryId ? await db.select().from(categories).where(eq(categories.id, categoryId)) : [];
     queueSocialPost('project', { id: r.id, slug, title, summary, imageUrl }, cat?.slug);
@@ -153,7 +155,7 @@ export async function createProject(req, res) {
 
 export async function updateProject(req, res) {
   const id = Number(req.params.id);
-  const { title, categoryId, summary, description, imageUrl, images, tags, published, sortOrder } = req.body ?? {};
+  const { title, categoryId, summary, description, imageUrl, images, tags, published, sortOrder, metaTitle, metaDesc, ogImage } = req.body ?? {};
   const [before] = await db.select().from(projects).where(eq(projects.id, id));
   const cover = imageUrl !== undefined ? imageUrl
     : (Array.isArray(images) ? (images[0] ?? null) : undefined);
@@ -168,6 +170,9 @@ export async function updateProject(req, res) {
     ...(sortOrder !== undefined && { sortOrder }),
   }).where(eq(projects.id, id));
   if (Array.isArray(images)) await replaceProjectImages(id, images);
+  if (metaTitle !== undefined || metaDesc !== undefined || ogImage !== undefined) {
+    await upsertSeoMeta('project', id, { metaTitle, metaDesc, ogImage });
+  }
   // Republication : brouillon FB uniquement si passage brouillon→publié
   if (before && !before.published && published === true) {
     const [cat] = categoryId ? await db.select().from(categories).where(eq(categories.id, categoryId)) : [];
@@ -188,20 +193,21 @@ export const listArticles = async (_req, res) =>
   res.json(await db.select().from(articles).orderBy(desc(articles.createdAt)));
 
 export async function createArticle(req, res) {
-  const { title, summary, content, imageUrl, published = false } = req.body ?? {};
+  const { title, summary, content, imageUrl, published = false, metaTitle, metaDesc, ogImage } = req.body ?? {};
   if (!title) return res.status(400).json({ error: 'Titre requis' });
   const slug = await uniqueSlug(articles, title);
   const [r] = await db.insert(articles).values({
     slug, title, summary, content: sanitizeRichHtml(content), imageUrl, published,
     publishedAt: published ? new Date() : null,
   }).$returningId();
+  await upsertSeoMeta('article', r.id, { metaTitle, metaDesc, ogImage });
   if (published) queueSocialPost('article', { id: r.id, slug, title, summary, imageUrl });
   res.status(201).json({ id: r.id, slug });
 }
 
 export async function updateArticle(req, res) {
   const id = Number(req.params.id);
-  const { title, summary, content, imageUrl, published } = req.body ?? {};
+  const { title, summary, content, imageUrl, published, metaTitle, metaDesc, ogImage } = req.body ?? {};
   const [before] = await db.select().from(articles).where(eq(articles.id, id));
   const publishNow = before && !before.published && published === true;
   await db.update(articles).set({
@@ -212,6 +218,9 @@ export async function updateArticle(req, res) {
     ...(published !== undefined && { published }),
     ...(publishNow && { publishedAt: new Date() }),
   }).where(eq(articles.id, id));
+  if (metaTitle !== undefined || metaDesc !== undefined || ogImage !== undefined) {
+    await upsertSeoMeta('article', id, { metaTitle, metaDesc, ogImage });
+  }
   if (publishNow) {
     queueSocialPost('article', {
       id, slug: before.slug, title: title ?? before.title,
@@ -223,6 +232,101 @@ export async function updateArticle(req, res) {
 
 export async function deleteArticle(req, res) {
   await db.delete(articles).where(eq(articles.id, Number(req.params.id)));
+  res.json({ status: 'ok' });
+}
+
+// ─── SEO meta (helper partagé) ──────────────────────────────
+export async function upsertSeoMeta(entityType, entityId, { metaTitle, metaDesc, ogImage } = {}) {
+  const rows = await db.select().from(seoMeta)
+    .where(and(eq(seoMeta.entityType, entityType), eq(seoMeta.entityId, entityId)));
+  const values = {
+    metaTitle: metaTitle?.trim() || null,
+    metaDesc: metaDesc?.trim() || null,
+    ogImage: ogImage?.trim() || null,
+  };
+  if (rows.length) {
+    await db.update(seoMeta).set(values)
+      .where(and(eq(seoMeta.entityType, entityType), eq(seoMeta.entityId, entityId)));
+  } else if (values.metaTitle || values.metaDesc || values.ogImage) {
+    await db.insert(seoMeta).values({ entityType, entityId, ...values });
+  }
+}
+
+// ─── City pages (SEO local) ─────────────────────────────────
+export const listCityPages = async (_req, res) =>
+  res.json(await db.select().from(cityPages).orderBy(asc(cityPages.serviceSlug), asc(cityPages.sortOrder)));
+
+export async function createCityPage(req, res) {
+  const { city, serviceSlug, title, content, imageUrl, published = false, sortOrder = 0, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  if (!city || !serviceSlug || !title) return res.status(400).json({ error: 'Ville, service et titre requis' });
+  const slug = slugify(city);
+  const dup = await db.select().from(cityPages)
+    .where(and(eq(cityPages.serviceSlug, serviceSlug), eq(cityPages.slug, slug)));
+  if (dup.length) return res.status(409).json({ error: `La page /${serviceSlug}/${slug}/ existe déjà.` });
+  const [r] = await db.insert(cityPages).values({
+    slug, city, serviceSlug, title, content: sanitizeRichHtml(content), imageUrl, published, sortOrder,
+  }).$returningId();
+  await upsertSeoMeta('city_page', r.id, { metaTitle, metaDesc, ogImage });
+  res.status(201).json({ id: r.id, slug });
+}
+
+export async function updateCityPage(req, res) {
+  const id = Number(req.params.id);
+  const { city, serviceSlug, title, content, imageUrl, published, sortOrder, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  await db.update(cityPages).set({
+    ...(city !== undefined && { city, slug: slugify(city) }),
+    ...(serviceSlug !== undefined && { serviceSlug }),
+    ...(title !== undefined && { title }),
+    ...(content !== undefined && { content: sanitizeRichHtml(content) }),
+    ...(imageUrl !== undefined && { imageUrl }),
+    ...(published !== undefined && { published }),
+    ...(sortOrder !== undefined && { sortOrder }),
+  }).where(eq(cityPages.id, id));
+  if (metaTitle !== undefined || metaDesc !== undefined || ogImage !== undefined) {
+    await upsertSeoMeta('city_page', id, { metaTitle, metaDesc, ogImage });
+  }
+  res.json({ status: 'ok' });
+}
+
+export async function deleteCityPage(req, res) {
+  const id = Number(req.params.id);
+  await db.delete(seoMeta).where(and(eq(seoMeta.entityType, 'city_page'), eq(seoMeta.entityId, id)));
+  await db.delete(cityPages).where(eq(cityPages.id, id));
+  res.json({ status: 'ok' });
+}
+
+// ─── Redirects ──────────────────────────────────────────────
+export const listRedirects = async (_req, res) =>
+  res.json(await db.select().from(redirects).orderBy(asc(redirects.oldPath)));
+
+export async function createRedirect(req, res) {
+  const { oldPath, newPath, status = 301 } = req.body ?? {};
+  if (!oldPath || !newPath) return res.status(400).json({ error: 'Chemins requis' });
+  const [r] = await db.insert(redirects).values({ oldPath, newPath, status: Number(status) || 301 }).$returningId();
+  res.status(201).json({ id: r.id });
+}
+
+export async function updateRedirect(req, res) {
+  const { oldPath, newPath, status } = req.body ?? {};
+  await db.update(redirects).set({
+    ...(oldPath !== undefined && { oldPath }),
+    ...(newPath !== undefined && { newPath }),
+    ...(status !== undefined && { status: Number(status) || 301 }),
+  }).where(eq(redirects.id, Number(req.params.id)));
+  res.json({ status: 'ok' });
+}
+
+export async function deleteRedirect(req, res) {
+  await db.delete(redirects).where(eq(redirects.id, Number(req.params.id)));
+  res.json({ status: 'ok' });
+}
+
+// ─── SEO meta (lecture/suppression pour l'onglet SEO) ───────
+export const listSeoMeta = async (_req, res) =>
+  res.json(await db.select().from(seoMeta));
+
+export async function deleteSeoMeta(req, res) {
+  await db.delete(seoMeta).where(eq(seoMeta.id, Number(req.params.id)));
   res.json({ status: 'ok' });
 }
 
