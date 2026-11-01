@@ -47,19 +47,17 @@ const slides = [...byCat.values()]
   })
   .filter((s): s is { url: string; alt: string } => s !== null);
 
-// Pages villes proches (haversine), max 5
+// Liens villes sous la carte : triés par proximité (haversine)
 const haversine = (a1: number, o1: number, a2: number, o2: number) => {
   const R = 6371, d = (x: number) => (x * Math.PI) / 180;
   const h = Math.sin(d(a2 - a1) / 2) ** 2 + Math.cos(d(a1)) * Math.cos(d(a2)) * Math.sin(d(o2 - o1) / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 };
-const nearby = page.lat != null && page.lng != null
-  ? allCityPages
-      .filter((c: { id: number; lat: number | null; lng: number | null }) => c.id !== page.id && c.lat != null && c.lng != null)
-      .map((c: { id: number; lat: number; lng: number } & Record<string, unknown>) => ({ ...c, d: haversine(page.lat, page.lng, c.lat, c.lng) }))
-      .sort((a: { d: number }, b: { d: number }) => a.d - b.d)
-      .slice(0, 5)
-  : allCityPages.filter((c: { id: number }) => c.id !== page.id).slice(0, 5);
+const orderedCityPages = page.lat != null && page.lng != null
+  ? [...(allCityPages as CityPage[])]
+      .filter((c) => c.id !== page.id && c.lat != null && c.lng != null)
+      .sort((a, b) => haversine(page.lat!, page.lng!, a.lat!, a.lng!) - haversine(page.lat!, page.lng!, b.lat!, b.lng!))
+  : (allCityPages as CityPage[]).filter((c) => c.id !== page.id);
 const serviceInfo = (services as Service[]).find((s) => s.slug === service);
 const base = import.meta.env.BASE_URL;
 const pageImage = page.imageUrl
@@ -109,18 +107,7 @@ const pageImage = page.imageUrl
         </section>
       )}
 
-      {nearby.length > 0 && (
-        <section class="nearby">
-          <h2 class="mesh-title">Nous intervenons aussi à</h2>
-          <ul class="nearby-list">
-            {nearby.map((c: { serviceSlug: string; slug: string; city: string }) => (
-              <li><a href={`${base}${c.serviceSlug}/${c.slug}/`}>{c.city}</a></li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {allCityPages.length > 0 && (
+      {orderedCityPages.length > 0 && (
         <section class="zone-section">
           <h2 class="section-title">Nos zones d'intervention</h2>
           <p class="section-subtitle">
@@ -128,7 +115,7 @@ const pageImage = page.imageUrl
           </p>
           <CityMap pages={allCityPages as CityPage[]} />
           <ul class="zone-links">
-            {allCityPages.map((c: CityPage) => (
+            {orderedCityPages.map((c) => (
               <li><a href={`${base}${c.serviceSlug}/${c.slug}/`}>{c.city}</a></li>
             ))}
           </ul>
@@ -231,10 +218,6 @@ const pageImage = page.imageUrl
     color: var(--color-text-muted);
   }
 
-  .nearby {
-    margin-bottom: var(--space-10);
-  }
-
   .zone-section {
     margin-bottom: var(--space-10);
   }
@@ -249,23 +232,6 @@ const pageImage = page.imageUrl
   }
 
   .zone-links a {
-    display: inline-block;
-    padding: 6px 14px;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .nearby-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    list-style: none;
-    padding: 0;
-  }
-
-  .nearby-list a {
     display: inline-block;
     padding: 6px 14px;
     border: 1px solid var(--color-border);
