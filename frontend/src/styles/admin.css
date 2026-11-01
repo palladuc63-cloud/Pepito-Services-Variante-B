@@ -251,4 +251,23 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .item-card-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
 .item-card-actions { display: flex; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--line, #2a332c); flex-wrap: wrap; }
 
+/* Calendrier éditorial */
+.cal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.cal-header h2 { font-size: 17px; text-transform: capitalize; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-dow { font-size: 11px; color: var(--muted); text-align: center; padding: 4px 0; text-transform: uppercase; }
+.cal-day { min-height: 72px; border: 1px solid var(--line, #2a332c); border-radius: 8px; padding: 4px 6px; font-size: 12px; overflow: hidden; }
+.cal-day.other { opacity: .35; }
+.cal-day.today { border-color: var(--green); }
+.cal-day .num { font-weight: 600; font-size: 12px; color: var(--muted); }
+.cal-pill { display: block; font-size: 11px; padding: 2px 6px; border-radius: 5px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.cal-pill.proj { background: rgba(34, 197, 94, .15); color: #4ade80; }
+.cal-pill.art { background: rgba(96, 165, 250, .15); color: #93c5fd; }
+.cal-pill.city { background: rgba(245, 158, 11, .15); color: #fbbf24; }
+.cal-pill.future { border: 1px dashed currentColor; }
+.cal-more { display: block; font-size: 10px; color: var(--muted); margin-top: 2px; }
+.cal-legend { display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.cal-legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; }
+.cal-legend .dot-sched { background: transparent; border: 1px dashed var(--muted); }
+
 @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }

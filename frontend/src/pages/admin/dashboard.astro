@@ -17,6 +17,7 @@ const base = import.meta.env.BASE_URL;
       <aside class="admin-side">
         <img class="admin-logo" src={`${base}pepito-logo-white.svg`} alt="Pépito Services — clôtures et portails" width="553" height="256" />
         <button class="admin-nav-link active" data-tab="overview">📊 Vue d'ensemble</button>
+        <button class="admin-nav-link" data-tab="calendar">📅 Calendrier</button>
         <button class="admin-nav-link" data-tab="projects">🚧 Réalisations</button>
         <button class="admin-nav-link" data-tab="articles">📰 Articles</button>
         <button class="admin-nav-link" data-tab="services">🛠️ Services</button>
@@ -70,6 +71,25 @@ const base = import.meta.env.BASE_URL;
             <div class="grid-2">
               <div id="analytics-pages"></div>
               <div id="analytics-refs"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CALENDRIER -->
+        <section id="tab-calendar" hidden>
+          <div class="card">
+            <div class="cal-header">
+              <button class="btn btn-sm" id="cal-prev">‹ Préc.</button>
+              <h2 id="cal-title" style="margin:0;flex:1;text-align:center"></h2>
+              <button class="btn btn-sm" id="cal-next">Suiv. ›</button>
+            </div>
+            <div id="calendar-alerts"></div>
+            <div id="calendar-grid" class="cal-grid"></div>
+            <div class="cal-legend">
+              <span><i class="dot" style="background:#4ade80"></i>Réalisation</span>
+              <span><i class="dot" style="background:#93c5fd"></i>Article</span>
+              <span><i class="dot" style="background:#fbbf24"></i>Page ville</span>
+              <span><i class="dot dot-sched"></i>Programmé</span>
             </div>
           </div>
         </section>
@@ -301,6 +321,7 @@ const base = import.meta.env.BASE_URL;
     messages: ['Messages', 'Demandes reçues via le formulaire et Janus'],
     social: ['Réseaux sociaux', 'Posts Facebook générés automatiquement'],
     overview: ["Vue d'ensemble", "L'essentiel du site en un coup d'œil"],
+    calendar: ['Calendrier', 'Publications passées et programmées'],
     seo: ['SEO / Redirections', 'Overrides meta et redirections 301/302'],
     settings: ['Paramètres', 'Coordonnées et contenus du site'],
   };
@@ -423,6 +444,74 @@ const base = import.meta.env.BASE_URL;
     refsEl.innerHTML = `<h3 style="margin:0 0 8px;font-size:.9rem">Sources de trafic</h3>` + list(a.referrers, 'Pas encore de données.');
   };
   $('#analytics-days').addEventListener('change', () => loaders.analytics());
+
+  // ── Calendrier des publications ──
+  let calCursor = new Date();
+  loaders.calendar = async () => {
+    const [projects, articles, citypages] = await Promise.all([
+      api.get('/api/admin/projects'), api.get('/api/admin/articles'), api.get('/api/admin/city-pages'),
+    ]);
+    const now = new Date();
+    const mk = (arr, type, cls, tab) => arr
+      .map((x) => ({
+        type, cls, tab, title: x.title ?? x.city,
+        at: x.publishedAt ?? x.createdAt,
+        future: x.publishedAt && new Date(x.publishedAt) > now,
+      }))
+      .filter((x) => x.at);
+    renderCalendar([
+      ...mk(projects, 'Réalisation', 'proj', 'projects'),
+      ...mk(articles, 'Article', 'art', 'articles'),
+      ...mk(citypages, 'Page ville', 'city', 'citypages'),
+    ], now);
+  };
+
+  function renderCalendar(items, now) {
+    const y = calCursor.getFullYear(), m = calCursor.getMonth();
+    $('#cal-title').textContent = calCursor.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    const key = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const byDay = {};
+    items.forEach((it) => { const k = key(new Date(it.at)); (byDay[k] ??= []).push(it); });
+    const offset = (new Date(y, m, 1).getDay() + 6) % 7; // lundi = 0
+    const first = new Date(y, m, 1 - offset);
+    let html = ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.']
+      .map((d) => `<div class="cal-dow">${d}</div>`).join('');
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(first.getFullYear(), first.getMonth(), first.getDate() + i);
+      const day = byDay[key(d)] ?? [];
+      const extra = day.length - 2;
+      html += `<div class="cal-day${d.getMonth() !== m ? ' other' : ''}${key(d) === key(now) ? ' today' : ''}">
+        <span class="num">${d.getDate()}</span>
+        ${day.slice(0, 2).map((it) => `<span class="cal-pill ${it.cls}${it.future ? ' future' : ''}" data-goto-tab="${it.tab}" title="${esc(it.type)} — ${esc(it.title)}">${esc(it.title)}</span>`).join('')}
+        ${extra > 0 ? `<span class="cal-more">+${extra} autre${extra > 1 ? 's' : ''}</span>` : ''}
+      </div>`;
+      if (i >= 27 && d.getMonth() !== m && (i + 1) % 7 === 0) break;
+    }
+    $('#calendar-grid').innerHTML = html;
+
+    // Alertes : semaines des 8 prochaines semaines sans aucune publication (passée ou programmée)
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+    monday.setHours(0, 0, 0, 0);
+    const alerts = [];
+    for (let w = 0; w < 8; w++) {
+      const ws = new Date(monday); ws.setDate(monday.getDate() + w * 7);
+      const we = new Date(ws); we.setDate(ws.getDate() + 7);
+      if (!items.some((it) => { const t = new Date(it.at); return t >= ws && t < we; }))
+        alerts.push(`Semaine du ${ws.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} : aucune publication prévue.`);
+    }
+    const lastPub = items.filter((it) => new Date(it.at) <= now).sort((a, b) => new Date(b.at) - new Date(a.at))[0];
+    if (lastPub && now - new Date(lastPub.at) > 30 * 864e5)
+      alerts.unshift('Dernière publication il y a plus de 30 jours — le référencement aime la régularité.');
+    $('#calendar-alerts').innerHTML = alerts.length
+      ? `<div class="guardrails-box"><ul>${alerts.slice(0, 5).map((a) => `<li>${a}</li>`).join('')}</ul></div>`
+      : '';
+    document.querySelectorAll('[data-goto-tab]').forEach((p) => p.addEventListener('click', () => {
+      document.querySelector(`.admin-nav-link[data-tab="${p.dataset.gotoTab}"]`)?.click();
+    }));
+  }
+  $('#cal-prev').addEventListener('click', () => { calCursor.setMonth(calCursor.getMonth() - 1); loaders.calendar(); });
+  $('#cal-next').addEventListener('click', () => { calCursor.setMonth(calCursor.getMonth() + 1); loaders.calendar(); });
   document.querySelectorAll('.admin-nav-link[data-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.admin-nav-link').forEach((b) => b.classList.remove('active'));
