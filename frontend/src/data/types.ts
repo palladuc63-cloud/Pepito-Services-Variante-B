@@ -50,6 +50,14 @@ export interface Service {
   sortOrder: number;
 }
 
+export interface ProjectImage {
+  id: number;
+  projectId: number;
+  imageUrl: string;
+  alt: string | null;
+  sortOrder: number;
+}
+
 export interface Project {
   id: number;
   slug: string;
@@ -59,6 +67,7 @@ export interface Project {
   summary: string | null;
   description: string | null;
   imageUrl: string | null;
+  images: ProjectImage[];
   tags: string[];
   published: boolean;
   sortOrder: number;

@@ -9,17 +9,22 @@ export interface Props {
 
 const { project, categoryLabel: customCategoryLabel } = Astro.props;
 const categoryLabel = customCategoryLabel ?? project.category?.label ?? 'Réalisation';
+const gallery = project.images?.length
+  ? project.images.map((i) => i.imageUrl)
+  : (project.imageUrl ? [project.imageUrl] : []);
 ---
 
 <article class="card project-card" data-category={project.category?.slug ?? ''} id={project.slug}>
-  <div class="card-media">
-    {project.imageUrl ? (
+  <div class="card-media" data-gallery={gallery.length > 1 ? '' : undefined}>
+    {gallery.map((url, i) => (
       <img
-        src={project.imageUrl}
-        alt={`Aperçu de la réalisation ${project.title}`}
+        src={url}
+        alt={i === 0 ? `Aperçu de la réalisation ${project.title}` : ''}
         loading="lazy"
+        class:list={[i === 0 && 'is-active']}
       />
-    ) : null}
+    ))}
+    {gallery.length > 1 && <span class="gallery-count" aria-hidden="true">{gallery.length} photos</span>}
   </div>
   <div class="card-body">
     <span class="project-category">{categoryLabel}</span>
@@ -86,4 +91,68 @@ const categoryLabel = customCategoryLabel ?? project.category?.label ?? 'Réalis
     margin-top: auto;
     padding-top: var(--space-4);
   }
+
+  .card-media {
+    position: relative;
+  }
+
+  .card-media[data-gallery] img {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.45s ease, transform var(--transition-base);
+  }
+
+  .card-media[data-gallery] img.is-active {
+    opacity: 1;
+  }
+
+  .gallery-count {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-media[data-gallery] img {
+      transition: none;
+    }
+  }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.card-media[data-gallery]').forEach((media) => {
+    const imgs = media.querySelectorAll<HTMLImageElement>('img');
+    if (imgs.length < 2) return;
+    let idx = 0;
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const start = () => {
+      if (timer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      timer = setInterval(() => {
+        imgs[idx].classList.remove('is-active');
+        idx = (idx + 1) % imgs.length;
+        imgs[idx].classList.add('is-active');
+      }, 1400);
+    };
+    const stop = () => {
+      if (timer) clearInterval(timer);
+      timer = null;
+      imgs.forEach((img, i) => img.classList.toggle('is-active', i === 0));
+      idx = 0;
+    };
+    media.addEventListener('mouseenter', start);
+    media.addEventListener('mouseleave', stop);
+    media.addEventListener('focusin', start);
+    media.addEventListener('focusout', stop);
+  });
+</script>

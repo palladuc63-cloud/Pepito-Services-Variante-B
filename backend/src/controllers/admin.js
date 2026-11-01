@@ -1,7 +1,7 @@
 import { eq, asc, desc } from 'drizzle-orm';
 import { db } from '../db.js';
 import {
-  categories, services, projects, articles, messages, settings, socialPosts,
+  categories, services, projects, articles, messages, settings, socialPosts, projectImages,
 } from '../db/schema.js';
 import { slugify } from '../utils/slug.js';
 import { buildPostContent, postLink } from '../utils/social.js';
@@ -103,24 +103,47 @@ export async function deleteService(req, res) {
 }
 
 // ─── Projects ───────────────────────────────────────────────
+async function projectImagesMap(projectIds) {
+  if (!projectIds.length) return new Map();
+  const rows = await db.select().from(projectImages).orderBy(asc(projectImages.sortOrder));
+  const map = new Map();
+  for (const row of rows) {
+    if (!projectIds.includes(row.projectId)) continue;
+    if (!map.has(row.projectId)) map.set(row.projectId, []);
+    map.get(row.projectId).push(row);
+  }
+  return map;
+}
+
+async function replaceProjectImages(projectId, images) {
+  await db.delete(projectImages).where(eq(projectImages.projectId, projectId));
+  const list = Array.isArray(images) ? images.filter((u) => typeof u === 'string' && u.trim()) : [];
+  for (const [i, url] of list.slice(0, 10).entries()) {
+    await db.insert(projectImages).values({ projectId, imageUrl: url.trim(), sortOrder: i });
+  }
+}
+
 export async function listProjects(_req, res) {
   const rows = await db
     .select({ project: projects, category: categories })
     .from(projects)
     .leftJoin(categories, eq(projects.categoryId, categories.id))
     .orderBy(asc(projects.sortOrder), desc(projects.createdAt));
-  res.json(rows.map((r) => ({ ...r.project, category: r.category })));
+  const imgs = await projectImagesMap(rows.map((r) => r.project.id));
+  res.json(rows.map((r) => ({ ...r.project, category: r.category, images: imgs.get(r.project.id) ?? [] })));
 }
 
 export async function createProject(req, res) {
-  const { title, categoryId, summary, description, imageUrl, tags, published, sortOrder = 0 } = req.body ?? {};
+  const { title, categoryId, summary, description, imageUrl, images, tags, published, sortOrder = 0 } = req.body ?? {};
   if (!title) return res.status(400).json({ error: 'Titre requis' });
   const slug = await uniqueSlug(projects, title);
+  const cover = imageUrl ?? (Array.isArray(images) && images.length ? images[0] : null);
   const [r] = await db.insert(projects).values({
     slug, title, categoryId: categoryId || null, summary,
-    description: sanitizeRichHtml(description), imageUrl,
+    description: sanitizeRichHtml(description), imageUrl: cover,
     tags: Array.isArray(tags) ? tags : [], published: published !== false, sortOrder,
   }).$returningId();
+  if (Array.isArray(images)) await replaceProjectImages(r.id, images);
   if (published !== false) {
     const [cat] = categoryId ? await db.select().from(categories).where(eq(categories.id, categoryId)) : [];
     queueSocialPost('project', { id: r.id, slug, title, summary, imageUrl }, cat?.slug);
@@ -130,18 +153,21 @@ export async function createProject(req, res) {
 
 export async function updateProject(req, res) {
   const id = Number(req.params.id);
-  const { title, categoryId, summary, description, imageUrl, tags, published, sortOrder } = req.body ?? {};
+  const { title, categoryId, summary, description, imageUrl, images, tags, published, sortOrder } = req.body ?? {};
   const [before] = await db.select().from(projects).where(eq(projects.id, id));
+  const cover = imageUrl !== undefined ? imageUrl
+    : (Array.isArray(images) ? (images[0] ?? null) : undefined);
   await db.update(projects).set({
     ...(title !== undefined && { title }),
     ...(categoryId !== undefined && { categoryId: categoryId || null }),
     ...(summary !== undefined && { summary }),
     ...(description !== undefined && { description: sanitizeRichHtml(description) }),
-    ...(imageUrl !== undefined && { imageUrl }),
+    ...(cover !== undefined && { imageUrl: cover }),
     ...(tags !== undefined && { tags: Array.isArray(tags) ? tags : [] }),
     ...(published !== undefined && { published }),
     ...(sortOrder !== undefined && { sortOrder }),
   }).where(eq(projects.id, id));
+  if (Array.isArray(images)) await replaceProjectImages(id, images);
   // Republication : brouillon FB uniquement si passage brouillon→publié
   if (before && !before.published && published === true) {
     const [cat] = categoryId ? await db.select().from(categories).where(eq(categories.id, categoryId)) : [];
@@ -151,7 +177,9 @@ export async function updateProject(req, res) {
 }
 
 export async function deleteProject(req, res) {
-  await db.delete(projects).where(eq(projects.id, Number(req.params.id)));
+  const id = Number(req.params.id);
+  await db.delete(projectImages).where(eq(projectImages.projectId, id));
+  await db.delete(projects).where(eq(projects.id, id));
   res.json({ status: 'ok' });
 }
 

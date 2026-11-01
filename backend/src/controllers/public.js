@@ -1,6 +1,6 @@
 import { eq, asc, desc, and } from 'drizzle-orm';
 import { db } from '../db.js';
-import { settings, categories, services, projects, articles, messages } from '../db/schema.js';
+import { settings, categories, services, projects, articles, messages, projectImages } from '../db/schema.js';
 import { notify } from '../utils/notify.js';
 
 async function getSettingsMap() {
@@ -31,7 +31,15 @@ export async function listProjects(_req, res) {
       .leftJoin(categories, eq(projects.categoryId, categories.id))
       .where(eq(projects.published, true))
       .orderBy(asc(projects.sortOrder), desc(projects.createdAt));
-    res.json(rows.map((r) => ({ ...r.project, category: r.category })));
+    const ids = rows.map((r) => r.project.id);
+    const imgs = ids.length
+      ? await db.select().from(projectImages).orderBy(asc(projectImages.sortOrder))
+      : [];
+    res.json(rows.map((r) => ({
+      ...r.project,
+      category: r.category,
+      images: imgs.filter((i) => i.projectId === r.project.id),
+    })));
   } catch (err) {
     console.error('GET /public/projects:', err.message);
     res.status(500).json({ error: 'Erreur serveur' });

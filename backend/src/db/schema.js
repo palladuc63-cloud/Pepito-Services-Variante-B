@@ -48,6 +48,15 @@ export const projects = mysqlTable('projects', {
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
 });
 
+// Galerie photos d'une réalisation (couverture = sort_order 0)
+export const projectImages = mysqlTable('project_images', {
+  id: serial('id').primaryKey(),
+  projectId: int('project_id').notNull().references(() => projects.id),
+  imageUrl: varchar('image_url', { length: 500 }).notNull(),
+  alt: varchar('alt', { length: 255 }),
+  sortOrder: int('sort_order').default(0).notNull(),
+});
+
 // Articles d'actualité / blog
 export const articles = mysqlTable('articles', {
   id: serial('id').primaryKey(),
