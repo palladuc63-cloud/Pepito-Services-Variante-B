@@ -5,7 +5,7 @@ const UMAMI_API = (process.env.UMAMI_API_URL || '').replace(/\/$/, '');
 const WEBSITE_ID = process.env.UMAMI_WEBSITE_ID || '';
 const UMAMI_USER = process.env.UMAMI_USER || '';
 const UMAMI_PASS = process.env.UMAMI_PASSWORD || '';
-const DASHBOARD_URL = (process.env.UMAMI_SCRIPT_URL || '').replace(/\/script\.js.*$/, '');
+const DASHBOARD_URL = process.env.UMAMI_PUBLIC_URL || '';
 
 let tokenCache = { token: null, at: 0 };
 

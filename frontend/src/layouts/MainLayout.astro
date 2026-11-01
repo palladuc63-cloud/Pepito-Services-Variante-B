@@ -21,6 +21,7 @@ const { title, description, image, canonicalPath, noIndex, seoMeta, jsonLd } = A
 const { settings } = await getSite();
 const umamiSrc = process.env.UMAMI_SCRIPT_URL || import.meta.env.UMAMI_SCRIPT_URL;
 const umamiId = process.env.UMAMI_WEBSITE_ID || import.meta.env.UMAMI_WEBSITE_ID;
+const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
 ---
 
 <!doctype html>
@@ -53,7 +54,7 @@ const umamiId = process.env.UMAMI_WEBSITE_ID || import.meta.env.UMAMI_WEBSITE_ID
       async
     ></script>
     {umamiSrc && umamiId && (
-      <script is:inline defer src={umamiSrc} data-website-id={umamiId}></script>
+      <script is:inline defer src={umamiSrc} data-website-id={umamiId} data-host-url={umamiHost}></script>
     )}
   </head>
   <body>
