@@ -1,0 +1,96 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import CityMap from '../components/CityMap.astro';
+import { getCityPages } from '../lib/api.js';
+import { getSite } from '../lib/site.js';
+import type { CityPage } from '../data/types';
+
+const [cityPages, { services }] = await Promise.all([getCityPages(), getSite()]);
+const base = import.meta.env.BASE_URL;
+
+// Pages villes regroupées par service
+const byService = new Map<string, { title: string; pages: CityPage[] }>();
+for (const c of cityPages as CityPage[]) {
+  const g = byService.get(c.serviceSlug) ?? {
+    title: (services as { slug: string; title: string }[]).find((s) => s.slug === c.serviceSlug)?.title ?? c.serviceSlug,
+    pages: [] as CityPage[],
+  };
+  g.pages.push(c);
+  byService.set(c.serviceSlug, g);
+}
+---
+
+<MainLayout
+  title="Nos zones d'intervention"
+  description="Pépito Services intervient dans la Loire et la région Auvergne-Rhône-Alpes : clôtures, portails, terrassement et travaux extérieurs près de chez vous."
+  canonicalPath="/zones/"
+>
+  <article class="section">
+    <div class="container article-container">
+      <header class="page-header">
+        <h1 class="section-title">Nos zones d'intervention</h1>
+        <p class="zones-intro">
+          Pépito Services se déplace dans toute la Loire et les départements voisins
+          pour vos projets de clôtures, portails et aménagements extérieurs.
+          Devis gratuit, visite technique sur place.
+        </p>
+      </header>
+
+      {cityPages.length > 0 && <CityMap pages={cityPages as CityPage[]} />}
+
+      {[...byService.values()].map((g) => (
+        <section class="zones-group">
+          <h2 class="zones-group-title">{g.title}</h2>
+          <ul class="zone-links">
+            {g.pages.map((c) => (
+              <li><a href={`${base}${c.serviceSlug}/${c.slug}/`}>{c.city}</a></li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </article>
+</MainLayout>
+
+<style>
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+
+  .zones-intro {
+    color: var(--color-text-muted);
+    max-width: 60ch;
+    margin-top: var(--space-3);
+    line-height: var(--leading-relaxed);
+  }
+
+  .zones-group {
+    margin-top: var(--space-8);
+  }
+
+  .zones-group-title {
+    font-size: var(--text-xl, 1.4rem);
+    margin-bottom: var(--space-4);
+  }
+
+  .zone-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .zone-links a {
+    display: inline-block;
+    padding: 6px 14px;
+    color: inherit;
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+  }
+
+  .zone-links a:hover {
+    text-decoration: underline;
+  }
+</style>

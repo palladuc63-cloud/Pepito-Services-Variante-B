@@ -112,6 +112,35 @@ const jsonLd = [{
     },
   ],
 }];
+
+// FAQ locale — contenu unique + résultats enrichis (FAQPage)
+const svcLower = (svc?.title ?? 'travaux').toLowerCase();
+const faq = [
+  {
+    q: `Faites-vous des devis gratuits à ${page.city} ?`,
+    a: `Oui. Chaque projet à ${page.city} commence par une visite technique sur place, gratuite et sans engagement : relevés, conseils sur les matériaux et chiffrage détaillé.`,
+  },
+  {
+    q: `Quels sont vos délais d'intervention à ${page.city} ?`,
+    a: `Ils dépendent de la nature et de l'ampleur du chantier. Un calendrier précis vous est communiqué avec votre devis, et nos équipes basées dans le secteur interviennent rapidement à ${page.city} et ses alentours.`,
+  },
+  {
+    q: `Faut-il une autorisation pour des travaux de ${svcLower} à ${page.city} ?`,
+    a: `Cela dépend du projet et du PLU de votre commune. Lors de la visite technique, nous vous indiquons les démarches éventuelles à effectuer auprès de la mairie de ${page.city}.`,
+  },
+  ...(orderedCityPages.length ? [{
+    q: `Dans quelles communes proches de ${page.city} intervenez-vous ?`,
+    a: `Nous intervenons dans tout le secteur : ${orderedCityPages.slice(0, 6).map((c) => c.city).join(', ')}, ainsi que dans les communes voisines.`,
+  }] : []),
+];
+jsonLd[0]['@graph'].push({
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+});
 ---
 
 <MainLayout
@@ -144,6 +173,16 @@ const jsonLd = [{
 
         <div class="article-content" set:html={page.content ?? ''} />
       </div>
+
+      <section class="faq">
+        <h2 class="section-title">Questions fréquentes à {page.city}</h2>
+        {faq.map((item) => (
+          <details class="faq-item">
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </section>
 
       {localProjects.length > 0 && (
         <section class="local-reals">
@@ -288,6 +327,33 @@ const jsonLd = [{
   .mesh-card-body small {
     display: block;
     color: var(--color-text-muted);
+  }
+
+  .faq {
+    margin-bottom: var(--space-10);
+  }
+
+  .faq .section-title {
+    font-size: var(--text-xl, 1.4rem);
+    margin-bottom: var(--space-4);
+  }
+
+  .faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 8px);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-3);
+  }
+
+  .faq-item summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .faq-item p {
+    margin-top: var(--space-3);
+    color: var(--color-text-muted);
+    line-height: var(--leading-relaxed);
   }
 
   .zone-section {

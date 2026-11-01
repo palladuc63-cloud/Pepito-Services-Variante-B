@@ -51,7 +51,7 @@ export async function fetchCityInfo(city) {
 export async function fetchCityGeo(city) {
   try {
     const res = await fetch(
-      `https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(city.trim())}&fields=nom,code,codesPostaux,population,surface,codeDepartement&boost=population&limit=5`,
+      `https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(city.trim())}&fields=nom,code,codesPostaux,population,surface,codeDepartement,centre&boost=population&limit=5`,
       { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(8000) },
     );
     if (!res.ok) return null;
@@ -65,8 +65,35 @@ export async function fetchCityGeo(city) {
       dept: row.codeDepartement ?? null,
       population: row.population ?? null,
       surfaceKm2: row.surface ? Math.round(row.surface / 100) : null,
+      centre: row.centre?.coordinates ?? null, // [lng, lat]
+      voisines: await fetchNeighborCommunes(row),
     };
   } catch { return null; }
+}
+
+// Communes voisines de la même commune (même département, triées par
+// distance au centre) — citées dans le contenu pour la sémantique locale.
+async function fetchNeighborCommunes(row) {
+  try {
+    const [lng, lat] = row.centre?.coordinates ?? [];
+    if (!row.codeDepartement || lat == null) return [];
+    const res = await fetch(
+      `https://geo.api.gouv.fr/communes?codeDepartement=${row.codeDepartement}&fields=nom,code,centre&format=json&geometry=centre`,
+      { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(8000) },
+    );
+    if (!res.ok) return [];
+    const dist = (c) => {
+      const [cl, ca] = c.centre?.coordinates ?? [];
+      if (cl == null) return Infinity;
+      const dx = (cl - lng) * Math.cos((ca * Math.PI) / 180), dy = ca - lat;
+      return dx * dx + dy * dy;
+    };
+    return (await res.json())
+      .filter((c) => c.code !== row.code && c.centre?.coordinates)
+      .sort((a, b) => dist(a) - dist(b))
+      .slice(0, 5)
+      .map((c) => c.nom);
+  } catch { return []; }
 }
 
 // Télécharge la photo de la ville en local (vignette 960px quand
@@ -107,6 +134,9 @@ export function buildCityContent({ city, serviceTitle, extract, wikiUrl, geo }) 
     if (geo.surfaceKm2) bits.push(`sur un territoire de ${geo.surfaceKm2} km²`);
     if (geo.dept) bits.push(`, dans le département ${geo.dept}`);
     paras.push(`<p>${bits.join(' ')} : nos équipes interviennent dans tous les quartiers ainsi que dans les communes voisines, pour les particuliers comme pour les professionnels.</p>`);
+  }
+  if (geo?.voisines?.length) {
+    paras.push(`<p>Au-delà de ${esc(city)}, Pépito Services se déplace régulièrement dans les communes voisines : ${geo.voisines.map(esc).join(', ')}, et plus largement dans tout le secteur.</p>`);
   }
   if (extract) {
     const cleaned = extract.replace(/,\s*,/g, ',');

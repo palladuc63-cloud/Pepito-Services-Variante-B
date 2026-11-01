@@ -31,6 +31,7 @@ const base = import.meta.env.BASE_URL;
           const linkHref = link.href === '/' ? base : `${base}${link.href.replace(/^\//, '')}`;
           return <li><a href={linkHref}>{link.label}</a></li>;
         })}
+        <li><a href={`${base}zones/`}>Zones d'intervention</a></li>
         <li><a href={`${base}mentions-legales/`}>Mentions légales</a></li>
         <li><a href={`${base}politique-confidentialite/`}>Politique de confidentialité</a></li>
       </ul>

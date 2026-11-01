@@ -5,6 +5,7 @@ const STATIC_PATHS = [
   '/',
   '/a-propos/',
   '/realisations/',
+  '/zones/',
   '/actualites/',
   '/contact/',
   '/mentions-legales/',
