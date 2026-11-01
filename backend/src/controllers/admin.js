@@ -5,7 +5,7 @@ import {
   projectImages, cityPages, seoMeta, redirects,
 } from '../db/schema.js';
 import { slugify } from '../utils/slug.js';
-import { ensureCityPage } from '../utils/citygen.js';
+import { ensureCityPage, fetchCityInfo } from '../utils/citygen.js';
 import { buildPostContent, postLink } from '../utils/social.js';
 import { notify } from '../utils/notify.js';
 import { sanitizeRichHtml } from '../utils/sanitize.js';
@@ -274,8 +274,10 @@ export async function createCityPage(req, res) {
   const dup = await db.select().from(cityPages)
     .where(and(eq(cityPages.serviceSlug, serviceSlug), eq(cityPages.slug, slug)));
   if (dup.length) return res.status(409).json({ error: `La page /${serviceSlug}/${slug}/ existe déjà.` });
+  const geo = await fetchCityInfo(city).catch(() => ({ lat: null, lng: null }));
   const [r] = await db.insert(cityPages).values({
-    slug, city, serviceSlug, title, content: sanitizeRichHtml(content), imageUrl, published, sortOrder,
+    slug, city, serviceSlug, title, content: sanitizeRichHtml(content), imageUrl,
+    lat: geo.lat, lng: geo.lng, published, sortOrder,
   }).$returningId();
   await upsertSeoMeta('city_page', r.id, { metaTitle, metaDesc, ogImage });
   res.status(201).json({ id: r.id, slug });
@@ -284,7 +286,15 @@ export async function createCityPage(req, res) {
 export async function updateCityPage(req, res) {
   const id = Number(req.params.id);
   const { city, serviceSlug, title, content, imageUrl, published, sortOrder, metaTitle, metaDesc, ogImage } = req.body ?? {};
+  // Géocodage si la page n'a pas encore de coordonnées
+  const [cur] = await db.select().from(cityPages).where(eq(cityPages.id, id));
+  let geo = {};
+  if (cur && (cur.lat == null || cur.lng == null)) {
+    const info = await fetchCityInfo(city ?? cur.city).catch(() => ({}));
+    if (info.lat != null) geo = { lat: info.lat, lng: info.lng };
+  }
   await db.update(cityPages).set({
+    ...geo,
     ...(city !== undefined && { city, slug: slugify(city) }),
     ...(serviceSlug !== undefined && { serviceSlug }),
     ...(title !== undefined && { title }),

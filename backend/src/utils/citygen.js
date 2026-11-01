@@ -1,7 +1,7 @@
 // Génération automatique des pages villes (SEO local).
 // Source descriptive : résumé Wikipédia FR (CC BY-SA — attribution incluse).
 // Géocodage : coordonnées renvoyées par Wikipédia, fallback Nominatim.
-import { eq, asc, and } from 'drizzle-orm';
+import { eq, asc, and, like } from 'drizzle-orm';
 import { db } from '../db.js';
 import { cityPages, categories, services } from '../db/schema.js';
 import { slugify } from './slug.js';
@@ -10,7 +10,7 @@ const UA = 'PepitoServices-SiteBuilder/1.0 (contact@pepito-services.fr)';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-async function fetchCityInfo(city) {
+export async function fetchCityInfo(city) {
   const info = { extract: null, lat: null, lng: null, wikiUrl: null };
   try {
     const title = encodeURIComponent(city.trim().replace(/ /g, '_'));
@@ -47,7 +47,8 @@ function buildCityContent({ city, serviceTitle, extract, wikiUrl }) {
     `<p><strong>${svc} à ${esc(city)}</strong> : Pépito Services prend en charge vos projets de ${svc.toLowerCase()} sur ${esc(city)} et ses environs. Devis gratuit, visite technique sur place avant tout chiffrage.</p>`,
   ];
   if (extract) {
-    const short = extract.length > 420 ? `${extract.slice(0, 420).replace(/\s+\S*$/, '')}…` : extract;
+    const cleaned = extract.replace(/,\s*,/g, ',');
+    const short = cleaned.length > 420 ? `${cleaned.slice(0, 420).replace(/\s+\S*$/, '')}…` : cleaned;
     paras.push(`<p>${esc(short)}${wikiUrl ? ` <a href="${wikiUrl}" rel="noopener" target="_blank">(source : Wikipédia)</a>` : ''}</p>`);
   }
   paras.push(`<p>Nous connaissons le terrain et les contraintes locales de ${esc(city)} : chaque chantier est précédé d'une étude sur place, d'un conseil sur les matériaux adaptés et d'une pose soignée.</p>`);
@@ -63,6 +64,9 @@ async function resolveService(categoryId) {
     if (cat?.slug) {
       const [svc] = await db.select().from(services).where(eq(services.slug, cat.slug));
       if (svc) return svc;
+      // Slugs proches : « clotures » ↔ « clotures-palissades », « terrassements » ↔ « petits-terrassements »
+      const [near] = await db.select().from(services).where(like(services.slug, `%${cat.slug}%`));
+      if (near) return near;
     }
   }
   const [svc] = await db.select().from(services)
