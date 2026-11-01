@@ -32,7 +32,7 @@ export async function getSite() {
       name: s.site_name || 'Pépito Services',
       baseline: s.baseline || '',
       description: s.description || '',
-      logo: s.logo_url || '/logo.svg',
+      logo: s.logo_url || '/pepito-logo.svg',
       siteUrl:
         (import.meta.env.SITE || 'https://pepito-services.fr').replace(/\/$/, '') +
         (import.meta.env.BASE_URL || '/'),
