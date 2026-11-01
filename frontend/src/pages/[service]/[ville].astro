@@ -1,7 +1,9 @@
 ---
 import MainLayout from '../../layouts/MainLayout.astro';
+import ImageCarousel from '../../components/ImageCarousel.astro';
+import CityMap from '../../components/CityMap.astro';
 import { getCityPage, getCityPages, getContent, getProjects } from '../../lib/api.js';
-import type { Service } from '../../data/types';
+import type { CityPage, Project, Service } from '../../data/types';
 
 const { service = '', ville = '' } = Astro.params;
 const preview = Astro.url.searchParams.get('preview') === '1';
@@ -20,9 +22,18 @@ const slugify = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300
   .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
 // Réalisations dans la même ville
-const localProjects = projects.filter(
-  (p: { city?: string | null }) => p.city && slugify(p.city) === page.slug,
+const localProjects = (projects as Project[]).filter(
+  (p) => p.city && slugify(p.city) === page.slug,
 );
+
+// Visuels du carrousel : image de la page puis photos des réalisations locales
+const seen = new Set<string>();
+const slides = [
+  ...(page.imageUrl ? [{ url: page.imageUrl, alt: page.title }] : []),
+  ...localProjects.flatMap((p) =>
+    (p.images ?? []).map((i) => ({ url: i.imageUrl, alt: i.alt ?? p.title })),
+  ),
+].filter((s) => s.url && !seen.has(s.url) && !!seen.add(s.url));
 
 // Pages villes proches (haversine), max 5
 const haversine = (a1: number, o1: number, a2: number, o2: number) => {
@@ -56,18 +67,18 @@ const pageImage = page.imageUrl
     <div class="preview-banner">👁 Prévisualisation — ce brouillon n'est pas publié.</div>
   )}
   <article class="section city-page">
-    <div class="container article-container">
+    <div class:list={['container article-container', { 'with-carousel': slides.length > 0 }]}>
       <header class="page-header">
         {serviceInfo && <span class="tag">{serviceInfo.title}</span>}
         <h1 class="section-title">{page.title}</h1>
         <p class="city-name">📍 {page.city}</p>
       </header>
 
-      {page.imageUrl && (
-        <img src={page.imageUrl} alt={page.title} class="article-image" />
-      )}
+      <div class:list={['city-layout', { 'with-carousel': slides.length > 0 }]}>
+        {slides.length > 0 && <ImageCarousel images={slides} />}
 
-      <div class="article-content" set:html={page.content ?? ''} />
+        <div class="article-content" set:html={page.content ?? ''} />
+      </div>
 
       {localProjects.length > 0 && (
         <section class="local-reals">
@@ -97,6 +108,21 @@ const pageImage = page.imageUrl
         </section>
       )}
 
+      {allCityPages.length > 0 && (
+        <section class="zone-section">
+          <h2 class="section-title">Nos zones d'intervention</h2>
+          <p class="section-subtitle">
+            Cliquez sur une ville pour découvrir nos réalisations et prestations locales.
+          </p>
+          <CityMap pages={allCityPages as CityPage[]} />
+          <ul class="zone-links">
+            {allCityPages.map((c: CityPage) => (
+              <li><a href={`${base}${c.serviceSlug}/${c.slug}/`}>{c.city}</a></li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <footer class="article-footer">
         <p>Vous avez un projet à {page.city} ?</p>
         <a href={`${base}contact/`} class="btn btn-primary">Demander un devis gratuit</a>
@@ -120,6 +146,10 @@ const pageImage = page.imageUrl
     max-width: 70ch;
   }
 
+  .article-container.with-carousel {
+    max-width: var(--max-width);
+  }
+
   .page-header {
     margin-bottom: var(--space-8);
   }
@@ -129,15 +159,26 @@ const pageImage = page.imageUrl
     margin-top: var(--space-2);
   }
 
-  .article-image {
-    width: 100%;
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--space-8);
+  .city-layout.with-carousel {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--space-8);
+    align-items: start;
+    margin-bottom: var(--space-10);
+  }
+
+  .city-layout:not(.with-carousel) {
+    margin-bottom: var(--space-10);
+  }
+
+  @media (max-width: 900px) {
+    .city-layout.with-carousel {
+      grid-template-columns: 1fr;
+    }
   }
 
   .article-content {
     line-height: var(--leading-relaxed);
-    margin-bottom: var(--space-10);
   }
 
   .mesh-title {
@@ -180,6 +221,28 @@ const pageImage = page.imageUrl
 
   .nearby {
     margin-bottom: var(--space-10);
+  }
+
+  .zone-section {
+    margin-bottom: var(--space-10);
+  }
+
+  .zone-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-4);
+  }
+
+  .zone-links a {
+    display: inline-block;
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    text-decoration: none;
+    color: inherit;
   }
 
   .nearby-list {
