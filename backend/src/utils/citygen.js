@@ -96,7 +96,7 @@ export async function downloadCityImage(imageUrl, serviceSlug, slug) {
 
 // Contenu unique par ville : extrait Wikipédia propre à la commune +
 // données officielles + blocs locaux (chantiers/maillage au rendu).
-function buildCityContent({ city, serviceTitle, extract, wikiUrl, geo }) {
+export function buildCityContent({ city, serviceTitle, extract, wikiUrl, geo }) {
   const svc = esc(serviceTitle);
   const cp = geo?.postal ? ` (${geo.postal})` : '';
   const paras = [
