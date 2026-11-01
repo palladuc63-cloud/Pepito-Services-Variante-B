@@ -22,7 +22,7 @@ export async function fetchCityInfo(city) {
       if (j.extract && j.type !== 'disambiguation') {
         info.extract = j.extract;
         info.wikiUrl = j.content_urls?.desktop?.page ?? null;
-        info.image = j.originalimage?.source ?? j.thumbnail?.source ?? null;
+        info.image = (j.originalimage?.source ?? j.thumbnail?.source ?? '').split('?')[0] || null;
       }
       if (j.coordinates) { info.lat = j.coordinates.lat; info.lng = j.coordinates.lon; }
     }
