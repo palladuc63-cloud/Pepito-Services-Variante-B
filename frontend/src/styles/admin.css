@@ -253,6 +253,10 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .item-card-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
 .item-card-actions { display: flex; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--line, #2a332c); flex-wrap: wrap; }
 
+/* Carte des pages villes */
+#city-map { height: 340px; border-radius: 10px; margin-bottom: 18px; border: 1px solid var(--line, #2a332c); overflow: hidden; }
+#city-map .leaflet-popup-content a { color: #2563eb; }
+
 /* Calendrier éditorial */
 .cal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .cal-header h2 { font-size: 17px; text-transform: capitalize; }

@@ -11,6 +11,7 @@ const base = import.meta.env.BASE_URL;
     <title>Back-office — Pépito Services</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   </head>
   <body class="admin">
     <div class="admin-shell">
@@ -175,6 +176,7 @@ const base = import.meta.env.BASE_URL;
                 <button class="btn btn-primary btn-sm" id="btn-new-city">+ Nouvelle page ville</button>
               </div>
             </div>
+            <div id="city-map" aria-label="Carte des pages villes"></div>
             <div id="citypages-table">
               <table class="admin-table">
                 <thead><tr><th>URL</th><th>Titre</th><th>Statut</th><th></th></tr></thead>
@@ -942,6 +944,7 @@ const base = import.meta.env.BASE_URL;
        <button class="btn btn-sm btn-danger" data-city-del="${c.id}">✕</button>`)).join('')
       : '<p style="color:var(--muted);margin:0">Aucune page ville pour l’instant.</p>';
     applyView('citypages');
+    renderCityMap(citypages);
     document.querySelectorAll('[data-city-pub]').forEach((b) => b.addEventListener('click', async () => {
       await api.put(`/api/admin/city-pages/${b.dataset.cityPub}`, { published: true });
       showAlert('Page ville publiée.');
@@ -955,6 +958,58 @@ const base = import.meta.env.BASE_URL;
     }));
     checkGuardrails();
   };
+
+  // Carte des pages villes (Leaflet chargé à la demande)
+  let cityMap = null, cityMapLayer = null, leafletLoading = null;
+  function ensureLeaflet() {
+    if (window.L) return Promise.resolve();
+    if (!leafletLoading) {
+      leafletLoading = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        s.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+        s.crossOrigin = '';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+    return leafletLoading;
+  }
+  async function renderCityMap(citypages) {
+    const el = document.getElementById('city-map');
+    if (!el) return;
+    const withCoords = citypages.filter((c) => c.lat && c.lng);
+    if (!withCoords.length) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    await ensureLeaflet();
+    if (!cityMap) {
+      cityMap = L.map(el, { scrollWheelZoom: false }).setView([45.6, 4.2], 8);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 18,
+      }).addTo(cityMap);
+      setTimeout(() => cityMap.invalidateSize(), 100);
+    }
+    if (cityMapLayer) cityMapLayer.remove();
+    cityMapLayer = L.layerGroup().addTo(cityMap);
+    const bounds = [];
+    withCoords.forEach((c) => {
+      const scheduled = c.publishedAt && new Date(c.publishedAt) > new Date();
+      const color = c.published ? '#22c55e' : scheduled ? '#f59e0b' : '#9ca3af';
+      const status = c.published ? 'Publié' : scheduled ? '⏰ Programmé' : 'Brouillon';
+      const marker = L.circleMarker([c.lat, c.lng], {
+        radius: 8, color, weight: 2, fillColor: color, fillOpacity: 0.75,
+      });
+      marker.bindPopup(
+        `<strong>${esc(c.title)}</strong><br/>/${esc(c.serviceSlug)}/${esc(c.slug)}/<br/>${status}` +
+        `<br/><a href="${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir la page ↗</a>`
+      );
+      cityMapLayer.addLayer(marker);
+      bounds.push([c.lat, c.lng]);
+    });
+    if (bounds.length) cityMap.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 });
+  }
 
   function cityPageForm(c = {}, meta = {}) {
     return `
