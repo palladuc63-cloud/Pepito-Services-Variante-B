@@ -16,7 +16,8 @@ const base = import.meta.env.BASE_URL;
     <div class="admin-shell">
       <aside class="admin-side">
         <img class="admin-logo" src={`${base}pepito-logo-white.svg`} alt="Pépito Services — clôtures et portails" width="553" height="256" />
-        <button class="admin-nav-link active" data-tab="projects">🚧 Réalisations</button>
+        <button class="admin-nav-link active" data-tab="overview">📊 Vue d'ensemble</button>
+        <button class="admin-nav-link" data-tab="projects">🚧 Réalisations</button>
         <button class="admin-nav-link" data-tab="articles">📰 Articles</button>
         <button class="admin-nav-link" data-tab="services">🛠️ Services</button>
         <button class="admin-nav-link" data-tab="categories">🗂️ Catégories</button>
@@ -31,8 +32,8 @@ const base = import.meta.env.BASE_URL;
       <main class="admin-main">
         <div class="admin-top">
           <div>
-            <h1 id="page-title">Réalisations</h1>
-            <p id="page-sub">Chantiers publiés sur le site</p>
+            <h1 id="page-title">Vue d'ensemble</h1>
+            <p id="page-sub">L'essentiel du site en un coup d'œil</p>
           </div>
           <a href={base} target="_blank" class="btn btn-sm">Voir le site ↗</a>
         </div>
@@ -40,8 +41,23 @@ const base = import.meta.env.BASE_URL;
         <p id="global-alert" class="alert" style="display:none"></p>
         <div id="guardrails"></div>
 
+        <!-- VUE D'ENSEMBLE -->
+        <section id="tab-overview">
+          <div id="overview-stats" class="stat-grid"></div>
+          <div class="grid-2">
+            <div class="card">
+              <h2 style="margin:0 0 12px">📅 Publications programmées</h2>
+              <div id="overview-scheduled"></div>
+            </div>
+            <div class="card">
+              <h2 style="margin:0 0 12px">📩 Derniers messages</h2>
+              <div id="overview-messages"></div>
+            </div>
+          </div>
+        </section>
+
         <!-- RÉALISATIONS -->
-        <section id="tab-projects">
+        <section id="tab-projects" hidden>
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
               <h2 style="margin:0">Réalisations</h2>
@@ -239,10 +255,65 @@ const base = import.meta.env.BASE_URL;
     citypages: ['Pages villes', 'Pages SEO local « service + ville »'],
     messages: ['Messages', 'Demandes reçues via le formulaire et Janus'],
     social: ['Réseaux sociaux', 'Posts Facebook générés automatiquement'],
+    overview: ["Vue d'ensemble", "L'essentiel du site en un coup d'œil"],
     seo: ['SEO / Redirections', 'Overrides meta et redirections 301/302'],
     settings: ['Paramètres', 'Coordonnées et contenus du site'],
   };
   const loaders = {};
+  // ══════════ VUE D'ENSEMBLE ══════════
+  loaders.overview = async () => {
+    const [projects, articles, citypages, messages, social] = await Promise.all([
+      api.get('/api/admin/projects'), api.get('/api/admin/articles'),
+      api.get('/api/admin/city-pages'), api.get('/api/admin/messages'),
+      api.get('/api/admin/social-posts').catch(() => ({ posts: [] })),
+    ]);
+    window._projects = projects;
+    window._articles = articles;
+    window._citypages = citypages;
+    const posts = social.posts ?? [];
+    const now = Date.now(), D = 864e5;
+
+    // ── Cartes stats ──
+    const stat = (num, label, warn = false) =>
+      `<div class="stat-card${warn ? ' warn' : ''}"><strong>${num}</strong><span>${label}</span></div>`;
+    const unread = messages.filter((m) => !m.isRead).length;
+    const fbDrafts = posts.filter((p) => p.status === 'draft').length;
+    const scheduled = [
+      ...projects.map((p) => ({ ...p, _type: 'Réalisation', _at: p.publishedAt })),
+      ...articles.map((a) => ({ ...a, _type: 'Article', _at: a.publishedAt })),
+      ...citypages.map((c) => ({ ...c, _type: 'Page ville', _at: c.publishedAt })),
+    ].filter((e) => e._at && new Date(e._at) > now)
+      .sort((a, b) => new Date(a._at) - new Date(b._at));
+    $('#overview-stats').innerHTML = [
+      stat(projects.filter((p) => p.published).length, 'réalisations publiées'),
+      stat(articles.filter((a) => a.published).length, 'articles publiés'),
+      stat(citypages.filter((c) => c.published).length, 'pages villes publiées'),
+      stat(scheduled.length, 'publications programmées'),
+      stat(unread, 'messages non lus', unread > 0),
+      stat(fbDrafts, 'posts FB en brouillon', fbDrafts > 0),
+    ].join('');
+
+    // ── Prochaines publications ──
+    $('#overview-scheduled').innerHTML = scheduled.length
+      ? `<ul class="ov-list">${scheduled.slice(0, 8).map((e) => `
+          <li><span class="tag-pill">${esc(e._type)}</span> ${esc(e.title ?? e.city)}
+            <time>${new Date(e._at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</time></li>`).join('')}</ul>`
+      : '<p style="color:var(--muted);margin:0">Rien de programmé — planifie une sortie pour entretenir le rythme SEO.</p>';
+
+    // ── Derniers messages ──
+    $('#overview-messages').innerHTML = messages.length
+      ? `<ul class="ov-list">${messages.slice(0, 5).map((m) => `
+          <li>${m.isRead ? '' : '<span class="tag-pill pub">Nouveau</span> '}
+            <strong>${esc(m.name)}</strong> — ${esc((m.message ?? '').slice(0, 60))}${(m.message ?? '').length > 60 ? '…' : ''}
+            <time>${new Date(m.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</time></li>`).join('')}</ul>
+        <button class="btn btn-sm" data-goto="messages" style="margin-top:8px">Tous les messages →</button>`
+      : '<p style="color:var(--muted);margin:0">Aucun message pour l\'instant.</p>';
+
+    document.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => {
+      document.querySelector(`.admin-nav-link[data-tab="${b.dataset.goto}"]`)?.click();
+    }));
+    checkGuardrails();
+  };
   document.querySelectorAll('.admin-nav-link[data-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.admin-nav-link').forEach((b) => b.classList.remove('active'));
@@ -876,10 +947,8 @@ const base = import.meta.env.BASE_URL;
     showAlert('Paramètres enregistrés.');
   });
 
-  // Chargement initial — les 3 listes nourrissent les gardes-fous
-  loaders.projects();
-  api.get('/api/admin/articles').then((a) => { window._articles = a; checkGuardrails(); }).catch(() => {});
-  api.get('/api/admin/city-pages').then((c) => { window._citypages = c; checkGuardrails(); }).catch(() => {});
+  // Chargement initial — la vue d'ensemble charge tout et nourrit les gardes-fous
+  loaders.overview();
 </script>
   </body>
 </html>
