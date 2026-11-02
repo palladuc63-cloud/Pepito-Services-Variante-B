@@ -1057,7 +1057,6 @@ const base = import.meta.env.BASE_URL;
       <div class="form-row cols-3">
         <div><label class="form-label">Ordre</label><input class="form-input" id="s-order" type="number" value="${s.sortOrder}" /></div>
         <div class="switch-row" style="align-items:end"><input type="checkbox" id="s-active" ${s.active ? 'checked' : ''} /><label for="s-active">Actif</label></div>
-        <div class="switch-row" style="align-items:end"><input type="checkbox" id="s-prov" ${s.provisional ? 'checked' : ''} /><label for="s-prov">Badge « à valider »</label></div>
       </div>`, async () => {
       await api.put(`/api/admin/services/${s.id}`, {
         title: $('#s-title').value.trim(),
@@ -1066,7 +1065,6 @@ const base = import.meta.env.BASE_URL;
         imageUrl: $('#s-image').value.trim() || null,
         sortOrder: Number($('#s-order').value) || 0,
         active: $('#s-active').checked,
-        provisional: $('#s-prov').checked,
       });
       backdrop.style.display = 'none';
       showAlert('Service mis à jour.');

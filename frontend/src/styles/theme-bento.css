@@ -549,10 +549,6 @@
   font-weight: 800;
 }
 
-:root[data-theme='bento'] .page-header .content-badge {
-  margin-top: 1rem;
-}
-
 /* À propos (page) : en-tête et texte côte à côte */
 @media (min-width: 1024px) {
   :root[data-theme='bento'] main .section > .container:has(> .prose) {

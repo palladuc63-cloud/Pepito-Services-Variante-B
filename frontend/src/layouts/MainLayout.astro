@@ -30,7 +30,7 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
   <head>
     <script is:inline>
       try {
-        var themes = ['nature', 'immersif', 'bento', 'editorial', 'blason'];
+        var themes = ['nature', 'immersif', 'bento', 'editorial'];
         var fromUrl = new URLSearchParams(location.search).get('theme');
         if (themes.indexOf(fromUrl) !== -1) localStorage.setItem('pepito-theme', fromUrl);
         var t = localStorage.getItem('pepito-theme');

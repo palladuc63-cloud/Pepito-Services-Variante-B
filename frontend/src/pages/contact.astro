@@ -2,7 +2,6 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import Section from '../components/Section.astro';
 import ContactForm from '../components/ContactForm.astro';
-import ContentBadge from '../components/ContentBadge.astro';
 import Icon from '../components/Icon.astro';
 import { getSite } from '../lib/site.js';
 
@@ -21,7 +20,6 @@ const { settings } = await getSite();
         Vous avez un projet de clôture, palissade, portillon ou aménagement
         extérieur ? Écrivez-nous pour échanger autour de votre besoin.
       </p>
-      <ContentBadge label="Coordonnées à valider avec l’entreprise" />
     </div>
 
     <div class="contact-grid">

@@ -16,7 +16,6 @@ mêmes données. Le thème actif est posé sur
 | `artisan` | Vert forêt, cuivre, serif, motif piquets | standard |
 | `bento` | Tuiles façon app | `theme-bento.css` |
 | `editorial` | Revue d'architecture, filets, sans arrondi | `theme-editorial.css` |
-| `blason` | Badges pointus, logo centré, italique condensé | `theme-blason.css` |
 
 - **Tokens** : `frontend/src/styles/tokens.css` — un bloc de
   variables CSS par thème (`[data-theme='x']`). Seule source de
@@ -29,7 +28,7 @@ mêmes données. Le thème actif est posé sur
 - **Sélecteur** : `ThemeSwitcher.astro` (pastille en bas à gauche,
   prévue pour la phase de validation — la retirer une fois le thème
   définitif choisi). Choix mémorisé en `localStorage` et forçable
-  par l'URL : `?theme=blason`.
+  par l'URL : `?theme=bento`.
 - **Polices** : déclarées dans `frontend/astro.config.mjs`
   (`fonts:`) et injectées par `<Font>` dans `SeoHead.astro` —
   auto-hébergées, aucun appel externe. Bricolage Grotesque,

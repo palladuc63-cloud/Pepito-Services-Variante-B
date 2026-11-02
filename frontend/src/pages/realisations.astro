@@ -2,7 +2,6 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import Section from '../components/Section.astro';
 import ProjectFilter from '../components/ProjectFilter.astro';
-import ContentBadge from '../components/ContentBadge.astro';
 import CityMap from '../components/CityMap.astro';
 import { getSite } from '../lib/site.js';
 import { getProjects, getCityPages } from '../lib/api.js';
@@ -25,10 +24,9 @@ const base = import.meta.env.BASE_URL;
     <div class="page-header">
       <h1 class="section-title">Nos réalisations</h1>
       <p class="section-subtitle">
-        Aperçu de chantiers réalisés par Pépito Services. Les descriptions et
-        catégories sont provisoires et seront validées avec l’entreprise.
+        Aperçu de chantiers réalisés par Pépito Services :
+        clôtures, portails et aménagements extérieurs sur mesure.
       </p>
-      <ContentBadge />
     </div>
 
     {preview && (

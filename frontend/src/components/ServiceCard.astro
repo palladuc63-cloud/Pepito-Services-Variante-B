@@ -1,6 +1,5 @@
 ---
 import type { Service } from '../data/types';
-import ContentBadge from './ContentBadge.astro';
 import Icon from './Icon.astro';
 import { categoryIcon } from '../lib/icons';
 
@@ -28,11 +27,6 @@ const base = import.meta.env.BASE_URL;
     {number && <span class="service-number" aria-hidden="true">N° {number}</span>}
     <h3 class="card-title service-title"><Icon name={categoryIcon(service.slug)} size={22} class="service-icon" /> {service.title}</h3>
     <p class="card-text">{service.summary}</p>
-    {service.provisional && (
-      <div class="service-badge">
-        <ContentBadge />
-      </div>
-    )}
     <a href={`${base}contact/`} class="service-link">En savoir plus</a>
   </div>
 </article>
@@ -73,13 +67,9 @@ const base = import.meta.env.BASE_URL;
     color: var(--copper-dark);
   }
 
-  .service-badge {
+  .service-link {
     margin-top: auto;
     padding-top: var(--space-4);
-  }
-
-  .service-link {
-    margin-top: var(--space-4);
     font-weight: 600;
     color: var(--forest);
     text-decoration: none;

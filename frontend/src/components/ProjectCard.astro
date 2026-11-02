@@ -1,6 +1,5 @@
 ---
 import type { Project } from '../data/types';
-import ContentBadge from './ContentBadge.astro';
 import Icon from './Icon.astro';
 import { categoryIcon } from '../lib/icons';
 import { getCityPages } from '../lib/api.js';
@@ -56,9 +55,6 @@ const gallery = project.images?.length
       <a href={`${base}realisations/${project.slug}/`} class="card-title-link">{project.title}</a>
     </h3>
     <p class="card-text">{project.summary}</p>
-    <div class="project-footer">
-      <ContentBadge />
-    </div>
   </div>
 </article>
 
@@ -122,11 +118,6 @@ const gallery = project.images?.length
 
   .card-title-link:hover {
     text-decoration: underline;
-  }
-
-  .project-footer {
-    margin-top: auto;
-    padding-top: var(--space-4);
   }
 
   .card-media {
