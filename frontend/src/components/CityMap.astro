@@ -1,23 +1,35 @@
 ---
 import type { CityPage } from '../data/types';
+import { getCityMarkers } from '../lib/api.js';
+import { getSite } from '../lib/site.js';
 
 export interface Props {
-  pages: CityPage[];
+  pages?: CityPage[];
   height?: string;
 }
 
 const { pages, height = '420px' } = Astro.props;
 const base = import.meta.env.BASE_URL;
 
-// Marqueurs : pages villes publiées géocodées
-const markers = pages
-  .filter((p) => p.lat != null && p.lng != null)
-  .map((p) => ({
-    lat: p.lat,
-    lng: p.lng,
-    label: p.city,
-    url: `${base}${p.serviceSlug}/${p.slug}/`,
-  }));
+// Marqueurs : toutes les villes publiées géocodées — les pages encore
+// programmées apparaissent sur la carte sans lien (zone réelle d'intervention)
+interface Marker { lat: number; lng: number; city: string; url: string | null }
+let markers: Marker[] = [];
+try {
+  markers = await getCityMarkers();
+} catch {}
+if (!markers.length && pages?.length) {
+  markers = pages
+    .filter((p) => p.lat != null && p.lng != null)
+    .map((p) => ({ lat: p.lat!, lng: p.lng!, city: p.city, url: `/${p.serviceSlug}/${p.slug}/` }));
+}
+markers = markers.map((m) => ({ ...m, url: m.url ? `${base}${m.url.replace(/^\/+/, '')}` : null }));
+
+// Zone d'intervention : cercle centré sur la ville de l'entreprise (Thiers)
+const { settings } = await getSite();
+const radiusKm = Number(String(settings.contact.serviceArea || '').replace(/[^\d]/g, '')) || 0;
+const home = markers.find((m) => m.city?.toLowerCase() === 'thiers') || { lat: 45.8567, lng: 3.5489 };
+const zone = radiusKm ? { lat: home.lat, lng: home.lng, radius: radiusKm * 1000 } : null;
 ---
 
 <link
@@ -27,7 +39,12 @@ const markers = pages
   crossorigin=""
 />
 <div class="city-map-wrap">
-  <div id="city-map" style={`height:${height}`} data-markers={JSON.stringify(markers)}></div>
+  <div
+    id="city-map"
+    style={`height:${height}`}
+    data-markers={JSON.stringify(markers)}
+    data-zone={zone ? JSON.stringify(zone) : ''}
+  ></div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" is:inline></script>
 <script is:inline>
@@ -49,16 +66,37 @@ const markers = pages
         iconSize: [16, 16],
         iconAnchor: [8, 8],
       });
+      var iconSoon = L.divIcon({
+        className: 'city-marker',
+        html: '<span class="city-marker-dot city-marker-dot--soon"></span>',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+      });
+      var zone = null;
+      try { zone = JSON.parse(el.dataset.zone || 'null'); } catch (e) {}
+      if (zone && zone.radius) {
+        L.circle([zone.lat, zone.lng], {
+          radius: zone.radius,
+          color: 'rgba(22, 163, 74, 0.45)',
+          weight: 1.5,
+          dashArray: '6 6',
+          fillColor: 'rgba(22, 163, 74, 0.07)',
+          fillOpacity: 1,
+        }).addTo(map);
+      }
       var bounds = [];
       markers.forEach(function (m) {
         var ll = [m.lat, m.lng];
         bounds.push(ll);
-        L.marker(ll, { icon: icon })
-          .addTo(map)
-          .bindPopup('<a href="' + m.url + '"><strong>' + m.label + '</strong></a>');
+        var popup = m.url
+          ? '<a href="' + m.url + '"><strong>' + m.city + '</strong></a>'
+          : '<strong>' + m.city + '</strong><br/><span class="city-marker-soon">Bientôt en ligne</span>';
+        L.marker(ll, { icon: m.url ? icon : iconSoon }).addTo(map).bindPopup(popup);
       });
-      if (bounds.length) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
-      else map.setView([45.4397, 4.3872], 8);
+      if (zone && zone.radius) {
+        map.fitBounds(L.circle([zone.lat, zone.lng], { radius: zone.radius }).getBounds());
+      } else if (bounds.length) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
+      else map.setView([45.8567, 3.5489], 9);
     }
     function whenReady() {
       if (typeof L !== 'undefined') initCityMap();
@@ -91,6 +129,19 @@ const markers = pages
     background: var(--color-primary, #16a34a);
     border: 3px solid #fff;
     box-shadow: 0 1px 4px rgb(0 0 0 / 35%);
+  }
+
+  :global(.city-marker-dot--soon) {
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border: 3px solid var(--color-primary, #16a34a);
+    opacity: 0.85;
+  }
+
+  :global(.city-marker-soon) {
+    font-size: 11px;
+    color: #6a604f;
   }
 
   :global(.leaflet-popup-content a) {

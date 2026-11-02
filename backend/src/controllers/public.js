@@ -1,4 +1,4 @@
-import { eq, asc, desc, and, or, isNull, lte } from 'drizzle-orm';
+import { eq, asc, desc, and, or, isNull, isNotNull, lte } from 'drizzle-orm';
 import { db } from '../db.js';
 import {
   settings, categories, services, projects, articles, messages, projectImages,
@@ -150,6 +150,37 @@ export async function listCityPages(_req, res) {
     res.json(rows.map(withSeo(seo)));
   } catch (err) {
     console.error('GET /public/city-pages:', err.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+// GET /api/public/city-markers — toutes les villes publiées géocodées pour la
+// carte. Les pages programmées (pas encore en ligne) remontent sans url.
+export async function listCityMarkers(_req, res) {
+  try {
+    const rows = await db
+      .select({
+        city: cityPages.city,
+        lat: cityPages.lat,
+        lng: cityPages.lng,
+        serviceSlug: cityPages.serviceSlug,
+        slug: cityPages.slug,
+        publishedAt: cityPages.publishedAt,
+      })
+      .from(cityPages)
+      .where(and(eq(cityPages.published, true), isNotNull(cityPages.lat), isNotNull(cityPages.lng)))
+      .orderBy(asc(cityPages.city));
+    const now = new Date();
+    // Dédoublonnage par ville (plusieurs services possibles), lien si en ligne
+    const byCity = new Map();
+    for (const r of rows) {
+      const url = !r.publishedAt || r.publishedAt <= now ? `/${r.serviceSlug}/${r.slug}/` : null;
+      const prev = byCity.get(r.city);
+      if (!prev || (!prev.url && url)) byCity.set(r.city, { lat: r.lat, lng: r.lng, city: r.city, url });
+    }
+    res.json([...byCity.values()]);
+  } catch (err) {
+    console.error('GET /public/city-markers:', err.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 }

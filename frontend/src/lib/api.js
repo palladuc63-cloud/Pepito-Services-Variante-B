@@ -63,6 +63,12 @@ export async function getArticle(slug, { preview = false, headers } = {}) {
   }
 }
 
+// Marqueurs de la carte des zones — villes publiées géocodées,
+// url seulement quand la page est déjà en ligne
+export async function getCityMarkers() {
+  return fetchJson('/api/public/city-markers');
+}
+
 // Pages villes (SEO local) — /<service>/<ville>/
 export async function getCityPages() {
   return fetchJson('/api/public/city-pages');

@@ -3,11 +3,15 @@ import MainLayout from '../layouts/MainLayout.astro';
 import CityMap from '../components/CityMap.astro';
 import Icon from '../components/Icon.astro';
 import { categoryIcon } from '../lib/icons';
-import { getCityPages } from '../lib/api.js';
+import { getCityPages, getCityMarkers } from '../lib/api.js';
 import { getSite } from '../lib/site.js';
 import type { CityPage } from '../data/types';
 
-const [cityPages, { services }] = await Promise.all([getCityPages(), getSite()]);
+const [cityPages, { services }, cityMarkers] = await Promise.all([
+  getCityPages(),
+  getSite(),
+  getCityMarkers().catch(() => []),
+]);
 const base = import.meta.env.BASE_URL;
 
 // Pages villes regroupées par service
@@ -39,7 +43,24 @@ for (const c of cityPages as CityPage[]) {
         </p>
       </header>
 
-      {cityPages.length > 0 && <CityMap pages={cityPages as CityPage[]} />}
+      {cityMarkers.length > 0 && <CityMap />}
+
+      {cityMarkers.length > 0 && (
+        <section class="zones-group">
+          <h2 class="zones-group-title"><Icon name="pin" size={20} /> Villes couvertes</h2>
+          <ul class="zone-links">
+            {cityMarkers.map((c: { city: string; url: string | null }) => (
+              <li>
+                {c.url ? (
+                  <a href={`${base}${c.url.replace(/^\/+/, '')}`}><Icon name="pin" size={12} /> {c.city}</a>
+                ) : (
+                  <span class="zone-chip-soon">{c.city}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {[...byService.values()].map((g) => (
         <section class="zones-group">
@@ -100,5 +121,15 @@ for (const c of cityPages as CityPage[]) {
 
   .zone-links a:hover {
     text-decoration: underline;
+  }
+
+  .zone-chip-soon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 6px 14px;
+    border: 1px dashed var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text-muted);
   }
 </style>

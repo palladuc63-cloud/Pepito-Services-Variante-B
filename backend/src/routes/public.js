@@ -10,6 +10,7 @@ router.get('/projects/:slug', ctrl.getProject);
 router.get('/articles', ctrl.listArticles);
 router.get('/articles/:slug', ctrl.getArticle);
 router.get('/city-pages', ctrl.listCityPages);
+router.get('/city-markers', ctrl.listCityMarkers);
 router.get('/city-pages/:service/:slug', ctrl.getCityPage);
 router.get('/redirects', ctrl.listRedirects);
 // Anti-spam : 3 messages/min par IP
