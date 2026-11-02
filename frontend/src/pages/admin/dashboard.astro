@@ -677,7 +677,7 @@ const base = import.meta.env.BASE_URL;
         <td>${esc(p.category?.label ?? '—')}</td>
         <td>${statusBadge(p)}</td>
         <td style="text-align:right;white-space:nowrap">
-          <a class="btn btn-sm btn-link" href="\$\{siteBase\}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
+          <a class="btn btn-sm btn-link" href="\${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
           <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
           <button class="btn btn-sm btn-danger" data-proj-del="${p.id}">✕</button>
         </td>
@@ -688,7 +688,7 @@ const base = import.meta.env.BASE_URL;
        <div class="item-card-meta"><span class="tag-pill">${esc(p.category?.label ?? '—')}</span>
          ${p.city ? `<span class="tag-pill">📍 ${esc(p.city)}</span>` : ''}
          ${statusBadge(p)}</div>`,
-      `<a class="btn btn-sm btn-link" href="\$\{siteBase\}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
+      `<a class="btn btn-sm btn-link" href="\${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
        <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
        <button class="btn btn-sm btn-danger" data-proj-del="${p.id}">✕</button>`)).join('')
       : '<p style="color:var(--muted);margin:0">Aucune réalisation.</p>';
@@ -825,7 +825,7 @@ const base = import.meta.env.BASE_URL;
         <td>${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('fr-FR') : '—'}</td>
         <td>${statusBadge(a)}</td>
         <td style="text-align:right;white-space:nowrap">
-          <a class="btn btn-sm btn-link" href="\$\{siteBase\}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
+          <a class="btn btn-sm btn-link" href="\${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
           <button class="btn btn-sm" data-art-edit="${a.id}">Éditer</button>
           <button class="btn btn-sm btn-danger" data-art-del="${a.id}">✕</button>
         </td>
@@ -835,7 +835,7 @@ const base = import.meta.env.BASE_URL;
        <span class="muted">/${esc(a.slug)}/</span>
        <div class="item-card-meta"><span class="tag-pill">${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('fr-FR') : '—'}</span>
          ${statusBadge(a)}</div>`,
-      `<a class="btn btn-sm btn-link" href="\$\{siteBase\}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
+      `<a class="btn btn-sm btn-link" href="\${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
        <button class="btn btn-sm" data-art-edit="${a.id}">Éditer</button>
        <button class="btn btn-sm btn-danger" data-art-del="${a.id}">✕</button>`)).join('')
       : '<p style="color:var(--muted);margin:0">Aucun article.</p>';
@@ -953,7 +953,7 @@ const base = import.meta.env.BASE_URL;
         <td>${statusBadge(c)}</td>
         <td style="text-align:right;white-space:nowrap">
           ${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
-          <a class="btn btn-sm btn-link" href="\$\{siteBase\}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
+          <a class="btn btn-sm btn-link" href="\${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
           <button class="btn btn-sm" data-city-edit="${c.id}">Éditer</button>
           <button class="btn btn-sm btn-danger" data-city-del="${c.id}">✕</button>
         </td>
@@ -964,7 +964,7 @@ const base = import.meta.env.BASE_URL;
        <div class="item-card-meta">${c.auto ? '<span class="tag-pill">Auto</span>' : ''}
          ${statusBadge(c)}</div>`,
       `${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
-       <a class="btn btn-sm btn-link" href="\$\{siteBase\}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
+       <a class="btn btn-sm btn-link" href="\${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
        <button class="btn btn-sm" data-city-edit="${c.id}">Éditer</button>
        <button class="btn btn-sm btn-danger" data-city-del="${c.id}">✕</button>`)).join('')
       : '<p style="color:var(--muted);margin:0">Aucune page ville pour l’instant.</p>';
