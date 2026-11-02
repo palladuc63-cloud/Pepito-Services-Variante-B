@@ -41,6 +41,10 @@ const base = import.meta.env.BASE_URL;
             <h1 id="page-title">Vue d'ensemble</h1>
             <p id="page-sub">L'essentiel du site en un coup d'œil</p>
           </div>
+          <div class="admin-top-actions">
+            <a class="btn btn-sm" href={`${base}guide-backoffice.pdf`} target="_blank" rel="noopener">📖 Guide PDF</a>
+            <button class="btn btn-sm" id="btn-tour" type="button">❓ Visite guidée</button>
+          </div>
         </div>
 
         <p id="global-alert" class="alert" style="display:none"></p>
@@ -284,6 +288,22 @@ const base = import.meta.env.BASE_URL;
           </div>
         </section>
       </main>
+    </div>
+
+    <!-- TOUR GUIDÉ -->
+    <div id="tour-root" style="display:none">
+      <div id="tour-spot"></div>
+      <div id="tour-card">
+        <div id="tour-step-label"></div>
+        <h3 id="tour-title"></h3>
+        <p id="tour-text"></p>
+        <div class="tour-actions">
+          <button class="btn btn-sm" id="tour-skip" type="button">Passer</button>
+          <span class="tour-spacer"></span>
+          <button class="btn btn-sm" id="tour-prev" type="button">← Précédent</button>
+          <button class="btn btn-primary btn-sm" id="tour-next" type="button">Suivant →</button>
+        </div>
+      </div>
     </div>
 
     <!-- MODAL générique -->
@@ -1552,6 +1572,145 @@ const base = import.meta.env.BASE_URL;
 
   // Chargement initial — la vue d'ensemble charge tout et nourrit les gardes-fous
   loaders.overview();
+</script>
+
+<script>
+  // @ts-nocheck — DOM vanilla, le typage strict ajoute du bruit sans valeur ici.
+  // ── Visite guidée du back-office ─────────────────────────────────────
+  (function () {
+    var base = document.querySelector('script[data-bo-base]')?.dataset.boBase || '/';
+    var root = document.getElementById('tour-root');
+    var spot = document.getElementById('tour-spot');
+    var card = document.getElementById('tour-card');
+    var label = document.getElementById('tour-step-label');
+    var title = document.getElementById('tour-title');
+    var text = document.getElementById('tour-text');
+    var btnPrev = document.getElementById('tour-prev');
+    var btnNext = document.getElementById('tour-next');
+    var btnSkip = document.getElementById('tour-skip');
+    var btnHelp = document.getElementById('btn-tour');
+
+    var steps = [
+      {
+        title: 'Bienvenue dans votre back-office 👋',
+        text: 'C\'est ici que vous gérez tout votre site : demandes clients, chantiers, articles, diaporama… Cette visite vous montre l\'essentiel en moins de 2 minutes.',
+      },
+      { tab: 'overview', target: '#overview-stats',
+        title: '📊 Vue d\'ensemble',
+        text: 'L\'activité en un coup d\'œil : contenus publiés, messages non lus, statistiques de visite et calendrier de publication.' },
+      { tab: 'home', target: '#slides-list',
+        title: '🏠 Accueil — le diaporama',
+        text: 'Les images du grand diaporama de la page d\'accueil. Ajoutez, réordonnez (↑↓), masquez sans supprimer. Titre et sous-titre vides = les textes généraux du site.' },
+      { tab: 'messages', target: '#messages-list',
+        title: '📩 Messages',
+        text: 'Toutes les demandes arrivent ici : formulaire de contact, chatbot du site et demandes de rappel téléphonique. Vous pouvez répondre par email en un clic.' },
+      { tab: 'prospects', target: '#prospects-list',
+        title: '📇 Prospects',
+        text: 'Une fiche unique par contact (dédoublonnée par email/téléphone). Suivez l\'avancement : Nouveau → Contacté → Qualifié → Gagné.' },
+      { tab: 'projects', target: '#projects-table',
+        title: '🚧 Réalisations',
+        text: 'Votre portfolio : « + Nouvelle réalisation », glissez vos photos, publiez tout de suite ou programmez la date. Un brouillon reste invisible du site.' },
+      { tab: 'citypages', target: '#city-map',
+        title: '📍 Pages villes',
+        text: 'Des pages « service + ville » publiées automatiquement au rythme prévu — c\'est ce qui fait remonter le site sur Google dans votre zone. Rien à faire.' },
+      { tab: 'articles', target: '#articles-table',
+        title: '📰 Articles',
+        text: 'Le blog / actualités : chantiers récents, conseils, vie de l\'entreprise. Publication immédiate ou programmée.' },
+      { tab: 'social', target: '#social-list',
+        title: '📣 Réseaux',
+        text: 'À chaque contenu publié, un brouillon de post Facebook est préparé. Relisez puis publiez — rien ne part sans votre validation.' },
+      { tab: 'settings', target: '#settings-form',
+        title: '⚙️ Paramètres',
+        text: 'Vos coordonnées, horaires et zone d\'intervention — tout changement se répercute sur l\'ensemble du site. Plus bas : planification, catégories et SEO.' },
+      {
+        title: 'C\'est parti ! 🎉',
+        text: 'Vous savez tout. En cas de doute, le « Guide PDF » (bouton en haut à droite) reprend chaque écran pas à pas, et vous pouvez relancer cette visite à tout moment.',
+      },
+    ];
+
+    var idx = 0;
+
+    function show(el) {
+      if (!el) return null;
+      el.scrollIntoView({ block: 'center', behavior: 'auto' });
+      var r = el.getBoundingClientRect();
+      spot.style.display = 'block';
+      spot.style.left = (r.left - 8) + 'px';
+      spot.style.top = (r.top - 8) + 'px';
+      spot.style.width = (r.width + 16) + 'px';
+      spot.style.height = (r.height + 16) + 'px';
+      return r;
+    }
+
+    function placeCard(r) {
+      card.classList.toggle('tour-centered', !r);
+      if (!r) return;
+      var cw = card.offsetWidth, ch = card.offsetHeight;
+      var top = r.bottom + 14;
+      if (top + ch > window.innerHeight - 12) top = Math.max(12, r.top - ch - 14);
+      var left = Math.min(Math.max(12, r.left), window.innerWidth - cw - 12);
+      card.style.top = top + 'px';
+      card.style.left = left + 'px';
+    }
+
+    function render() {
+      var s = steps[idx];
+      label.textContent = 'Étape ' + (idx + 1) + ' / ' + steps.length;
+      title.textContent = s.title;
+      text.textContent = s.text;
+      btnPrev.style.visibility = idx === 0 ? 'hidden' : 'visible';
+      btnNext.textContent = idx === steps.length - 1 ? 'Terminer ✓' : 'Suivant →';
+      spot.style.display = 'none';
+      var go = function () {
+        var el = s.target && document.querySelector(s.target);
+        placeCard(el ? show(el) : null);
+      };
+      if (s.tab) {
+        var nav = document.querySelector('.admin-nav-link[data-tab="' + s.tab + '"]');
+        if (nav) nav.click();
+        setTimeout(go, 450);
+      } else {
+        go();
+      }
+    }
+
+    function open() {
+      root.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      idx = 0;
+      render();
+    }
+
+    function close() {
+      root.style.display = 'none';
+      document.body.style.overflow = '';
+      try { localStorage.setItem('pepito_bo_tour_done', '1'); } catch (e) {}
+    }
+
+    btnNext.addEventListener('click', function () {
+      if (idx === steps.length - 1) { close(); return; }
+      idx += 1; render();
+    });
+    btnPrev.addEventListener('click', function () { if (idx > 0) { idx -= 1; render(); } });
+    btnSkip.addEventListener('click', close);
+    if (btnHelp) btnHelp.addEventListener('click', open);
+    document.addEventListener('keydown', function (e) {
+      if (root.style.display === 'none') return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowRight') btnNext.click();
+      else if (e.key === 'ArrowLeft') btnPrev.click();
+    });
+    window.addEventListener('resize', function () {
+      if (root.style.display !== 'none') render();
+    });
+
+    // Première visite : proposition de tour (non bloquante)
+    try {
+      if (!localStorage.getItem('pepito_bo_tour_done')) {
+        setTimeout(open, 1200);
+      }
+    } catch (e) {}
+  })();
 </script>
   </body>
 </html>

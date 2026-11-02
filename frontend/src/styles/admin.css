@@ -411,3 +411,44 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .slide-row { flex-wrap: wrap; }
   .slide-actions { width: 100%; justify-content: flex-start; }
 }
+
+/* ─── Visite guidée ─── */
+.admin-top-actions { display: flex; gap: 8px; align-items: center; }
+
+#tour-root { position: fixed; inset: 0; z-index: 10000; }
+
+#tour-spot {
+  position: fixed;
+  display: none;
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgb(0 0 0 / 0.62);
+  outline: 2px solid var(--green);
+  pointer-events: none;
+  transition: left .25s ease, top .25s ease, width .25s ease, height .25s ease;
+}
+
+#tour-card {
+  position: fixed;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  background: var(--panel, #182018);
+  border: 1px solid var(--line, #2c3b2a);
+  border-radius: 12px;
+  padding: 18px;
+  color: var(--ink, #e8ece6);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.5);
+  z-index: 10001;
+}
+
+#tour-card.tour-centered {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#tour-step-label { font-size: 11px; color: var(--green); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+#tour-title { margin: 0 0 8px; font-size: 17px; }
+#tour-text { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--muted, #b9c4b6); }
+
+.tour-actions { display: flex; gap: 8px; margin-top: 16px; align-items: center; }
+.tour-spacer { flex: 1; }
