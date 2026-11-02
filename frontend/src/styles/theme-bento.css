@@ -626,30 +626,50 @@
 
 :root[data-theme='bento'] .site-footer {
   margin: 0 0.75rem 0.75rem;
-  padding-block: 2rem;
+  padding-block: 3rem 2rem;
   border-radius: var(--r-card);
+  background: var(--basalt-dark);
+  color: var(--on-dark);
 }
 
 :root[data-theme='bento'] .footer-inner {
-  text-align: left;
+  text-align: center;
+  justify-items: center;
+  gap: 2rem;
+}
+
+:root[data-theme='bento'] .footer-logo {
+  width: 17rem;
+  margin: 0 auto;
 }
 
 :root[data-theme='bento'] .footer-links,
 :root[data-theme='bento'] .footer-socials {
-  justify-content: flex-start;
+  justify-content: center;
+}
+
+:root[data-theme='bento'] .footer-socials a {
+  color: var(--on-dark);
+  font-weight: 600;
+}
+
+:root[data-theme='bento'] .footer-links a {
+  color: rgb(246 244 239 / 0.82);
+}
+
+:root[data-theme='bento'] .footer-links a:hover,
+:root[data-theme='bento'] .footer-socials a:hover {
+  color: var(--copper-light);
+}
+
+:root[data-theme='bento'] .footer-legal {
+  width: 100%;
+  border-top-color: rgb(246 244 239 / 0.14);
+  color: rgb(246 244 239 / 0.55);
 }
 
 @media (min-width: 1024px) {
   :root[data-theme='bento'] .site-footer {
     margin: 0 1rem 1rem 0;
-  }
-
-  :root[data-theme='bento'] .footer-inner {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-  }
-
-  :root[data-theme='bento'] .footer-legal {
-    grid-column: 1 / -1;
   }
 }
