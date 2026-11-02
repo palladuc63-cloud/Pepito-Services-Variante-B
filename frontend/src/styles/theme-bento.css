@@ -36,6 +36,22 @@
   column-gap: 1rem;
 }
 
+/* Mobile/tablette : logo centré sur sa ligne, menu espacé en dessous */
+@media (max-width: 1023px) {
+  :root[data-theme='bento'] .brand-area {
+    flex: 0 0 100%;
+    justify-content: center;
+  }
+
+  :root[data-theme='bento'] .brand-area > a {
+    margin-inline: auto;
+  }
+
+  :root[data-theme='bento'] .desktop-nav {
+    margin-top: 0.9rem;
+  }
+}
+
 :root[data-theme='bento'] .desktop-nav {
   display: flex;
   order: 3;
