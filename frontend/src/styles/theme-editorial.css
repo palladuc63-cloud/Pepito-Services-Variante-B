@@ -392,8 +392,7 @@
 }
 
 :root[data-theme='editorial'] #a-propos .about-logo {
-  order: 2;
-  max-width: 10rem;
+  display: none;
 }
 
 :root[data-theme='editorial'] #a-propos .prose {
