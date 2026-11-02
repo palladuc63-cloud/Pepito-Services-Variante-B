@@ -81,7 +81,7 @@ export const messages = mysqlTable('messages', {
   phone: varchar('phone', { length: 40 }),
   projectType: varchar('project_type', { length: 100 }),
   message: text('message').notNull(),
-  source: varchar('source', { length: 40 }).default('contact').notNull(), // contact | janus
+  source: varchar('source', { length: 40 }).default('contact').notNull(), // contact | janus | voice
   isRead: boolean('is_read').default(false).notNull(),
   repliedAt: timestamp('replied_at'),                             // réponse envoyée depuis le BO
   createdAt: timestamp('created_at').defaultNow().notNull(),

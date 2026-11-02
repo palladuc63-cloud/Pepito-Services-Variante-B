@@ -166,7 +166,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function createMessage(req, res) {
   try {
-    const { name, email, phone, projectType, message, source } = req.body ?? {};
+    const { name, email, phone, projectType, message, source, skipMail } = req.body ?? {};
     if (!name || typeof name !== 'string' || name.trim().length < 2) {
       return res.status(400).json({ error: 'Nom requis.' });
     }
@@ -183,7 +183,7 @@ export async function createMessage(req, res) {
       phone: phone?.trim().slice(0, 40) || null,
       projectType: projectType?.slice(0, 100) || null,
       message: message.trim().slice(0, 5000),
-      source: ['contact', 'janus'].includes(source) ? source : 'contact',
+      source: ['contact', 'janus', 'voice'].includes(source) ? source : 'contact',
     });
 
     notify(
@@ -191,7 +191,7 @@ export async function createMessage(req, res) {
       `${name.trim()}${projectType ? ` (${projectType})` : ''}\n${message.trim().slice(0, 300)}`,
     );
 
-    sendMail({
+    if (!skipMail) sendMail({
       subject: `📩 Message du site — ${name.trim()}${projectType ? ` (${projectType})` : ''}`,
       replyTo: email?.trim() || undefined,
       text: [

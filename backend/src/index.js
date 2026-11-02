@@ -10,6 +10,8 @@ import publicRouter from './routes/public.js';
 import adminRouter from './routes/admin.js';
 import uploadRouter from './routes/upload.js';
 import { sweepDueSocialPosts } from './utils/social.js';
+import { rateLimit } from './utils/rateLimit.js';
+import { createMessage } from './controllers/public.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -57,6 +59,14 @@ app.use('/api/auth', authRouter);
 app.use('/api/public', publicRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/upload', uploadRouter);
+
+// Alias pour les intégrations externes (chatbot Janus, assistant vocal)
+// qui POSTent sur {apiBaseUrl}/api/messages : mêmes règles que le
+// formulaire, source « janus » par défaut.
+app.post('/api/messages', rateLimit({ max: 5 }), (req, res, next) => {
+  if (!req.body?.source) req.body = { ...req.body, source: 'janus' };
+  createMessage(req, res, next);
+});
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
