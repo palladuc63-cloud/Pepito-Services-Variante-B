@@ -257,12 +257,6 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 
   .form-row.cols-2, .form-row.cols-3 { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
-  .stat-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .stat-card { padding: 10px 8px; }
-  .stat-card strong { font-size: 18px; }
-  .stat-card span { font-size: 10px; }
-  .item-cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .item-card-actions .btn { padding: 8px 10px; font-size: 12px; }
 
   /* Tables : scroll horizontal dans un conteneur (colonnes alignées) */
   .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -277,19 +271,8 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .modal-backdrop { padding: 8px; align-items: flex-start; }
   .modal { max-height: calc(100dvh - 16px); padding: 16px; margin-top: 8px; }
 
-  /* Carte des villes plus compacte */
-  #city-map { height: 240px; }
-
-  .view-toggle { flex-wrap: wrap; }
-
   /* En-têtes de cards avec contrôles : passage à la ligne */
   .card > div[style*="justify-content:space-between"] { flex-wrap: wrap; gap: 8px; }
-
-  /* Calendrier resserré */
-  .cal-day { min-height: 54px; padding: 3px 4px; }
-  .cal-pill { font-size: 10px; padding: 2px 4px; }
-  .cal-dow { font-size: 9px; }
-  .cal-legend { gap: 8px; font-size: 11px; }
 }
 
 /* Gardes-fous rythme de publication */
@@ -364,3 +347,22 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .cal-legend .dot-sched { background: transparent; border: 1px dashed var(--muted); }
 
 @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+/* Mobile — overrides placés après toutes les règles de base */
+@media (max-width: 800px) {
+  .stat-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .stat-card { padding: 10px 8px; }
+  .stat-card strong { font-size: 18px; }
+  .stat-card span { font-size: 10px; }
+
+  .item-cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .item-card-actions .btn { padding: 8px 10px; font-size: 12px; }
+
+  #city-map { height: 240px; }
+  .view-toggle { flex-wrap: wrap; }
+
+  .cal-day { min-height: 54px; padding: 3px 4px; }
+  .cal-pill { font-size: 10px; padding: 2px 4px; }
+  .cal-dow { font-size: 9px; }
+  .cal-legend { gap: 8px; font-size: 11px; }
+}
