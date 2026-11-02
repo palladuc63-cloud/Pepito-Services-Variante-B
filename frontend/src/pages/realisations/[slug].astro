@@ -3,7 +3,8 @@ import MainLayout from '../../layouts/MainLayout.astro';
 import ImageCarousel from '../../components/ImageCarousel.astro';
 import Icon from '../../components/Icon.astro';
 import { categoryIcon } from '../../lib/icons';
-import { getProject, getCityPages } from '../../lib/api.js';
+import { getProject, getCityPages, getCityMarkers } from '../../lib/api.js';
+import CityMap from '../../components/CityMap.astro';
 import { getSite } from '../../lib/site.js';
 
 const preview = Astro.url.searchParams.get('preview') === '1';
@@ -22,6 +23,13 @@ const slugify = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300
 const cityPage = project.city
   ? cityPages.find((c: { slug: string; serviceSlug: string }) => c.slug === slugify(project.city))
   : null;
+
+// La ville du chantier est-elle géocodée ? (carte de localisation)
+let geocoded = false;
+try {
+  const allMarkers = await getCityMarkers();
+  geocoded = !!(project.city && allMarkers.some((m: { city: string }) => slugify(m.city) === slugify(project.city)));
+} catch {}
 
 const slides = (project.images?.length ? project.images : [{ imageUrl: project.imageUrl, alt: project.title }])
   .filter((i: { imageUrl?: string }) => i.imageUrl)
@@ -97,6 +105,13 @@ const jsonLd = [{
           {project.description && <div class="article-content" set:html={project.description} />}
         </div>
       </div>
+
+      {geocoded && (
+        <section class="project-localisation">
+          <h2 class="loc-title"><Icon name="pin" size={16} /> Chantier à {project.city}</h2>
+          <CityMap focusCity={project.city} height="300px" />
+        </section>
+      )}
 
       <footer class="article-footer">
         <a href={`${base}realisations/`} class="btn btn-secondary"><Icon name="arrow-left" size={15} /> Toutes nos réalisations</a>
@@ -175,6 +190,20 @@ const jsonLd = [{
     color: var(--color-text-muted);
     margin-top: 0;
     line-height: var(--leading-relaxed);
+  }
+
+  .project-localisation {
+    margin-bottom: var(--space-8);
+  }
+
+  .loc-title {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: var(--text-lg, 1.1rem);
+    font-weight: 700;
+    margin: 0 0 var(--space-4);
+    color: var(--forest, inherit);
   }
 
   .article-footer {

@@ -6,10 +6,15 @@ import { getSite } from '../lib/site.js';
 export interface Props {
   pages?: CityPage[];
   height?: string;
+  focusCity?: string; // mode « localisation » : un seul marqueur centré
 }
 
-const { pages, height = '420px' } = Astro.props;
+const { pages, height = '420px', focusCity } = Astro.props;
 const base = import.meta.env.BASE_URL;
+
+const slugify = (s: string) =>
+  s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
 // Marqueurs : toutes les villes publiées géocodées — les pages encore
 // programmées apparaissent sur la carte sans lien (zone réelle d'intervention)
@@ -25,9 +30,15 @@ if (!markers.length && pages?.length) {
 }
 markers = markers.map((m) => ({ ...m, url: m.url ? `${base}${m.url.replace(/^\/+/, '')}` : null }));
 
+// Mode focus : ne garder que la ville demandée (page réalisation)
+if (focusCity) {
+  const wanted = slugify(focusCity);
+  markers = markers.filter((m) => slugify(m.city) === wanted);
+}
+
 // Zone d'intervention : cercle centré sur la ville de l'entreprise (Thiers)
 const { settings } = await getSite();
-const radiusKm = Number(String(settings.contact.serviceArea || '').replace(/[^\d]/g, '')) || 0;
+const radiusKm = focusCity ? 0 : Number(String(settings.contact.serviceArea || '').replace(/[^\d]/g, '')) || 0;
 const home = markers.find((m) => m.city?.toLowerCase() === 'thiers') || { lat: 45.8567, lng: 3.5489 };
 const zone = radiusKm ? { lat: home.lat, lng: home.lng, radius: radiusKm * 1000 } : null;
 ---
@@ -96,7 +107,8 @@ const zone = radiusKm ? { lat: home.lat, lng: home.lng, radius: radiusKm * 1000 
       if (zone && zone.radius) {
         // LatLng.toBounds : bounds sans avoir besoin d'une carte (Circle.getBounds exige _map)
         map.fitBounds(L.latLng(zone.lat, zone.lng).toBounds(zone.radius * 2));
-      } else if (bounds.length) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
+      } else if (bounds.length === 1) map.setView(bounds[0], 13);
+      else if (bounds.length) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
       else map.setView([45.8567, 3.5489], 9);
       // Navigation SPA : la carte peut être init avant que son conteneur
       // ait sa taille finale → recalcul différé pour forcer le chargement
