@@ -47,7 +47,7 @@
 
   /* Typography */
   --font-heading: var(--font-poppins), 'Poppins', system-ui, sans-serif;
-  --font-accent: var(--font-lobster), 'Lobster', 'Brush Script MT', cursive;
+  --font-accent: var(--font-fraunces), 'Fraunces', Georgia, serif;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
