@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { eq, asc, and, like } from 'drizzle-orm';
+import { eq, asc, like } from 'drizzle-orm';
 import { db } from '../db.js';
 import { cityPages, categories, services, seoMeta } from '../db/schema.js';
 import { nextSlot } from './schedule.js';
@@ -174,11 +174,21 @@ export async function ensureCityPage(city, categoryId) {
   const name = city?.trim();
   const slug = name ? slugify(name) : '';
   if (!slug) return;
-  const svc = await resolveService(categoryId);
+  // Une seule page par ville : l'espace combiné /clotures-portails/ regroupe
+  // les prestations extérieures (anti doorway pages). Fallback sur le service
+  // résolu si le service combiné n'existe pas.
+  const [combined] = await db.select().from(services).where(eq(services.slug, 'clotures-portails'));
+  const svc = combined ?? await resolveService(categoryId);
   if (!svc?.slug) return;
   const exists = await db.select({ id: cityPages.id }).from(cityPages)
-    .where(and(eq(cityPages.serviceSlug, svc.slug), eq(cityPages.slug, slug)));
+    .where(eq(cityPages.slug, slug));
   if (exists.length) return;
+  // Libellé élargi aux terrassements quand la réalisation déclenchante en est une
+  let label = svc.title;
+  if (combined && categoryId) {
+    const [cat] = await db.select().from(categories).where(eq(categories.id, categoryId));
+    if (cat?.slug === 'terrassements') label = 'Clôtures, portails & terrassements';
+  }
   const [info, geo] = await Promise.all([fetchCityInfo(name), fetchCityGeo(name)]);
   const imageUrl = info.image ? await downloadCityImage(info.image, svc.slug, slug) : null;
   // Entre dans la file de publication si la planification est activée,
@@ -188,8 +198,8 @@ export async function ensureCityPage(city, categoryId) {
     slug,
     city: name,
     serviceSlug: svc.slug,
-    title: `${svc.title} à ${name}`,
-    content: buildCityContent({ city: name, serviceTitle: svc.title, extract: info.extract, wikiUrl: info.wikiUrl, geo }),
+    title: `${label} à ${name}`,
+    content: buildCityContent({ city: name, serviceTitle: label, extract: info.extract, wikiUrl: info.wikiUrl, geo }),
     lat: info.lat,
     lng: info.lng,
     imageUrl,
@@ -202,8 +212,8 @@ export async function ensureCityPage(city, categoryId) {
   await db.insert(seoMeta).values({
     entityType: 'city_page',
     entityId: id,
-    metaTitle: `${svc.title} à ${name}${pc} — Devis gratuit`,
-    metaDesc: `Pépito Services réalise vos travaux de ${svc.title.toLowerCase()} à ${name}${pc} et alentours. Devis gratuit, visite technique sur place.`,
+    metaTitle: `${label} à ${name}${pc} — Devis gratuit`,
+    metaDesc: `Pépito Services réalise vos travaux de ${label.toLowerCase()} à ${name}${pc} et alentours. Devis gratuit, visite technique sur place.`,
   });
   console.log(`[citygen] brouillon créé : /${svc.slug}/${slug}/`);
 }

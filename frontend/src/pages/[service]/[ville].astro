@@ -68,7 +68,9 @@ const pageImage = page.imageUrl
   : undefined;
 
 // ── SEO local : fil d'Ariane + données structurées ──────────
-const svc = (services as { slug: string; title: string }[]).find((s) => s.slug === page.serviceSlug);
+// Service inactif (espace combiné /clotures-portails/) : titre déduit du titre de page
+const svc = (services as { slug: string; title: string }[]).find((s) => s.slug === page.serviceSlug)
+  ?? { slug: page.serviceSlug, title: page.title.split(' à ')[0] };
 const siteUrl = settings.siteUrl.replace(/\/$/, '');
 const pageUrl = `${siteUrl}/${page.serviceSlug}/${page.slug}/`;
 const serviceUrl = `${siteUrl}/#services`;

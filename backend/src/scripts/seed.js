@@ -209,10 +209,19 @@ async function main() {
       imageUrl: '/uploads/515879492_1171006688374879_4729343418322258480_n.jpg',
       sortOrder: 2,
     },
+    // Service virtuel : espace URL combiné des pages villes (inactif — hors nav)
+    {
+      slug: 'clotures-portails',
+      title: 'Clôtures & portails',
+      summary: 'Pose de clôtures, palissades, portails et portillons.',
+      description: 'Ensemble des prestations d’aménagement extérieur : clôtures, palissades, portails et portillons.',
+      sortOrder: 99,
+      active: false,
+    },
   ];
   for (const s of srvcs) {
     const [found] = await db.select().from(services).where(eq(services.slug, s.slug));
-    if (!found) await db.insert(services).values({ ...s, confirmed: true, provisional: true });
+    if (!found) await db.insert(services).values({ active: true, ...s, confirmed: true, provisional: true });
   }
   console.log('Services OK.');
 

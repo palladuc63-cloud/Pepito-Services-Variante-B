@@ -14,7 +14,8 @@ const base = import.meta.env.BASE_URL;
 const byService = new Map<string, { title: string; pages: CityPage[] }>();
 for (const c of cityPages as CityPage[]) {
   const g = byService.get(c.serviceSlug) ?? {
-    title: (services as { slug: string; title: string }[]).find((s) => s.slug === c.serviceSlug)?.title ?? c.serviceSlug,
+    title: (services as { slug: string; title: string }[]).find((s) => s.slug === c.serviceSlug)?.title
+      ?? c.title?.split(' à ')[0] ?? c.serviceSlug,
     pages: [] as CityPage[],
   };
   g.pages.push(c);
