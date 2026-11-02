@@ -49,6 +49,10 @@ const base = import.meta.env.BASE_URL;
         <section id="tab-overview">
           <div id="overview-stats" class="stat-grid"></div>
           <div class="card" style="margin-bottom:16px">
+            <h2 style="margin:0 0 12px">📩 Derniers messages</h2>
+            <div id="overview-messages"></div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
               <h2 style="margin:0">📈 Statistiques de visite</h2>
               <div style="display:flex;gap:6px">
@@ -64,16 +68,6 @@ const base = import.meta.env.BASE_URL;
             <div class="grid-2">
               <div id="analytics-pages"></div>
               <div id="analytics-refs"></div>
-            </div>
-          </div>
-          <div class="grid-2">
-            <div class="card">
-              <h2 style="margin:0 0 12px">📅 Publications programmées</h2>
-              <div id="overview-scheduled"></div>
-            </div>
-            <div class="card">
-              <h2 style="margin:0 0 12px">📩 Derniers messages</h2>
-              <div id="overview-messages"></div>
             </div>
           </div>
           <div class="card" style="margin-top:16px">
@@ -378,22 +372,19 @@ const base = import.meta.env.BASE_URL;
 
   // ══════════ VUE D'ENSEMBLE ══════════
   loaders.overview = async () => {
-    const [projects, articles, citypages, messages, social] = await Promise.all([
+    const [projects, articles, citypages, messages] = await Promise.all([
       api.get('/api/admin/projects'), api.get('/api/admin/articles'),
       api.get('/api/admin/city-pages'), api.get('/api/admin/messages'),
-      api.get('/api/admin/social-posts').catch(() => ({ posts: [] })),
     ]);
     window._projects = projects;
     window._articles = articles;
     window._citypages = citypages;
-    const posts = social.posts ?? [];
     const now = Date.now(), D = 864e5;
 
     // ── Cartes stats ──
     const stat = (num, label, warn = false) =>
       `<div class="stat-card${warn ? ' warn' : ''}"><strong>${num}</strong><span>${label}</span></div>`;
     const unread = messages.filter((m) => !m.isRead).length;
-    const fbDrafts = posts.filter((p) => p.status === 'draft').length;
     const scheduled = [
       ...projects.map((p) => ({ ...p, _type: 'Réalisation', _at: p.publishedAt })),
       ...articles.map((a) => ({ ...a, _type: 'Article', _at: a.publishedAt })),
@@ -404,17 +395,8 @@ const base = import.meta.env.BASE_URL;
       stat(projects.filter((p) => p.published).length, 'réalisations publiées'),
       stat(articles.filter((a) => a.published).length, 'articles publiés'),
       stat(citypages.filter((c) => c.published).length, 'pages villes publiées'),
-      stat(scheduled.length, 'publications programmées'),
       stat(unread, 'messages non lus', unread > 0),
-      stat(fbDrafts, 'posts FB en brouillon', fbDrafts > 0),
     ].join('');
-
-    // ── Prochaines publications ──
-    $('#overview-scheduled').innerHTML = scheduled.length
-      ? `<ul class="ov-list">${scheduled.slice(0, 8).map((e) => `
-          <li><span class="tag-pill">${esc(e._type)}</span> ${esc(e.title ?? e.city)}
-            <time>${new Date(e._at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</time></li>`).join('')}</ul>`
-      : '<p style="color:var(--muted);margin:0">Rien de programmé — planifie une sortie pour entretenir le rythme SEO.</p>';
 
     // ── Derniers messages ──
     $('#overview-messages').innerHTML = messages.length
