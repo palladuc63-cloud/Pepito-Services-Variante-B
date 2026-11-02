@@ -381,3 +381,33 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .cal-legend { gap: 8px; font-size: 11px; }
   .hide-mobile { display: none !important; }
 }
+
+/* Slides du hero (onglet Accueil) */
+.slide-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border, #e5e1da);
+}
+.slide-row:last-child { border-bottom: none; }
+.slide-thumb {
+  width: 96px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.slide-thumb--empty {
+  display: grid;
+  place-items: center;
+  background: var(--surface-alt, #f0ede8);
+  font-size: 20px;
+}
+.slide-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.slide-info strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slide-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 800px) {
+  .slide-row { flex-wrap: wrap; }
+  .slide-actions { width: 100%; justify-content: flex-start; }
+}

@@ -20,6 +20,7 @@ const base = import.meta.env.BASE_URL;
           <img class="admin-logo" src={`${base}pepito-logo-white.svg`} alt="Pépito Services — clôtures et portails" width="553" height="256" />
         </a>
         <button class="admin-nav-link active" data-tab="overview">📊 Vue d'ensemble</button>
+        <button class="admin-nav-link" data-tab="home">🏠 Accueil</button>
         <button class="admin-nav-link" data-tab="messages">📩 Messages</button>
         <button class="admin-nav-link" data-tab="prospects">📇 Prospects</button>
         <button class="admin-nav-link" data-tab="projects">🚧 Réalisations</button>
@@ -84,6 +85,21 @@ const base = import.meta.env.BASE_URL;
               <span><i class="dot" style="background:#fbbf24"></i>Page ville</span>
               <span><i class="dot dot-sched"></i>Programmé</span>
             </div>
+          </div>
+        </section>
+
+        <!-- ACCUEIL — slides du hero -->
+        <section id="tab-home" hidden>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <h2 style="margin:0">Slides du hero</h2>
+              <button class="btn btn-primary btn-sm" id="btn-new-slide">+ Nouvelle slide</button>
+            </div>
+            <p class="form-hint" style="margin-top:0">
+              Image libre ou réalisation liée. Titre et sous-titre vides = textes globaux des Paramètres.
+              Sans aucune slide active, le hero affiche les 6 premières réalisations.
+            </p>
+            <div id="slides-list"></div>
           </div>
         </section>
 
@@ -333,6 +349,7 @@ const base = import.meta.env.BASE_URL;
     prospects: ['Prospects', 'Contacts à relancer (formulaire, chatbot, téléphone)'],
     social: ['Réseaux sociaux', 'Posts Facebook générés automatiquement'],
     overview: ["Vue d'ensemble", "L'essentiel du site en un coup d'œil"],
+    home: ['Accueil', 'Slides du diaporama de la page d\u2019accueil'],
     seo: ['SEO / Redirections', 'Overrides meta et redirections 301/302'],
     settings: ['Paramètres', 'Coordonnées et contenus du site'],
   };
@@ -638,6 +655,122 @@ const base = import.meta.env.BASE_URL;
     ogImage: $(`#${pfx}-og-image`).value.trim() || null,
   });
 
+  // ══════════ ACCUEIL (slides du hero) ══════════
+  let slidesList = [];
+  loaders.home = async () => {
+    slidesList = await api.get('/api/admin/slides');
+    const el = $('#slides-list');
+    if (!slidesList.length) {
+      el.innerHTML = '<p class="form-hint">Aucune slide — le hero affiche les 6 premières réalisations publiées.</p>';
+      return;
+    }
+    el.innerHTML = slidesList.map((s, i) => {
+      const img = s.imageUrl || s.projectImageUrl || '';
+      const meta = [
+        s.projectTitle ? `→ ${s.projectTitle}` : '',
+        s.linkUrl || '',
+        s.active ? '' : 'masquée',
+      ].filter(Boolean).join(' · ');
+      return `
+      <div class="slide-row" data-id="${s.id}">
+        ${img ? `<img class="slide-thumb" src="${esc(img)}" alt="" loading="lazy" />` : '<div class="slide-thumb slide-thumb--empty">🖼️</div>'}
+        <div class="slide-info">
+          <strong>${esc(s.title || s.projectTitle || '— sans titre (textes globaux)')}</strong>
+          <span class="form-hint">${esc(s.subtitle || '')}${s.subtitle && meta ? ' · ' : ''}${esc(meta)}</span>
+        </div>
+        <div class="slide-actions">
+          <label class="form-hint" title="Visible sur le site"><input type="checkbox" data-slide-active="${s.id}" ${s.active ? 'checked' : ''} /> Visible</label>
+          <button class="btn btn-sm" data-slide-move="${s.id}|-1" ${i === 0 ? 'disabled' : ''} aria-label="Monter">↑</button>
+          <button class="btn btn-sm" data-slide-move="${s.id}|1" ${i === slidesList.length - 1 ? 'disabled' : ''} aria-label="Descendre">↓</button>
+          <button class="btn btn-sm" data-slide-edit="${s.id}">Éditer</button>
+          <button class="btn btn-sm btn-danger" data-slide-del="${s.id}">Suppr.</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    el.querySelectorAll('[data-slide-active]').forEach((c) => c.addEventListener('change', async () => {
+      await api.put(`/api/admin/slides/${c.dataset.slideActive}`, { active: c.checked });
+      loaders.home();
+    }));
+    el.querySelectorAll('[data-slide-move]').forEach((b) => b.addEventListener('click', async () => {
+      const [id, dir] = b.dataset.slideMove.split('|');
+      const i = slidesList.findIndex((x) => String(x.id) === id);
+      const j = i + Number(dir);
+      if (i < 0 || j < 0 || j >= slidesList.length) return;
+      const a = slidesList[i], t = slidesList[j];
+      await Promise.all([
+        api.put(`/api/admin/slides/${a.id}`, { sortOrder: t.sortOrder }),
+        api.put(`/api/admin/slides/${t.id}`, { sortOrder: a.sortOrder }),
+      ]);
+      loaders.home();
+    }));
+    el.querySelectorAll('[data-slide-edit]').forEach((b) => b.addEventListener('click', () => editSlide(Number(b.dataset.slideEdit))));
+    el.querySelectorAll('[data-slide-del]').forEach((b) => b.addEventListener('click', async () => {
+      if (!confirm('Supprimer cette slide ?')) return;
+      await api.del(`/api/admin/slides/${b.dataset.slideDel}`);
+      loaders.home();
+    }));
+  };
+
+  function slideForm(s, projects) {
+    return `
+      <div class="form-row">
+        <label class="form-label">Image (sinon = couverture de la réalisation liée)</label>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" id="s-image" value="${esc(s?.imageUrl ?? '')}" placeholder="/uploads/…" />
+          <label class="btn btn-sm" style="white-space:nowrap">📁<input type="file" id="s-image-file" accept="image/*" hidden /></label>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Réalisation liée (optionnel — image + bouton vers sa page)</label>
+        <select class="form-input" id="s-project">
+          <option value="">— Aucune —</option>
+          ${projects.map((p) => `<option value="${p.id}" ${s?.projectId === p.id ? 'selected' : ''}>${esc(p.title)}${p.published ? '' : ' (brouillon)'}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-row cols-2">
+        <div><label class="form-label">Titre (optionnel)</label><input class="form-input" id="s-title" value="${esc(s?.title ?? '')}" placeholder="${esc('Nom du site par défaut')}" /></div>
+        <div><label class="form-label">Sous-titre (optionnel)</label><input class="form-input" id="s-subtitle" value="${esc(s?.subtitle ?? '')}" placeholder="Baseline par défaut" /></div>
+      </div>
+      <div class="form-row cols-2">
+        <div><label class="form-label">Lien du bouton (optionnel)</label><input class="form-input" id="s-link" value="${esc(s?.linkUrl ?? '')}" placeholder="/realisations/…" /></div>
+        <div><label class="form-label">Texte du bouton</label><input class="form-input" id="s-linklabel" value="${esc(s?.linkLabel ?? '')}" placeholder="Découvrir" /></div>
+      </div>`;
+  }
+
+  async function saveSlide(id) {
+    const body = {
+      title: $('#s-title').value.trim() || null,
+      subtitle: $('#s-subtitle').value.trim() || null,
+      imageUrl: $('#s-image').value.trim() || null,
+      projectId: $('#s-project').value ? Number($('#s-project').value) : null,
+      linkUrl: $('#s-link').value.trim() || null,
+      linkLabel: $('#s-linklabel').value.trim() || null,
+    };
+    if (!body.imageUrl && !body.projectId) return showAlert('Choisis une image ou une réalisation liée.', false);
+    if (id) await api.put(`/api/admin/slides/${id}`, body);
+    else await api.post('/api/admin/slides', body);
+    backdrop.style.display = 'none';
+    showAlert(id ? 'Slide mise à jour.' : 'Slide créée.');
+    loaders.home();
+  }
+
+  async function slideProjects() {
+    if (!window._projects?.length) window._projects = await api.get('/api/admin/projects');
+    return window._projects;
+  }
+
+  async function editSlide(id) {
+    const s = slidesList.find((x) => x.id === id);
+    openModal('Éditer la slide', slideForm(s, await slideProjects()), () => saveSlide(id));
+    bindUpload('s-image');
+  }
+
+  $('#btn-new-slide').addEventListener('click', async () => {
+    openModal('Nouvelle slide', slideForm(null, await slideProjects()), () => saveSlide(null));
+    bindUpload('s-image');
+  });
+
   // ══════════ RÉALISATIONS ══════════
   let categories = [];
   loaders.categories = async () => {
@@ -679,7 +812,7 @@ const base = import.meta.env.BASE_URL;
         <td>${esc(p.category?.label ?? '—')}</td>
         <td>${statusBadge(p)}</td>
         <td style="text-align:right;white-space:nowrap">
-          <a class="btn btn-sm btn-link" href="\${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
+          <a class="btn btn-sm btn-link" href="${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
           <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
           <button class="btn btn-sm btn-danger" data-proj-del="${p.id}">✕</button>
         </td>
@@ -690,7 +823,7 @@ const base = import.meta.env.BASE_URL;
        <div class="item-card-meta"><span class="tag-pill">${esc(p.category?.label ?? '—')}</span>
          ${p.city ? `<span class="tag-pill">📍 ${esc(p.city)}</span>` : ''}
          ${statusBadge(p)}</div>`,
-      `<a class="btn btn-sm btn-link" href="\${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
+      `<a class="btn btn-sm btn-link" href="${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
        <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
        <button class="btn btn-sm btn-danger" data-proj-del="${p.id}">✕</button>`)).join('')
       : '<p style="color:var(--muted);margin:0">Aucune réalisation.</p>';
@@ -827,7 +960,7 @@ const base = import.meta.env.BASE_URL;
         <td>${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('fr-FR') : '—'}</td>
         <td>${statusBadge(a)}</td>
         <td style="text-align:right;white-space:nowrap">
-          <a class="btn btn-sm btn-link" href="\${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
+          <a class="btn btn-sm btn-link" href="${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
           <button class="btn btn-sm" data-art-edit="${a.id}">Éditer</button>
           <button class="btn btn-sm btn-danger" data-art-del="${a.id}">✕</button>
         </td>
@@ -837,7 +970,7 @@ const base = import.meta.env.BASE_URL;
        <span class="muted">/${esc(a.slug)}/</span>
        <div class="item-card-meta"><span class="tag-pill">${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('fr-FR') : '—'}</span>
          ${statusBadge(a)}</div>`,
-      `<a class="btn btn-sm btn-link" href="\${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
+      `<a class="btn btn-sm btn-link" href="${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
        <button class="btn btn-sm" data-art-edit="${a.id}">Éditer</button>
        <button class="btn btn-sm btn-danger" data-art-del="${a.id}">✕</button>`)).join('')
       : '<p style="color:var(--muted);margin:0">Aucun article.</p>';
@@ -955,7 +1088,7 @@ const base = import.meta.env.BASE_URL;
         <td>${statusBadge(c)}</td>
         <td style="text-align:right;white-space:nowrap">
           ${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
-          <a class="btn btn-sm btn-link" href="\${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
+          <a class="btn btn-sm btn-link" href="${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
           <button class="btn btn-sm" data-city-edit="${c.id}">Éditer</button>
           <button class="btn btn-sm btn-danger" data-city-del="${c.id}">✕</button>
         </td>
@@ -966,7 +1099,7 @@ const base = import.meta.env.BASE_URL;
        <div class="item-card-meta">${c.auto ? '<span class="tag-pill">Auto</span>' : ''}
          ${statusBadge(c)}</div>`,
       `${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
-       <a class="btn btn-sm btn-link" href="\${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
+       <a class="btn btn-sm btn-link" href="${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
        <button class="btn btn-sm" data-city-edit="${c.id}">Éditer</button>
        <button class="btn btn-sm btn-danger" data-city-del="${c.id}">✕</button>`)).join('')
       : '<p style="color:var(--muted);margin:0">Aucune page ville pour l’instant.</p>';

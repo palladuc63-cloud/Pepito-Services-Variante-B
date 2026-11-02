@@ -59,6 +59,21 @@ export interface ProjectImage {
   sortOrder: number;
 }
 
+export interface Slide {
+  id: number;
+  title: string | null;
+  subtitle: string | null;
+  imageUrl: string | null;
+  projectId: number | null;
+  linkUrl: string | null;
+  linkLabel: string | null;
+  sortOrder: number;
+  active: boolean;
+  /** Renseignés par l'API quand la slide pointe vers une réalisation publiée. */
+  projectSlug?: string | null;
+  projectTitle?: string | null;
+}
+
 export interface SeoMeta {
   id: number;
   entityType: 'page' | 'project' | 'article' | 'city_page' | 'service';

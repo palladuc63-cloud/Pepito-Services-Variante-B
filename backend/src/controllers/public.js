@@ -2,7 +2,7 @@ import { eq, asc, desc, and, or, isNull, lte } from 'drizzle-orm';
 import { db } from '../db.js';
 import {
   settings, categories, services, projects, articles, messages, projectImages,
-  cityPages, seoMeta, redirects,
+  cityPages, seoMeta, redirects, slides,
 } from '../db/schema.js';
 import { notify } from '../utils/notify.js';
 import { sendMail } from '../utils/mailer.js';
@@ -27,12 +27,29 @@ const live = (col) => or(isNull(col), lte(col, new Date()));
 // GET /api/public/content — tout ce dont le frontend a besoin pour le layout + homepage
 export async function getContent(_req, res) {
   try {
-    const [settingsMap, cats, srvcs] = await Promise.all([
+    const [settingsMap, cats, srvcs, slideRows] = await Promise.all([
       getSettingsMap(),
       db.select().from(categories).where(eq(categories.active, true)).orderBy(asc(categories.sortOrder)),
       db.select().from(services).where(eq(services.active, true)).orderBy(asc(services.sortOrder)),
+      db.select({ slide: slides, project: projects })
+        .from(slides)
+        .leftJoin(projects, eq(slides.projectId, projects.id))
+        .where(eq(slides.active, true))
+        .orderBy(asc(slides.sortOrder), asc(slides.id)),
     ]);
-    res.json({ settings: settingsMap, categories: cats, services: srvcs });
+    // Le projet lié n'est exploité que s'il est publié (cover + lien) ;
+    // sinon la slide retombe sur sa propre image, sans lien vers la réa.
+    const now = new Date();
+    const slidesOut = slideRows.map(({ slide, project }) => {
+      const liveProject = project?.published && (!project.publishedAt || project.publishedAt <= now) ? project : null;
+      return {
+        ...slide,
+        imageUrl: slide.imageUrl || liveProject?.imageUrl || null,
+        projectSlug: liveProject?.slug || null,
+        projectTitle: liveProject?.title || null,
+      };
+    });
+    res.json({ settings: settingsMap, categories: cats, services: srvcs, slides: slidesOut });
   } catch (err) {
     console.error('GET /public/content:', err.message);
     res.status(500).json({ error: 'Erreur serveur' });

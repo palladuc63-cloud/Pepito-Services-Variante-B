@@ -4,7 +4,7 @@ import { categoryIcon } from './icons.ts';
 // Transforme le contenu API (clé/valeur + catégories) en objet "settings"
 // compatible avec les composants existants.
 export async function getSite() {
-  const { settings: s, categories, services } = await getContent();
+  const { settings: s, categories, services, slides } = await getContent();
 
   const socials = [];
   if (s.facebook_url) socials.push({ name: 'Facebook', url: s.facebook_url });
@@ -31,6 +31,7 @@ export async function getSite() {
   return {
     categories,
     services,
+    slides: slides || [],
     settings: {
       name: s.site_name || 'Pépito Services',
       baseline: s.baseline || '',

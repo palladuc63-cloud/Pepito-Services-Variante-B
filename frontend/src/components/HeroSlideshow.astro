@@ -1,17 +1,37 @@
 ---
-import type { Project, SiteSettings } from '../data/types';
+import type { Project, SiteSettings, Slide } from '../data/types';
 
 export interface Props {
   settings: SiteSettings;
   projects: Project[];
+  slides?: Slide[];
 }
-const { settings, projects } = Astro.props;
+const { settings, projects, slides: dbSlides = [] } = Astro.props;
 const base = import.meta.env.BASE_URL;
 
-const slides = projects.slice(0, 6).map((project) => ({
-  image: project.imageUrl,
-  alt: `Réalisation Pépito Services — ${project.title} (contenu à valider)`,
-})).filter((s) => s.image);
+// Slides gérées dans le BO (image libre ou réalisation liée, texte optionnel).
+// Sans slide active → repli sur les 6 premières réalisations publiées.
+const managed = dbSlides
+  .filter((s) => s.imageUrl)
+  .map((s) => ({
+    image: s.imageUrl,
+    alt: s.title || s.projectTitle || `Réalisation ${settings.name}`,
+    title: s.title || null,
+    subtitle: s.subtitle || null,
+    linkUrl: s.linkUrl || (s.projectSlug ? `${base}realisations/${s.projectSlug}/` : null),
+    linkLabel: s.linkLabel || (s.linkUrl ? 'Découvrir' : 'Voir la réalisation'),
+  }));
+
+const slides = managed.length
+  ? managed
+  : projects.slice(0, 6).map((project) => ({
+      image: project.imageUrl,
+      alt: `Réalisation ${settings.name} — ${project.title}`,
+      title: null,
+      subtitle: null,
+      linkUrl: null,
+      linkLabel: null,
+    })).filter((s) => s.image);
 ---
 
 <section
@@ -42,14 +62,33 @@ const slides = projects.slice(0, 6).map((project) => ({
 
   <div class="slideshow-overlay" aria-hidden="true"></div>
 
-  <div class="container hero-content">
-    <h1 id="hero-title" class="hero-title">{settings.name}</h1>
-    <p class="hero-baseline">{settings.baseline}</p>
-    <p class="hero-description">{settings.description}</p>
-    <div class="hero-actions">
-      <a href={`${base}contact/`} class="btn btn-primary">Demander un chiffrage</a>
-      <a href={`${base}realisations/`} class="btn btn-secondary">Voir nos réalisations</a>
-    </div>
+  <div class="hero-content-stack">
+    {
+      slides.map((slide, index) => (
+        <div
+          class:list={['container hero-content', { 'is-active': index === 0 }]}
+          data-content
+          aria-hidden={index !== 0}
+        >
+          <h1 class="hero-title">{slide.title || settings.name}</h1>
+          <p class="hero-baseline">{slide.subtitle || settings.baseline}</p>
+          <p class="hero-description">{settings.description}</p>
+          <div class="hero-actions">
+            {slide.linkUrl ? (
+              <>
+                <a href={slide.linkUrl} class="btn btn-primary">{slide.linkLabel}</a>
+                <a href={`${base}contact/`} class="btn btn-secondary">Demander un chiffrage</a>
+              </>
+            ) : (
+              <>
+                <a href={`${base}contact/`} class="btn btn-primary">Demander un chiffrage</a>
+                <a href={`${base}realisations/`} class="btn btn-secondary">Voir nos réalisations</a>
+              </>
+            )}
+          </div>
+        </div>
+      ))
+    }
   </div>
 
   <div class="slideshow-controls">
@@ -98,6 +137,7 @@ const slides = projects.slice(0, 6).map((project) => ({
     slideshow.dataset.bound = '1';
 
     const slides = Array.from(slideshow.querySelectorAll('[data-slide]')) as HTMLElement[];
+    const contents = Array.from(slideshow.querySelectorAll('[data-content]')) as HTMLElement[];
     const dots = Array.from(slideshow.querySelectorAll('[data-dot]')) as HTMLElement[];
     const prevBtn = slideshow.querySelector('[data-prev]') as HTMLElement | null;
     const nextBtn = slideshow.querySelector('[data-next]') as HTMLElement | null;
@@ -119,6 +159,11 @@ const slides = projects.slice(0, 6).map((project) => ({
         const active = index === current;
         dot.classList.toggle('is-active', active);
         dot.setAttribute('aria-selected', String(active));
+      });
+      contents.forEach((el, index) => {
+        const active = index === current;
+        el.classList.toggle('is-active', active);
+        el.setAttribute('aria-hidden', String(!active));
       });
 
       const activeImg = slides[current]?.querySelector('img');
@@ -294,6 +339,28 @@ const slides = projects.slice(0, 6).map((project) => ({
     }
   }
 
+  .hero-content-stack {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    width: 100%;
+  }
+
+  .hero-content {
+    grid-area: 1 / 1;
+    width: 100%;
+    max-width: 65ch;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 900ms ease, visibility 0s linear 900ms;
+  }
+
+  .hero-content.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 900ms ease;
+  }
+
   .hero-content > * {
     animation: hero-in 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
   }
@@ -301,13 +368,6 @@ const slides = projects.slice(0, 6).map((project) => ({
   .hero-baseline { animation-delay: 80ms; }
   .hero-description { animation-delay: 160ms; }
   .hero-actions { animation-delay: 240ms; }
-
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    max-width: 65ch;
-  }
 
   .hero-title {
     font-size: clamp(2.75rem, 8vw, 4.75rem);

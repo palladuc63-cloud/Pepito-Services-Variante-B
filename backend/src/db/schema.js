@@ -50,6 +50,22 @@ export const projects = mysqlTable('projects', {
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
 });
 
+// Slides du hero de la page d'accueil. Image libre (image_url) ou
+// réalisation liée (project_id → cover + lien). Champs texte optionnels :
+// quand renseignés ils remplacent les textes globaux (settings).
+export const slides = mysqlTable('slides', {
+  id: serial('id').primaryKey(),
+  title: varchar('title', { length: 200 }),           // sinon settings.site_name
+  subtitle: varchar('subtitle', { length: 300 }),      // sinon settings.baseline
+  imageUrl: varchar('image_url', { length: 500 }),    // prioritaire sur la cover du projet lié
+  projectId: int('project_id').references(() => projects.id),
+  linkUrl: varchar('link_url', { length: 500 }),      // bouton CTA custom ; sinon page du projet lié
+  linkLabel: varchar('link_label', { length: 100 }),
+  sortOrder: int('sort_order').default(0).notNull(),
+  active: boolean('active').default(true).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Galerie photos d'une réalisation (couverture = sort_order 0)
 export const projectImages = mysqlTable('project_images', {
   id: serial('id').primaryKey(),

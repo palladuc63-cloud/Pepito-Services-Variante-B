@@ -17,6 +17,11 @@ router.post('/services', ctrl.createService);
 router.put('/services/:id', ctrl.updateService);
 router.delete('/services/:id', ctrl.deleteService);
 
+router.get('/slides', ctrl.listSlides);
+router.post('/slides', ctrl.createSlide);
+router.put('/slides/:id', ctrl.updateSlide);
+router.delete('/slides/:id', ctrl.deleteSlide);
+
 router.get('/projects', ctrl.listProjects);
 router.post('/projects', ctrl.createProject);
 router.put('/projects/:id', ctrl.updateProject);

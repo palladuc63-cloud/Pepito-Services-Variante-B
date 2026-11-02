@@ -2,7 +2,7 @@ import { eq, asc, desc, and } from 'drizzle-orm';
 import { db } from '../db.js';
 import {
   categories, services, projects, articles, messages, settings,
-  projectImages, cityPages, seoMeta, redirects, prospects,
+  projectImages, cityPages, seoMeta, redirects, prospects, slides,
 } from '../db/schema.js';
 import { slugify } from '../utils/slug.js';
 import { ensureCityPage, fetchCityInfo } from '../utils/citygen.js';
@@ -49,6 +49,49 @@ export async function updateCategory(req, res) {
 
 export async function deleteCategory(req, res) {
   await db.delete(categories).where(eq(categories.id, Number(req.params.id)));
+  res.json({ status: 'ok' });
+}
+
+// ─── Slides (hero accueil) ───────────────────────────────────
+export const listSlides = async (_req, res) => {
+  const rows = await db
+    .select({ slide: slides, project: projects })
+    .from(slides)
+    .leftJoin(projects, eq(slides.projectId, projects.id))
+    .orderBy(asc(slides.sortOrder), asc(slides.id));
+  res.json(rows.map(({ slide, project }) => ({
+    ...slide,
+    projectTitle: project?.title || null,
+    projectImageUrl: project?.imageUrl || null,
+  })));
+};
+
+const slideFields = (b) => ({
+  title: b.title || null,
+  subtitle: b.subtitle || null,
+  imageUrl: b.imageUrl || null,
+  projectId: b.projectId || null,
+  linkUrl: b.linkUrl || null,
+  linkLabel: b.linkLabel || null,
+  ...(b.sortOrder !== undefined && { sortOrder: b.sortOrder }),
+  ...(b.active !== undefined && { active: b.active }),
+});
+
+export async function createSlide(req, res) {
+  const body = slideFields(req.body ?? {});
+  if (!body.imageUrl && !body.projectId) return res.status(400).json({ error: 'Image ou réalisation liée requise' });
+  const [last] = await db.select({ so: slides.sortOrder }).from(slides).orderBy(desc(slides.sortOrder)).limit(1);
+  const [r] = await db.insert(slides).values({ ...body, sortOrder: (last?.so ?? -1) + 1 }).$returningId();
+  res.status(201).json({ id: r.id });
+}
+
+export async function updateSlide(req, res) {
+  await db.update(slides).set(slideFields(req.body ?? {})).where(eq(slides.id, Number(req.params.id)));
+  res.json({ status: 'ok' });
+}
+
+export async function deleteSlide(req, res) {
+  await db.delete(slides).where(eq(slides.id, Number(req.params.id)));
   res.json({ status: 'ok' });
 }
 
