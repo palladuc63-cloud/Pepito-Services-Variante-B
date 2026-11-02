@@ -559,7 +559,7 @@ const base = import.meta.env.BASE_URL;
   });
 
   // ── Gardes-fous rythme de publication ──
-  // Règles SEO local : max ~2 pages villes/semaine, ~30 villes total,
+  // Règles SEO local : max ~2 pages villes/semaine, ~35 villes total,
   // 1-2 publications/mois minimum. Recalculé à chaque chargement d'onglet.
   function checkGuardrails() {
     const el = $('#guardrails');
@@ -585,7 +585,7 @@ const base = import.meta.env.BASE_URL;
     if (maxW > 2) warns.push(`${maxW} pages villes programmées la même semaine — maximum conseillé : 2/semaine.`);
     const liveCities = cps.filter((c) => c.published && !(c.publishedAt && new Date(c.publishedAt) > now)).length;
     const schedCities = cps.filter((c) => c.publishedAt && new Date(c.publishedAt) > now).length;
-    if (liveCities + schedCities > 30) warns.push(`${liveCities + schedCities} pages villes au total (${liveCities} en ligne, ${schedCities} programmées) — plafond recommandé ~30 (risque « doorway pages »).`);
+    if (liveCities + schedCities > 35) warns.push(`${liveCities + schedCities} pages villes au total (${liveCities} en ligne, ${schedCities} programmées) — plafond recommandé ~35 (risque « doorway pages »).`);
     const scheduled30 = scheduled.filter((e) => new Date(e.publishedAt) <= now + 30 * D).length;
     if (scheduled30 > 15) warns.push(`${scheduled30} publications sur les 30 prochains jours (>3/semaine) — ralentis le rythme.`);
 
