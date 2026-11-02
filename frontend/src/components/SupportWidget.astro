@@ -175,8 +175,11 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
       if (r.tab) tabLink(r.tab);
       chip('Signaler un problème', () => showEscalate(message));
     } else {
-      bubble('assistant', 'Je n\'ai pas de réponse certaine — ma base ne couvre que l\'utilisation du back-office. Une piste éventuelle, sinon je transmets à votre prestataire :');
-      for (const s of r.suggestions || []) {
+      const sugg = r.suggestions || [];
+      bubble('assistant', sugg.length
+        ? 'Je n\'ai pas de réponse certaine — une de ces pistes peut convenir :'
+        : 'Ça sort de mon périmètre — je ne réponds qu\'aux questions d\'utilisation du back-office. Je peux transmettre votre demande à votre prestataire :');
+      for (const s of sugg) {
         chip(s.title, () => {
           bubble('assistant', s.answer);
           clearActions();

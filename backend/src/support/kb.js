@@ -25,8 +25,8 @@ export const KB = [
   {
     id: 'messages',
     title: 'Lire et répondre aux messages',
-    keywords: ['message', 'messages', 'contact', 'demande', 'répondre', 'mail', 'formulaire', 'devis'],
-    phrases: ['répondre à un message', 'message de contact', 'demande de devis', 'messages non lus'],
+    keywords: ['message', 'messages', 'contact', 'demande', 'répondre', 'mail', 'email', 'courriel', 'formulaire', 'devis', 'client'],
+    phrases: ['répondre à un message', 'répondre à un email', 'répondre à un mail', 'répondre à un client', 'un client m\'a écrit', 'message de contact', 'demande de devis', 'messages non lus'],
     answer: 'Onglet « 📩 Messages » : toutes les demandes arrivent ici (formulaire, chatbot, rappel téléphonique). Cliquez sur un message pour y répondre par email en un clic — il est ensuite marqué « Répondu ».',
     tab: 'messages',
   },
