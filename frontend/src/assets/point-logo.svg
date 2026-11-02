@@ -1,0 +1,9 @@
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="POINT">
+  <defs>
+    <mask id="cutout-point">
+      <rect width="300" height="300" fill="#fff"/>
+      <text x="150" y="176" text-anchor="middle" font-size="72" fill="#000" font-family="Anton, sans-serif">POINT</text>
+    </mask>
+  </defs>
+  <circle cx="150" cy="150" r="140" fill="#f5f2ea" mask="url(#cutout-point)"/>
+</svg>

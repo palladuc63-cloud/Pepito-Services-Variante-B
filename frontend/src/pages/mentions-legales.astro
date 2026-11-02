@@ -1,7 +1,10 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
 import Section from '../components/Section.astro';
-import ContentBadge from '../components/ContentBadge.astro';
+import { getSite } from '../lib/site.js';
+import pointLogo from '../assets/point-logo.svg';
+
+const { settings } = await getSite();
 ---
 
 <MainLayout
@@ -13,50 +16,71 @@ import ContentBadge from '../components/ContentBadge.astro';
   <Section>
     <div class="page-header">
       <h1 class="section-title">Mentions légales</h1>
-      <p class="section-subtitle">
-        Les informations légales ci-dessous sont en attente de validation avec
-        l’entreprise.
-      </p>
-      <ContentBadge label="Mentions légales à valider avec l’entreprise" />
     </div>
 
     <div class="legal-content">
       <section class="legal-section">
         <h2>Éditeur du site</h2>
-        <p>Raison sociale : À valider avec l’entreprise</p>
-        <p>Forme juridique : À valider avec l’entreprise</p>
-        <p>Capital social : À valider avec l’entreprise</p>
-        <p>Numéro SIRET : À valider avec l’entreprise</p>
-        <p>RCS : À valider avec l’entreprise</p>
-        <p>Code APE : À valider avec l’entreprise</p>
-        <p>Adresse du siège social : À valider avec l’entreprise</p>
-        <p>Email de contact : À valider avec l’entreprise</p>
-        <p>Téléphone : À valider avec l’entreprise</p>
-        <p>Directeur de la publication : À valider avec l’entreprise</p>
+        <p>
+          Le site <strong>{settings.name}</strong> est édité par :<br />
+          <strong>Pépito Services — Sylvain Palladuc</strong><br />
+          Entrepreneur individuel<br />
+          Immatriculation en cours (numéro SIRET publié dès obtention)<br />
+          {settings.contact.address && <>Siège social : {settings.contact.address}<br /></>}
+          {settings.contact.phone && <>Téléphone : <a href={`tel:${settings.contact.phone.replace(/\s+/g, '')}`}>{settings.contact.phone}</a><br /></>}
+          {settings.contact.email && <>Email : <a href={`mailto:${settings.contact.email}`}>{settings.contact.email}</a><br /></>}
+          Directeur de la publication : Sylvain Palladuc
+        </p>
       </section>
 
       <section class="legal-section">
         <h2>Hébergement</h2>
-        <p>Nom de l’hébergeur : À valider avec l’entreprise</p>
-        <p>Adresse de l’hébergeur : À valider avec l’entreprise</p>
-        <p>Site web de l’hébergeur : À valider avec l’entreprise</p>
+        <p>
+          Ce site est hébergé par :<br />
+          <strong>OVHcloud</strong><br />
+          2 rue Kellermann, 59100 Roubaix, France<br />
+          <a href="https://www.ovhcloud.com" target="_blank" rel="noopener noreferrer">www.ovhcloud.com</a>
+        </p>
+        <p>
+          Les données du site sont hébergées sur un serveur situé en Union
+          européenne.
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Conception et réalisation</h2>
+        <p class="credit-line">
+          <img class="point-logo" src={pointLogo.src} alt="Logo POINT" width="28" height="28" loading="lazy" />
+          Site conçu et développé par <a href="https://agencepoint.fr" target="_blank" rel="noopener noreferrer"><strong>POINT</strong></a>
+        </p>
       </section>
 
       <section class="legal-section">
         <h2>Propriété intellectuelle</h2>
         <p>
-          L’ensemble des contenus (textes, images, logo) présents sur ce site est
-          la propriété de Pépito Services ou fait l’objet d’une autorisation
-          d’utilisation. Toute reproduction ou représentation, totale ou
-          partielle, est interdite sans autorisation préalable.
+          L’ensemble des contenus présents sur ce site (textes, photographies,
+          logo, charte graphique) est la propriété de Pépito Services ou fait
+          l’objet d’une autorisation d’utilisation. Toute reproduction,
+          représentation ou adaptation, totale ou partielle, est interdite
+          sans autorisation écrite préalable.
         </p>
       </section>
 
       <section class="legal-section">
         <h2>Crédits photos</h2>
         <p>
-          Les photographies proviennent des contenus fournis par Pépito Services
-          (Facebook / dossiers images). Crédits à préciser avec l’entreprise.
+          Les photographies de chantiers et de réalisations publiées sur ce
+          site sont réalisées par Pépito Services dans le cadre de ses
+          interventions.
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Liens hypertextes</h2>
+        <p>
+          Le site peut contenir des liens vers des sites tiers. Pépito
+          Services n’exerce aucun contrôle sur leur contenu et décline toute
+          responsabilité quant aux informations qu’ils diffusent.
         </p>
       </section>
     </div>
@@ -84,5 +108,22 @@ import ContentBadge from '../components/ContentBadge.astro';
   .legal-section p {
     color: var(--color-text-muted);
     margin-bottom: var(--space-2);
+    line-height: var(--leading-relaxed);
+  }
+
+  .legal-section a {
+    color: var(--color-primary);
+  }
+
+  .credit-line {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .point-logo {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
   }
 </style>

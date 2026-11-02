@@ -1,12 +1,14 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
 import Section from '../components/Section.astro';
-import ContentBadge from '../components/ContentBadge.astro';
+import { getSite } from '../lib/site.js';
+
+const { settings } = await getSite();
 ---
 
 <MainLayout
   title="Politique de confidentialité"
-  description="Politique de confidentialité du site Pépito Services."
+  description="Politique de confidentialité du site Pépito Services : données collectées, finalités, droits RGPD."
   canonicalPath="/politique-confidentialite"
   noIndex={true}
 >
@@ -14,49 +16,80 @@ import ContentBadge from '../components/ContentBadge.astro';
     <div class="page-header">
       <h1 class="section-title">Politique de confidentialité</h1>
       <p class="section-subtitle">
-        Cette page décrit la gestion des données personnelles sur le site.
-        Les informations opérationnelles (durées de conservation, cookies,
-        outils tiers) sont en attente de validation avec l’entreprise.
+        Cette page décrit la gestion des données personnelles sur le site
+        {settings.name}, conformément au Règlement Général sur la Protection
+        des Données (RGPD).
       </p>
-      <ContentBadge label="Politique de confidentialité à valider avec l’entreprise" />
     </div>
 
     <div class="legal-content">
       <section class="legal-section">
+        <h2>Responsable du traitement</h2>
+        <p>
+          Le responsable du traitement des données collectées sur ce site
+          est <strong>Pépito Services — Sylvain Palladuc</strong>, joignable
+          par email à
+          {settings.contact.email && <a href={`mailto:${settings.contact.email}`}>{settings.contact.email}</a>}
+          {settings.contact.phone && <> ou par téléphone au <a href={`tel:${settings.contact.phone.replace(/\s+/g, '')}`}>{settings.contact.phone}</a></>}.
+        </p>
+      </section>
+
+      <section class="legal-section">
         <h2>Données collectées</h2>
         <p>
-          Pour le moment, ce site vitrine ne collecte aucune donnée personnelle
-          en ligne. Le formulaire de contact affiché est une démonstration : aucune
-          saisie n’est transmise ni stockée.
+          Le formulaire de contact collecte les informations suivantes :
         </p>
+        <ul>
+          <li>Nom et prénom</li>
+          <li>Adresse email</li>
+          <li>Numéro de téléphone (facultatif)</li>
+          <li>Type de projet et description de votre demande</li>
+        </ul>
         <p>
-          Une fois le formulaire réel activé, les champs collectés (nom, email,
-          téléphone, type de projet, message) seront indiqués ici avec leur
-          finalité exacte.
-        </p>
-      </section>
-
-      <section class="legal-section">
-        <h2>Finalités du traitement</h2>
-        <p>
-          À valider avec l’entreprise : réponse aux demandes de contact, envoi
-          de devis, gestion de la relation client.
+          Ces données sont transmises par email à Pépito Services et
+          conservées dans l’espace d’administration du site afin de pouvoir
+          répondre à votre demande. Aucune autre donnée personnelle n’est
+          collectée à votre insu.
         </p>
       </section>
 
       <section class="legal-section">
-        <h2>Durées de conservation</h2>
-        <p>À valider avec l’entreprise.</p>
+        <h2>Finalités et base légale</h2>
+        <p>
+          Les données du formulaire sont utilisées exclusivement pour :
+        </p>
+        <ul>
+          <li>Répondre à votre demande de contact ou de devis</li>
+          <li>Assurer le suivi de la relation commerciale qui pourrait en
+            découler</li>
+        </ul>
+        <p>
+          La base légale de ce traitement est votre consentement (envoi
+          volontaire du formulaire) et, le cas échéant, l’exécution de mesures
+          précontractuelles à votre demande. Vos données ne font l’objet
+          d’<strong>aucune vente, cession ou utilisation publicitaire</strong>.
+        </p>
       </section>
 
       <section class="legal-section">
-        <h2>Vos droits</h2>
+        <h2>Durée de conservation</h2>
         <p>
-          Conformément au Règlement Général sur la Protection des Données
-          (RGPD), vous disposez d’un droit d’accès, de rectification, de
-          suppression, de limitation et d’opposition aux traitements de vos
-          données personnelles. Pour exercer ces droits, contactez
-          l’entreprise à l’adresse qui sera publiée ici après validation.
+          Les messages de contact sont conservés le temps nécessaire au
+          traitement de votre demande, puis supprimés au plus tard
+          <strong>12 mois</strong> après le dernier échange si aucune relation
+          commerciale ne s’instaure. Les données relatives aux clients sont
+          conservées pendant la durée de la relation commerciale, puis selon
+          les obligations légales applicables (comptabilité, garanties).
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Destinataires des données</h2>
+        <p>
+          Vos données sont accessibles uniquement à Pépito Services. Elles
+          ne sont transmises à aucun tiers. L’hébergement est assuré par
+          OVHcloud (2 rue Kellermann, 59100 Roubaix), sur un serveur situé
+          en Union européenne.
         </p>
       </section>
 
@@ -65,9 +98,9 @@ import ContentBadge from '../components/ContentBadge.astro';
         <p>
           Ce site n’utilise <strong>aucun cookie</strong> ni traceur
           publicitaire. La mesure d’audience est assurée par
-          <strong>Umami</strong>, un outil de statistiques auto-hébergé sur nos
-          serveurs : les données ne sont transmises à aucun tiers. Umami ne
-          dépose aucun cookie, ne collecte aucune donnée personnelle et
+          <strong>Umami</strong>, un outil de statistiques auto-hébergé sur
+          nos serveurs : les données ne sont transmises à aucun tiers. Umami
+          ne dépose aucun cookie, ne collecte aucune donnée personnelle et
           anonymise l’adresse IP. Ce dispositif relève de l’exemption de
           consentement prévue par la CNIL pour les mesures d’audience
           strictement nécessaires.
@@ -75,8 +108,31 @@ import ContentBadge from '../components/ContentBadge.astro';
       </section>
 
       <section class="legal-section">
-        <h2>Hébergement</h2>
-        <p>À valider avec l’entreprise.</p>
+        <h2>Vos droits</h2>
+        <p>
+          Conformément au RGPD, vous disposez d’un droit d’accès, de
+          rectification, de suppression, de limitation, d’opposition et de
+          portabilité des données vous concernant. Pour exercer ces droits,
+          contactez-nous à
+          {settings.contact.email && <a href={`mailto:${settings.contact.email}`}>{settings.contact.email}</a>}.
+          Une réponse vous sera apportée dans un délai maximum d’un mois.
+        </p>
+        <p>
+          Si vous estimez que vos droits ne sont pas respectés, vous pouvez
+          introduire une réclamation auprès de la
+          <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">CNIL</a>
+          (Commission Nationale de l'Informatique et des Libertés).
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>Sécurité</h2>
+        <p>
+          Le site est servi en HTTPS (chiffrement des échanges). L’accès à
+          l’espace d’administration est protégé par authentification. Pépito
+          Services met en œuvre les mesures techniques raisonnables pour
+          protéger vos données contre tout accès non autorisé.
+        </p>
       </section>
     </div>
   </Section>
@@ -104,5 +160,16 @@ import ContentBadge from '../components/ContentBadge.astro';
     color: var(--color-text-muted);
     margin-bottom: var(--space-4);
     line-height: var(--leading-relaxed);
+  }
+
+  .legal-section ul {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+    padding-left: var(--space-6);
+    line-height: var(--leading-relaxed);
+  }
+
+  .legal-section a {
+    color: var(--color-primary);
   }
 </style>
