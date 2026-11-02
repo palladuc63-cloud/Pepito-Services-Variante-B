@@ -326,7 +326,7 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .sched-row .muted { font-size: 13px; }
 
 /* Carte des pages villes */
-#city-map { height: 340px; border-radius: 10px; margin-bottom: 18px; border: 1px solid var(--line, #2a332c); overflow: hidden; }
+#city-map { height: 340px; border-radius: 10px; margin-bottom: 18px; border: 1px solid var(--line, #2a332c); overflow: hidden; position: relative; z-index: 0; }
 #city-map .leaflet-popup-content a { color: #2563eb; }
 
 /* Calendrier éditorial */
