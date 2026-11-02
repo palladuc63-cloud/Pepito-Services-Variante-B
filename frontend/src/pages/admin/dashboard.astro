@@ -1420,6 +1420,15 @@ const base = import.meta.env.BASE_URL;
         <div style="font-size:12px;color:var(--muted)">
           ${SRC_LABEL[p.source] ?? esc(p.source)} · ${new Date(p.lastContactAt ?? p.createdAt).toLocaleDateString('fr-FR')}
         </div>
+        ${p.conversation?.length ? `
+        <details class="prospect-conv">
+          <summary>💬 ${p.conversation.length} échange${p.conversation.length > 1 ? 's' : ''}</summary>
+          ${p.conversation.map((m) => `
+            <div class="conv-item">
+              <span class="conv-meta">${SRC_ICON[m.source] ?? '📇'} ${new Date(m.createdAt).toLocaleDateString('fr-FR')} ${new Date(m.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+              <p class="conv-text">${esc(m.message)}</p>
+            </div>`).join('')}
+        </details>` : ''}
         <select class="form-select" data-prosp-status="${p.id}" style="margin-top:8px">
           ${PROSPECT_STATUS.map(([v, l]) => `<option value="${v}" ${p.status === v ? 'selected' : ''}>${l}</option>`).join('')}
         </select>

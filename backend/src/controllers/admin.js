@@ -428,8 +428,29 @@ export async function deleteMessage(req, res) {
 }
 
 // ─── Prospects ──────────────────────────────────────────────
-export const listProspects = async (_req, res) =>
-  res.json(await db.select().from(prospects).orderBy(desc(prospects.lastContactAt), desc(prospects.createdAt)));
+// Chaque prospect embarque sa « conversation » : les messages reçus qui
+// correspondent à son email ou à son téléphone (normalisé, 9 derniers
+// chiffres — 06… ≡ +336…). Mis à jour à chaque nouveau contact.
+export async function listProspects(_req, res) {
+  const [prows, mrows] = await Promise.all([
+    db.select().from(prospects).orderBy(desc(prospects.lastContactAt), desc(prospects.createdAt)),
+    db.select().from(messages).orderBy(desc(messages.createdAt)),
+  ]);
+  const normPhone = (v) => String(v || '').replace(/\D/g, '').slice(-9);
+  res.json(prows.map((p) => {
+    const np = normPhone(p.phone), ne = String(p.email || '').toLowerCase();
+    const conversation = mrows
+      .filter((m) =>
+        (ne && String(m.email || '').toLowerCase() === ne) ||
+        (np && normPhone(m.phone) === np))
+      .slice(0, 15)
+      .map((m) => ({
+        id: m.id, source: m.source, createdAt: m.createdAt,
+        message: String(m.message || '').slice(0, 400),
+      }));
+    return { ...p, conversation, messageCount: conversation.length };
+  }));
+}
 
 const PROSPECT_STATUSES = ['nouveau', 'contacte', 'qualifie', 'gagne', 'perdu'];
 

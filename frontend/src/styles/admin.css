@@ -455,3 +455,28 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 
 /* Étapes centrées : assombrit tout l'écran (pas de spotlight) */
 #tour-root.tour-dim { background: rgb(0 0 0 / 0.62); }
+
+/* ─── Conversation liée à un prospect ─── */
+.prospect-conv {
+  margin-top: 8px;
+  border-top: 1px dashed var(--line, #2c3b2a);
+  padding-top: 6px;
+}
+.prospect-conv summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted, #b9c4b6);
+  list-style-position: inside;
+}
+.prospect-conv summary:hover { color: var(--ink, #e8ece6); }
+.conv-item { margin-top: 8px; }
+.conv-meta { font-size: 11px; color: var(--green, #7aa37a); font-weight: 600; }
+.conv-text {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink, #e8ece6);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
