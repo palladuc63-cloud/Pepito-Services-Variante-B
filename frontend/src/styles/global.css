@@ -523,3 +523,16 @@ a:focus-visible {
     transform: none;
   }
 }
+
+/* ─── Widget chatbot Janus : accent aligné sur le vert de marque ───
+   janus.js injecte son propre <style> après les CSS du site — le
+   sélecteur `body` donne la spécificité suffisante pour l'emporter,
+   et var(--forest) suit automatiquement le thème actif. */
+body #janus-btn,
+body #janus-header,
+body #janus-send,
+body #janus-cb button,
+body .j-cta,
+body .j-msg.user {
+  background-color: var(--forest);
+}
