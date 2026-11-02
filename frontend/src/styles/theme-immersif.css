@@ -234,9 +234,9 @@
 /* ═══ Cards : la photo d'abord ═══ */
 
 :root[data-theme='immersif'] .card {
-  background: transparent;
-  border: 0;
-  overflow: visible;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  overflow: hidden;
 }
 
 :root[data-theme='immersif'] .card:hover {
@@ -246,7 +246,7 @@
 :root[data-theme='immersif'] .card .card-media {
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 :root[data-theme='immersif'] .card-media img {
@@ -260,7 +260,7 @@
 }
 
 :root[data-theme='immersif'] .card .card-body {
-  padding-inline: 0;
+  padding: var(--space-5);
 }
 
 :root[data-theme='immersif'] .card-title {
@@ -301,7 +301,8 @@
 }
 
 :root[data-theme='immersif'] .section-cream .card {
-  background: transparent;
+  background: rgb(234 231 222 / 0.05);
+  border-color: rgb(234 231 222 / 0.18);
 }
 
 :root[data-theme='immersif'] .section-cream .card .card-media {
