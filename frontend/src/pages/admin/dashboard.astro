@@ -27,7 +27,7 @@ const base = import.meta.env.BASE_URL;
         <button class="admin-nav-link" data-tab="social">📣 Réseaux</button>
         <button class="admin-nav-link" data-tab="seo">🔗 SEO / Redirections</button>
         <button class="admin-nav-link" data-tab="settings">⚙️ Paramètres</button>
-        <button class="admin-nav-link" id="btn-logout" style="margin-top:auto">🚪 Déconnexion</button>
+        <button class="admin-nav-link" id="btn-logout">🚪 Déconnexion</button>
       </aside>
 
       <main class="admin-main">
@@ -350,7 +350,8 @@ const base = import.meta.env.BASE_URL;
       <div class="item-card-actions">${actions}</div>
     </div>`;
   function applyView(name) {
-    const mode = localStorage.getItem(viewKey(name)) || 'list';
+    const mode = localStorage.getItem(viewKey(name))
+      || (window.matchMedia('(max-width: 800px)').matches ? 'cards' : 'list');
     const table = $(`#${name}-table`), cards = $(`#${name}-cards`);
     if (!table || !cards) return;
     table.hidden = mode === 'cards';
@@ -671,7 +672,7 @@ const base = import.meta.env.BASE_URL;
         <td>${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="" />` : ''}</td>
         <td><strong>${esc(p.title)}</strong><br/><span style="color:var(--muted);font-size:12px">${esc(p.summary ?? '')}</span></td>
         <td>${esc(p.category?.label ?? '—')}</td>
-        <td>${statusBadge(p)}</td>
+        <td><span class="tag-pill ${p.published ? 'pub' : 'draft'}">${p.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(p)}</td>
         <td style="text-align:right;white-space:nowrap">
           <a class="btn btn-sm" href="${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
           <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
@@ -683,7 +684,7 @@ const base = import.meta.env.BASE_URL;
        <span class="muted">${esc(p.summary ?? '')}</span>
        <div class="item-card-meta"><span class="tag-pill">${esc(p.category?.label ?? '—')}</span>
          ${p.city ? `<span class="tag-pill">📍 ${esc(p.city)}</span>` : ''}
-         ${statusBadge(p)}</div>`,
+         <span class="tag-pill ${p.published ? 'pub' : 'draft'}">${p.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(p)}</div>`,
       `<a class="btn btn-sm" href="${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
        <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
        <button class="btn btn-sm btn-danger" data-proj-del="${p.id}">✕</button>`)).join('')
@@ -819,7 +820,7 @@ const base = import.meta.env.BASE_URL;
         <td>${a.imageUrl ? `<img src="${esc(a.imageUrl)}" alt="" />` : ''}</td>
         <td><strong>${esc(a.title)}</strong><br/><span style="color:var(--muted);font-size:12px">/${esc(a.slug)}/</span></td>
         <td>${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('fr-FR') : '—'}</td>
-        <td>${statusBadge(a)}</td>
+        <td><span class="tag-pill ${a.published ? 'pub' : 'draft'}">${a.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(a)}</td>
         <td style="text-align:right;white-space:nowrap">
           <a class="btn btn-sm" href="${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
           <button class="btn btn-sm" data-art-edit="${a.id}">Éditer</button>
@@ -830,7 +831,7 @@ const base = import.meta.env.BASE_URL;
       `<strong>${esc(a.title)}</strong>
        <span class="muted">/${esc(a.slug)}/</span>
        <div class="item-card-meta"><span class="tag-pill">${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('fr-FR') : '—'}</span>
-         ${statusBadge(a)}</div>`,
+         <span class="tag-pill ${a.published ? 'pub' : 'draft'}">${a.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(a)}</div>`,
       `<a class="btn btn-sm" href="${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
        <button class="btn btn-sm" data-art-edit="${a.id}">Éditer</button>
        <button class="btn btn-sm btn-danger" data-art-del="${a.id}">✕</button>`)).join('')
@@ -946,7 +947,7 @@ const base = import.meta.env.BASE_URL;
       <tr>
         <td><code>/${esc(c.serviceSlug)}/${esc(c.slug)}/</code>${c.auto ? '<br/><span class="tag-pill">Auto</span>' : ''}</td>
         <td><strong>${esc(c.title)}</strong><br/><span style="color:var(--muted);font-size:12px">${esc(c.city)}</span></td>
-        <td>${statusBadge(c)}</td>
+        <td><span class="tag-pill ${c.published ? 'pub' : 'draft'}">${c.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(c)}</td>
         <td style="text-align:right;white-space:nowrap">
           ${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
           <a class="btn btn-sm" href="${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
@@ -958,7 +959,7 @@ const base = import.meta.env.BASE_URL;
       `<strong>${esc(c.title)}</strong>
        <span class="muted"><code>/${esc(c.serviceSlug)}/${esc(c.slug)}/</code></span>
        <div class="item-card-meta">${c.auto ? '<span class="tag-pill">Auto</span>' : ''}
-         ${statusBadge(c)}</div>`,
+         <span class="tag-pill ${c.published ? 'pub' : 'draft'}">${c.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(c)}</div>`,
       `${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
        <a class="btn btn-sm" href="${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
        <button class="btn btn-sm" data-city-edit="${c.id}">Éditer</button>
@@ -1023,8 +1024,8 @@ const base = import.meta.env.BASE_URL;
     const bounds = [];
     withCoords.forEach((c) => {
       const scheduled = c.publishedAt && new Date(c.publishedAt) > new Date();
-      const color = c.published ? '#22c55e' : scheduled ? '#f59e0b' : '#9ca3af';
-      const status = c.published ? 'Publié' : scheduled ? '⏰ Programmé' : 'Brouillon';
+      const color = scheduled ? '#f59e0b' : c.published ? '#22c55e' : '#9ca3af';
+      const status = scheduled ? '⏰ Programmé' : c.published ? 'Publié' : 'Brouillon';
       const marker = L.circleMarker([c.lat, c.lng], {
         radius: 8, color, weight: 2, fillColor: color, fillOpacity: 0.75,
       });

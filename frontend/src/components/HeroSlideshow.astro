@@ -190,6 +190,19 @@ const slides = projects.slice(0, 6).map((project) => ({
     slideshow.addEventListener('focusin', stop);
     slideshow.addEventListener('focusout', start);
 
+    let touchStartX = 0;
+    slideshow.addEventListener('touchstart', (event) => {
+      touchStartX = event.changedTouches[0].clientX;
+    }, { passive: true });
+    slideshow.addEventListener('touchend', (event) => {
+      const dx = event.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 48) {
+        if (dx < 0) next();
+        else previous();
+        restart();
+      }
+    }, { passive: true });
+
     slideshow.addEventListener('keydown', (event) => {
       if (event.key === 'ArrowLeft') {
         event.preventDefault();
@@ -443,6 +456,25 @@ const slides = projects.slice(0, 6).map((project) => ({
 
     .slide-control--next {
       right: var(--space-8);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hero-slideshow {
+      padding-bottom: calc(36px + var(--space-8) + 3rem);
+    }
+
+    .slideshow-controls {
+      display: none;
+    }
+
+    .slide-dots {
+      bottom: calc(36px + var(--space-6));
+    }
+
+    .slide-dot {
+      width: 1rem;
+      height: 1rem;
     }
   }
 
