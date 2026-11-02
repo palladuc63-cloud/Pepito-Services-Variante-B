@@ -60,8 +60,13 @@ const markers = pages
       if (bounds.length) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
       else map.setView([45.4397, 4.3872], 8);
     }
-    if (typeof L !== 'undefined') initCityMap();
-    else window.addEventListener('load', initCityMap);
+    function whenReady() {
+      if (typeof L !== 'undefined') initCityMap();
+      else window.addEventListener('load', initCityMap, { once: true });
+    }
+    // Navigation SPA (ClientRouter) : ré-init à chaque affichage de page
+    document.addEventListener('astro:page-load', whenReady);
+    whenReady();
   })();
 </script>
 
