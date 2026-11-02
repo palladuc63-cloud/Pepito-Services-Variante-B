@@ -261,8 +261,9 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .stat-card { padding: 10px 12px; }
   .stat-card strong { font-size: 20px; }
 
-  /* Tables : scroll horizontal au lieu d'écraser les colonnes */
-  table.admin-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  /* Tables : scroll horizontal dans un conteneur (colonnes alignées) */
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-scroll > .admin-table { min-width: 640px; }
 
   /* Cibles tactiles */
   .btn { min-height: 40px; }

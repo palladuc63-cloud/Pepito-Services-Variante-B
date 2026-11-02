@@ -344,6 +344,14 @@ const base = import.meta.env.BASE_URL;
   };
   const loaders = {};
 
+  // Tables : conteneur scrollable (mobile) — préserve l'alignement des colonnes
+  document.querySelectorAll('table.admin-table').forEach((t) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'table-scroll';
+    t.replaceWith(wrap);
+    wrap.appendChild(t);
+  });
+
   // ── Toggle affichage liste ⇄ cards (préférence par onglet) ──
   const viewKey = (n) => `pepito-view-${n}`;
   const cardShell = (img, inner, actions) => `
