@@ -153,6 +153,10 @@ const projectTypes = [
         if (messageError) messageError.textContent = 'Veuillez écrire un message.';
         document.getElementById('contact-message')?.setAttribute('aria-invalid', 'true');
         isValid = false;
+      } else if (message.length < 10) {
+        if (messageError) messageError.textContent = 'Message trop court — décrivez votre projet en quelques mots.';
+        document.getElementById('contact-message')?.setAttribute('aria-invalid', 'true');
+        isValid = false;
       }
 
       if (!isValid) {
@@ -176,14 +180,20 @@ const projectTypes = [
             source: 'contact',
           }),
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+          const body = await res.json().catch(() => null);
+          throw new Error(body?.error ?? `HTTP ${res.status}`);
+        }
         const nameSpan = successBlock.querySelector('.success-name');
         if (nameSpan) nameSpan.textContent = name;
         successBlock.hidden = false;
         form.reset();
         successBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } catch {
+      } catch (err) {
         if (errorBox) {
+          const p = errorBox.querySelector('p');
+          const apiMsg = err instanceof Error && err.message && !err.message.startsWith('HTTP') ? err.message : null;
+          if (p) p.textContent = apiMsg ?? 'Une erreur est survenue lors de l’envoi. Réessayez ou contactez-nous directement.';
           errorBox.hidden = false;
           errorBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
