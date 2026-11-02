@@ -62,6 +62,40 @@
     width: 8rem;
     height: 3.25rem;
   }
+
+  /* Au scroll : logo à gauche de la rangée de pilules,
+     dans le même conteneur scrollable horizontalement */
+  :root[data-theme='bento'] .site-header.is-scrolled .main-nav {
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    min-height: 3.5rem;
+    padding-top: 0;
+  }
+
+  :root[data-theme='bento'] .site-header.is-scrolled .main-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  :root[data-theme='bento'] .site-header.is-scrolled .brand-area {
+    flex: none;
+    justify-content: flex-start;
+    order: 1;
+  }
+
+  :root[data-theme='bento'] .site-header.is-scrolled .brand-area > a {
+    margin-inline: 0;
+  }
+
+  :root[data-theme='bento'] .site-header.is-scrolled .desktop-nav {
+    flex: none;
+    width: auto;
+    order: 2;
+    margin-top: 0;
+    padding: 0.35rem 0.5rem 0.35rem 0;
+    overflow: visible;
+  }
 }
 
 :root[data-theme='bento'] .desktop-nav {
