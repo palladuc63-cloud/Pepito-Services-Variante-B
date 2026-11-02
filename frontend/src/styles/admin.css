@@ -117,6 +117,7 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   margin: 1px 2px;
 }
 .tag-pill.pub { color: var(--green); border-color: rgba(34,197,94,.4); }
+.tag-pill.sched { color: #b45309; border-color: rgba(217,119,6,.45); background: rgba(217,119,6,.08); }
 .tag-pill.draft { color: var(--muted); }
 .tag-pill.failed { color: var(--danger); border-color: rgba(224,90,78,.4); }
 
