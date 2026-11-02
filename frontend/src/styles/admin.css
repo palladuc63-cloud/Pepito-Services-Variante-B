@@ -41,6 +41,7 @@ body.admin {
   overflow-y: auto;
 }
 
+.admin-logo-link { display: block; }
 .admin-logo {
   display: block;
   width: 150px;
@@ -228,7 +229,8 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     padding: 8px 10px; gap: 6px;
     border-right: none; border-bottom: 1px solid var(--border);
   }
-  .admin-logo { width: 140px; margin-bottom: 0; padding: 4px; flex: 0 0 auto; }
+  .admin-logo-link { flex: 0 0 auto; }
+  .admin-logo { width: 140px; margin-bottom: 0; padding: 4px; }
   #nav-burger { display: inline-flex; margin-left: auto; }
   .admin-nav-link { display: none; }
 
