@@ -923,6 +923,7 @@ const base = import.meta.env.BASE_URL;
       loaders.projects();
     }));
     checkGuardrails();
+    loaders.categories();
   };
 
   function projectForm(p = {}, meta = {}) {
@@ -1622,7 +1623,7 @@ const base = import.meta.env.BASE_URL;
     let conf = {};
     try { conf = s.schedule_config ? JSON.parse(s.schedule_config) : {}; } catch {}
     renderScheduleRows(conf);
-    loaders.categories();
+    loaders.services();
     loaders.seo();
   };
 
@@ -1698,7 +1699,7 @@ const base = import.meta.env.BASE_URL;
         text: 'À chaque contenu publié, un brouillon de post Facebook est préparé. Relisez puis publiez — rien ne part sans votre validation.' },
       { tab: 'settings', target: '#settings-form',
         title: '⚙️ Paramètres',
-        text: 'Vos coordonnées, horaires et zone d\'intervention — tout changement se répercute sur l\'ensemble du site. Plus bas : planification, catégories et SEO.' },
+        text: 'Vos coordonnées, horaires et zone d\'intervention — tout changement se répercute sur l\'ensemble du site. Plus bas : services de la homepage, planification et SEO.' },
       {
         title: 'C\'est parti ! 🎉',
         text: 'Vous savez tout. En cas de doute, le « Guide PDF » (bouton en haut à droite) reprend chaque écran pas à pas, et vous pouvez relancer cette visite à tout moment.',
