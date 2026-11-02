@@ -26,9 +26,7 @@ const base = import.meta.env.BASE_URL;
         <button class="admin-nav-link" data-tab="citypages">📍 Pages villes</button>
         <button class="admin-nav-link" data-tab="articles">📰 Articles</button>
         <button class="admin-nav-link" data-tab="services">🛠️ Services</button>
-        <button class="admin-nav-link" data-tab="categories">🗂️ Catégories</button>
         <button class="admin-nav-link" data-tab="social">📣 Réseaux</button>
-        <button class="admin-nav-link" data-tab="seo">🔗 SEO / Redirections</button>
         <button class="admin-nav-link" data-tab="settings">⚙️ Paramètres</button>
         <button class="admin-nav-link" id="btn-logout">🚪 Déconnexion</button>
         <button id="nav-burger" aria-label="Ouvrir le menu" aria-expanded="false">
@@ -147,21 +145,6 @@ const base = import.meta.env.BASE_URL;
         </section>
 
         <!-- CATÉGORIES -->
-        <section id="tab-categories" hidden>
-          <div class="card">
-            <h2>Catégories de réalisations</h2>
-            <table class="admin-table">
-              <thead><tr><th>Slug</th><th>Label</th><th>Ordre</th><th>Active</th><th></th></tr></thead>
-              <tbody id="categories-body"></tbody>
-            </table>
-            <form id="category-form" class="form-row cols-3" style="margin-top:16px;align-items:end">
-              <div><label class="form-label">Nouveau label</label><input class="form-input" id="cat-label" required /></div>
-              <div><label class="form-label">Ordre</label><input class="form-input" id="cat-order" type="number" value="0" /></div>
-              <button class="btn btn-primary" type="submit">+ Ajouter</button>
-            </form>
-          </div>
-        </section>
-
         <!-- PAGES VILLES -->
         <section id="tab-citypages" hidden>
           <div class="card">
@@ -185,29 +168,6 @@ const base = import.meta.env.BASE_URL;
             </div>
             <div id="citypages-cards" class="item-cards" hidden></div>
             <p class="form-hint">Chaque page publiée est servie sur /&lt;service&gt;/&lt;ville&gt;/ — ex. /clotures/saint-etienne/</p>
-          </div>
-        </section>
-
-        <!-- SEO / REDIRECTIONS -->
-        <section id="tab-seo" hidden>
-          <div class="card" style="margin-bottom:16px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-              <h2 style="margin:0">Redirections</h2>
-              <button class="btn btn-primary btn-sm" id="btn-new-redirect">+ Nouvelle redirection</button>
-            </div>
-            <table class="admin-table">
-              <thead><tr><th>Ancien chemin</th><th>Nouveau chemin</th><th>Code</th><th></th></tr></thead>
-              <tbody id="redirects-body"></tbody>
-            </table>
-            <p class="form-hint">Chemins relatifs au site, sans le préfixe /test — ex. /ancienne-page/ → /realisations/</p>
-          </div>
-          <div class="card">
-            <h2>Overrides SEO</h2>
-            <table class="admin-table">
-              <thead><tr><th>Type</th><th>Entité</th><th>Meta title</th><th></th></tr></thead>
-              <tbody id="seometa-body"></tbody>
-            </table>
-            <p class="form-hint">Les champs « SEO » des formulaires (réalisation, article, page ville) créent ces overrides automatiquement.</p>
           </div>
         </section>
 
@@ -272,6 +232,39 @@ const base = import.meta.env.BASE_URL;
             </p>
             <div id="schedule-rows"></div>
             <button class="btn btn-primary" id="btn-save-schedule" type="button">Enregistrer la planification</button>
+          </div>
+
+          <div class="card" style="margin-top:16px">
+            <h2>🗂️ Catégories de réalisations</h2>
+            <table class="admin-table">
+              <thead><tr><th>Slug</th><th>Label</th><th>Ordre</th><th>Active</th><th></th></tr></thead>
+              <tbody id="categories-body"></tbody>
+            </table>
+            <form id="category-form" class="form-row cols-3" style="margin-top:16px;align-items:end">
+              <div><label class="form-label">Nouveau label</label><input class="form-input" id="cat-label" required /></div>
+              <div><label class="form-label">Ordre</label><input class="form-input" id="cat-order" type="number" value="0" /></div>
+              <button class="btn btn-primary" type="submit">+ Ajouter</button>
+            </form>
+          </div>
+
+          <div class="card" style="margin-top:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <h2 style="margin:0">🔗 Redirections</h2>
+              <button class="btn btn-primary btn-sm" id="btn-new-redirect">+ Nouvelle redirection</button>
+            </div>
+            <table class="admin-table">
+              <thead><tr><th>Ancien chemin</th><th>Nouveau chemin</th><th>Code</th><th></th></tr></thead>
+              <tbody id="redirects-body"></tbody>
+            </table>
+            <p class="form-hint">Chemins relatifs au site, sans le préfixe /test — ex. /ancienne-page/ → /realisations/</p>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <h2>Overrides SEO</h2>
+            <table class="admin-table">
+              <thead><tr><th>Type</th><th>Entité</th><th>Meta title</th><th></th></tr></thead>
+              <tbody id="seometa-body"></tbody>
+            </table>
+            <p class="form-hint">Les champs « SEO » des formulaires (réalisation, article, page ville) créent ces overrides automatiquement.</p>
           </div>
         </section>
       </main>
@@ -1401,6 +1394,8 @@ const base = import.meta.env.BASE_URL;
     let conf = {};
     try { conf = s.schedule_config ? JSON.parse(s.schedule_config) : {}; } catch {}
     renderScheduleRows(conf);
+    loaders.categories();
+    loaders.seo();
   };
 
   $('#btn-save-schedule').addEventListener('click', async () => {
