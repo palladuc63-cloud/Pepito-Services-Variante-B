@@ -9,6 +9,7 @@ import { ensureCityPage, fetchCityInfo } from '../utils/citygen.js';
 import { nextSlot, backfillDrafts } from '../utils/schedule.js';
 import { buildPostContent, postLink } from '../utils/social.js';
 import { notify } from '../utils/notify.js';
+import { sendMail } from '../utils/mailer.js';
 import { sanitizeRichHtml } from '../utils/sanitize.js';
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -377,6 +378,24 @@ export async function markMessageRead(req, res) {
   const { isRead } = req.body ?? {};
   await db.update(messages).set({ isRead: Boolean(isRead) })
     .where(eq(messages.id, Number(req.params.id)));
+  res.json({ status: 'ok' });
+}
+
+export async function replyToMessage(req, res) {
+  const text = String(req.body?.message ?? '').trim();
+  if (text.length < 2) return res.status(400).json({ error: 'Réponse vide.' });
+  const [msg] = await db.select().from(messages).where(eq(messages.id, Number(req.params.id)));
+  if (!msg) return res.status(404).json({ error: 'Message introuvable.' });
+  if (!msg.email) return res.status(400).json({ error: 'Pas d’adresse email pour ce message.' });
+  const quoted = msg.message.split('\n').map((l) => `> ${l}`).join('\n');
+  const ok = await sendMail({
+    to: msg.email,
+    subject: 'Re: votre demande — Pépito Services',
+    text: `${text}\n\n---\nLe ${new Date(msg.createdAt).toLocaleDateString('fr-FR')}, ${msg.name} écrivait :\n${quoted}`,
+  });
+  if (!ok) return res.status(502).json({ error: 'Envoi email impossible (SMTP).' });
+  await db.update(messages).set({ repliedAt: new Date(), isRead: true })
+    .where(eq(messages.id, msg.id));
   res.json({ status: 'ok' });
 }
 

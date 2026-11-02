@@ -1176,8 +1176,18 @@ const base = import.meta.env.BASE_URL;
               ${esc(m.email ?? '')} ${m.phone ? `· ${esc(m.phone)}` : ''} · ${new Date(m.createdAt).toLocaleString('fr-FR')}
             </div>
             <div class="msg-body">${esc(m.message)}</div>
+            ${m.repliedAt ? `<div style="font-size:12px;color:var(--accent,#2f6b45);margin-top:6px">✉️ Répondu le ${new Date(m.repliedAt).toLocaleString('fr-FR')}</div>` : ''}
+            ${m.email ? `
+            <div class="msg-reply" data-reply-box="${m.id}" hidden style="margin-top:10px">
+              <textarea class="form-input" rows="4" placeholder="Votre réponse à ${esc(m.name)}…" data-reply-text="${m.id}"></textarea>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <button class="btn btn-primary btn-sm" data-reply-send="${m.id}">Envoyer la réponse</button>
+                <button class="btn btn-sm" data-reply-cancel="${m.id}">Annuler</button>
+              </div>
+            </div>` : ''}
           </div>
           <div style="white-space:nowrap">
+            ${m.email && !m.repliedAt ? `<button class="btn btn-sm" data-msg-reply="${m.id}">Répondre</button>` : ''}
             <button class="btn btn-sm" data-msg-read="${m.id}" data-read="${m.isRead ? 0 : 1}">${m.isRead ? 'Non lu' : 'Marquer lu'}</button>
             <button class="btn btn-sm btn-danger" data-msg-del="${m.id}">✕</button>
           </div>
@@ -1191,6 +1201,28 @@ const base = import.meta.env.BASE_URL;
       if (!confirm('Supprimer ce message ?')) return;
       await api.del(`/api/admin/messages/${b.dataset.msgDel}`);
       loaders.messages();
+    }));
+    document.querySelectorAll('[data-msg-reply]').forEach((b) => b.addEventListener('click', () => {
+      const box = document.querySelector(`[data-reply-box="${b.dataset.msgReply}"]`);
+      if (box) box.hidden = !box.hidden;
+    }));
+    document.querySelectorAll('[data-reply-cancel]').forEach((b) => b.addEventListener('click', () => {
+      const box = document.querySelector(`[data-reply-box="${b.dataset.replyCancel}"]`);
+      if (box) box.hidden = true;
+    }));
+    document.querySelectorAll('[data-reply-send]').forEach((b) => b.addEventListener('click', async () => {
+      const id = b.dataset.replySend;
+      const ta = document.querySelector(`[data-reply-text="${id}"]`);
+      const message = ta?.value.trim() ?? '';
+      if (!message) { ta?.focus(); return; }
+      b.disabled = true; b.textContent = 'Envoi…';
+      try {
+        await api.post(`/api/admin/messages/${id}/reply`, { message });
+        loaders.messages();
+      } catch (err) {
+        showAlert(err?.message ?? 'Échec de l’envoi.', false);
+        b.disabled = false; b.textContent = 'Envoyer la réponse';
+      }
     }));
   };
 

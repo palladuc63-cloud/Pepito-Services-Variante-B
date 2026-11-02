@@ -114,6 +114,7 @@ const DDL = [
     message TEXT NOT NULL,
     source VARCHAR(40) NOT NULL DEFAULT 'contact',
     is_read TINYINT(1) NOT NULL DEFAULT 0,
+    replied_at TIMESTAMP NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
   )`,
   `CREATE TABLE IF NOT EXISTS settings (

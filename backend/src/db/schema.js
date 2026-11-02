@@ -83,6 +83,7 @@ export const messages = mysqlTable('messages', {
   message: text('message').notNull(),
   source: varchar('source', { length: 40 }).default('contact').notNull(), // contact | janus
   isRead: boolean('is_read').default(false).notNull(),
+  repliedAt: timestamp('replied_at'),                             // réponse envoyée depuis le BO
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

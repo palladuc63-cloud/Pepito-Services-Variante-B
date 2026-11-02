@@ -29,6 +29,7 @@ router.delete('/articles/:id', ctrl.deleteArticle);
 
 router.get('/messages', ctrl.listMessages);
 router.put('/messages/:id', ctrl.markMessageRead);
+router.post('/messages/:id/reply', ctrl.replyToMessage);
 router.delete('/messages/:id', ctrl.deleteMessage);
 
 router.get('/settings', ctrl.getSettings);

@@ -20,12 +20,12 @@ function getTransporter() {
   return transporter;
 }
 
-export async function sendMail({ subject, text, replyTo }) {
+export async function sendMail({ to, subject, text, replyTo }) {
   if (!mailConfigured()) return false;
   try {
     await getTransporter().sendMail({
       from: MAIL_FROM || SMTP_USER,
-      to: MAIL_TO,
+      to: to || MAIL_TO,
       replyTo,
       subject,
       text,
