@@ -1128,7 +1128,7 @@ const base = import.meta.env.BASE_URL;
     $('#services-body').innerHTML = services.map((s) => `
       <tr>
         <td>${s.imageUrl ? `<img src="${esc(s.imageUrl)}" alt="" />` : ''}</td>
-        <td><strong>${esc(s.title)}</strong><br/><span style="color:var(--muted);font-size:12px">${esc(s.summary ?? '')}</span></td>
+        <td><strong>${esc(s.title)}</strong>${s.slug === 'clotures-portails' ? ' <span class="tag-pill" title="Héberge les pages villes /clotures-portails/<ville>/ — ne pas activer">Technique</span>' : ''}<br/><span style="color:var(--muted);font-size:12px">${esc(s.summary ?? '')}</span></td>
         <td>${s.sortOrder}</td>
         <td><span class="status-dot ${s.active ? 'on' : 'off'}"></span>${s.active ? 'Oui' : 'Non'}</td>
         <td style="text-align:right"><button class="btn btn-sm" data-svc-edit="${s.id}">Éditer</button></td>
@@ -1140,6 +1140,7 @@ const base = import.meta.env.BASE_URL;
   function editService(id) {
     const s = window._services.find((x) => String(x.id) === String(id));
     openModal('Éditer le service', `
+      ${s.slug === 'clotures-portails' ? '<p class="form-hint">⚙️ Service technique : il supporte les pages villes <code>/clotures-portails/&lt;ville&gt;/</code>. Le laisser inactif — il ne doit pas apparaître sur la homepage.</p>' : ''}
       <div class="form-row"><label class="form-label">Titre</label><input class="form-input" id="s-title" value="${esc(s.title)}" /></div>
       <div class="form-row"><label class="form-label">Résumé</label><input class="form-input" id="s-summary" value="${esc(s.summary ?? '')}" /></div>
       <div class="form-row"><label class="form-label">Description</label><textarea class="form-textarea" id="s-desc">${esc(s.description ?? '')}</textarea></div>
