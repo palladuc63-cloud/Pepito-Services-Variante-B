@@ -209,6 +209,10 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 
 .msg-unread { border-left: 3px solid var(--green); }
 .msg-body { color: var(--muted); font-size: 13px; white-space: pre-wrap; }
+
+.prospects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.prospect-card-head { display: flex; align-items: center; gap: 10px; }
+.prospect-src-icon { font-size: 22px; line-height: 1; flex-shrink: 0; }
 .sp-edit-area { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 13px; line-height: 1.5; resize: vertical; background: var(--bg); color: var(--ink); }
 .sp-edit-area:focus { outline: none; border-color: var(--green); }
 

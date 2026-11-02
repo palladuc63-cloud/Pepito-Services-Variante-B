@@ -1253,34 +1253,33 @@ const base = import.meta.env.BASE_URL;
     ['gagne', 'Gagné'], ['perdu', 'Perdu'],
   ];
   const SRC_LABEL = { contact: 'Formulaire', janus: 'Chatbot', voice: 'Téléphone', manuel: 'Manuel' };
+  const SRC_ICON = { contact: '📩', janus: '💬', voice: '📞', manuel: '✏️' };
   loaders.prospects = async () => {
     const prospects = await api.get('/api/admin/prospects');
-    $('#prospects-list').innerHTML = prospects.length ? prospects.map((p) => `
-      <div class="card" style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap">
-          <div style="flex:1;min-width:220px">
+    $('#prospects-list').innerHTML = prospects.length ? `<div class="prospects-grid">${prospects.map((p) => `
+      <div class="card prospect-card">
+        <div class="prospect-card-head">
+          <span class="prospect-src-icon" title="${SRC_LABEL[p.source] ?? esc(p.source)}">${SRC_ICON[p.source] ?? '📇'}</span>
+          <div style="flex:1;min-width:0">
             <strong>${esc(p.name)}</strong>
-            <span class="tag-pill">${SRC_LABEL[p.source] ?? esc(p.source)}</span>
             ${p.projectType ? `<span class="tag-pill">${esc(p.projectType)}</span>` : ''}
             ${p.consent ? '<span class="tag-pill pub">✓ Consentement</span>' : ''}
-            <div style="font-size:12px;color:var(--muted);margin:4px 0">
-              ${p.email ? `<a href="mailto:${esc(p.email)}">${esc(p.email)}</a>` : ''}
-              ${p.phone ? ` ${p.email ? '·' : ''} <a href="tel:${esc(p.phone.replace(/\s+/g, ''))}">${esc(p.phone)}</a>` : ''}
-              ${!(p.email || p.phone) ? '<em>Aucune coordonnée</em>' : ''}
-            </div>
-            <div style="font-size:12px;color:var(--muted)">
-              Dernier contact : ${new Date(p.lastContactAt ?? p.createdAt).toLocaleString('fr-FR')}
-            </div>
-            <textarea class="sp-edit-area" rows="2" placeholder="Notes de suivi…" data-prosp-notes="${p.id}" style="margin-top:8px">${esc(p.notes ?? '')}</textarea>
           </div>
-          <div style="display:flex;flex-direction:column;gap:6px;white-space:nowrap">
-            <select class="form-select" data-prosp-status="${p.id}">
-              ${PROSPECT_STATUS.map(([v, l]) => `<option value="${v}" ${p.status === v ? 'selected' : ''}>${l}</option>`).join('')}
-            </select>
-            <button class="btn btn-sm btn-danger" data-prosp-del="${p.id}">✕</button>
-          </div>
+          <button class="btn btn-sm btn-danger" data-prosp-del="${p.id}">✕</button>
         </div>
-      </div>`).join('') : '<p style="color:var(--muted)">Aucun prospect pour l’instant — ils apparaissent dès qu’un contact arrive (formulaire, chatbot, téléphone).</p>';
+        <div style="font-size:12px;color:var(--muted);margin:6px 0">
+          ${p.email ? `<a href="mailto:${esc(p.email)}">${esc(p.email)}</a><br>` : ''}
+          ${p.phone ? `<a href="tel:${esc(p.phone.replace(/\s+/g, ''))}">${esc(p.phone)}</a>` : ''}
+          ${!(p.email || p.phone) ? '<em>Aucune coordonnée</em>' : ''}
+        </div>
+        <div style="font-size:12px;color:var(--muted)">
+          ${SRC_LABEL[p.source] ?? esc(p.source)} · ${new Date(p.lastContactAt ?? p.createdAt).toLocaleDateString('fr-FR')}
+        </div>
+        <select class="form-select" data-prosp-status="${p.id}" style="margin-top:8px">
+          ${PROSPECT_STATUS.map(([v, l]) => `<option value="${v}" ${p.status === v ? 'selected' : ''}>${l}</option>`).join('')}
+        </select>
+        <textarea class="sp-edit-area" rows="2" placeholder="Notes de suivi…" data-prosp-notes="${p.id}" style="margin-top:8px">${esc(p.notes ?? '')}</textarea>
+      </div>`).join('')}</div>` : '<p style="color:var(--muted)">Aucun prospect pour l’instant — ils apparaissent dès qu’un contact arrive (formulaire, chatbot, téléphone).</p>';
     document.querySelectorAll('[data-prosp-status]').forEach((s) => s.addEventListener('change', async () => {
       await api.put(`/api/admin/prospects/${s.dataset.prospStatus}`, { status: s.value });
       showAlert('Statut mis à jour.');
