@@ -97,6 +97,10 @@ const zone = radiusKm ? { lat: home.lat, lng: home.lng, radius: radiusKm * 1000 
         map.fitBounds(L.circle([zone.lat, zone.lng], { radius: zone.radius }).getBounds());
       } else if (bounds.length) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
       else map.setView([45.8567, 3.5489], 9);
+      // Navigation SPA : la carte peut être init avant que son conteneur
+      // ait sa taille finale → recalcul différé pour forcer le chargement
+      setTimeout(function () { map.invalidateSize(); }, 150);
+      setTimeout(function () { map.invalidateSize(); }, 600);
     }
     function whenReady() {
       if (typeof L !== 'undefined') initCityMap();
