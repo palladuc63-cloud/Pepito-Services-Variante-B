@@ -24,13 +24,18 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
   <div id="sav-actions" hidden></div>
 
   <form id="sav-escalate" hidden>
-    <p>Décrivez le problème — votre prestataire est notifié par email.</p>
-    <input id="sav-name" required maxlength="120" placeholder="Votre nom" />
-    <input id="sav-contact" required maxlength="200" placeholder="Email ou téléphone" />
-    <textarea id="sav-desc" required maxlength="5000" rows="3" placeholder="Décrivez le problème…"></textarea>
-    <div class="sav-esc-row">
-      <button type="submit" class="sav-primary">Envoyer</button>
-      <button type="button" id="sav-esc-cancel">Annuler</button>
+    <button type="button" id="sav-esc-head" aria-expanded="false">
+      <span class="sav-esc-caret">▸</span>
+      Décrire le problème — votre prestataire est notifié par email
+    </button>
+    <div id="sav-esc-body" hidden>
+      <input id="sav-name" required maxlength="120" placeholder="Votre nom" />
+      <input id="sav-contact" required maxlength="200" placeholder="Email ou téléphone" />
+      <textarea id="sav-desc" required maxlength="5000" rows="3" placeholder="Décrivez le problème…"></textarea>
+      <div class="sav-esc-row">
+        <button type="submit" class="sav-primary">Envoyer</button>
+        <button type="button" id="sav-esc-cancel">Annuler</button>
+      </div>
     </div>
   </form>
 
@@ -77,7 +82,15 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
   #sav-actions .sav-chip.sav-primary { background: var(--green); border-color: var(--green); color: #06120b; font-weight: 600; }
   #sav-escalate, #sav-form { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--border); }
   #sav-escalate { flex-direction: column; }
-  #sav-escalate p { margin: 0; font-size: 12px; color: var(--muted); }
+  #sav-esc-head {
+    display: flex; align-items: center; gap: 6px; width: 100%;
+    background: none; border: none; padding: 0; cursor: pointer;
+    font: 400 12px/1.4 var(--font); color: var(--muted); text-align: left;
+  }
+  #sav-esc-head:hover { color: var(--text); }
+  .sav-esc-caret { display: inline-block; transition: transform .15s; font-size: 10px; }
+  #sav-esc-head[aria-expanded="true"] .sav-esc-caret { transform: rotate(90deg); }
+  #sav-esc-body { display: flex; flex-direction: column; gap: 8px; }
   #sav-escalate input, #sav-escalate textarea, #sav-form input {
     background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
     color: var(--text); font: 400 13px/1.4 var(--font); padding: 7px 10px; width: 100%;
@@ -103,6 +116,8 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
   const form = $<HTMLFormElement>('sav-form');
   const input = $<HTMLInputElement>('sav-input');
   const escForm = $<HTMLFormElement>('sav-escalate');
+  const escHead = $<HTMLButtonElement>('sav-esc-head');
+  const escBody = $<HTMLDivElement>('sav-esc-body');
   const transcript: { role: string; text: string }[] = [];
 
   const scrollDown = () => { messages.scrollTop = messages.scrollHeight; };
@@ -148,6 +163,8 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
 
   function showEscalate(prefill?: string) {
     escForm.hidden = false;
+    escBody.hidden = true;
+    escHead.setAttribute('aria-expanded', 'false');
     form.hidden = true;
     clearActions();
     if (prefill) $<HTMLTextAreaElement>('sav-desc').value = prefill;
@@ -166,6 +183,12 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
   });
   $<HTMLButtonElement>('sav-close').addEventListener('click', () => { panel.hidden = true; });
   $<HTMLButtonElement>('sav-esc-cancel').addEventListener('click', hideEscalate);
+  escHead.addEventListener('click', () => {
+    const open = escBody.hidden;
+    escBody.hidden = !open;
+    escHead.setAttribute('aria-expanded', String(open));
+    if (open) $<HTMLInputElement>('sav-name').focus();
+  });
 
   function thanks() {
     clearActions();
