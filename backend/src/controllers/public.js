@@ -222,6 +222,9 @@ export async function createMessage(req, res) {
     if (email && !EMAIL_RE.test(email)) {
       return res.status(400).json({ error: 'Email invalide.' });
     }
+    if (!email?.trim() && !phone?.trim()) {
+      return res.status(400).json({ error: 'Email ou téléphone requis.' });
+    }
     if (!message || typeof message !== 'string' || message.trim().length < 10) {
       return res.status(400).json({ error: 'Message trop court.' });
     }
@@ -232,13 +235,13 @@ export async function createMessage(req, res) {
       phone: phone?.trim().slice(0, 40) || null,
       projectType: projectType?.slice(0, 100) || null,
       message: message.trim().slice(0, 5000),
-      source: ['contact', 'janus', 'voice'].includes(source) ? source : 'contact',
+      source: ['contact', 'janus', 'voice', 'sav'].includes(source) ? source : 'contact',
     });
 
     // Alimentation de la table prospects (dédoublonnée par email/téléphone).
     upsertProspect({
       name: name.trim(), email: email?.trim(), phone: phone?.trim(),
-      projectType, source: ['contact', 'janus', 'voice'].includes(source) ? source : 'contact',
+      projectType, source: ['contact', 'janus', 'voice', 'sav'].includes(source) ? source : 'contact',
       consent,
     });
 
