@@ -1246,16 +1246,24 @@ const base = import.meta.env.BASE_URL;
     st.textContent = configured
       ? '✅ Facebook connecté — les posts peuvent être publiés.'
       : '⚠️ Facebook non connecté — les posts restent en brouillon (tokens à configurer côté serveur).';
+    const spStatus = { draft: 'Brouillon', published: 'Publié', failed: 'Échec' };
     $('#social-list').innerHTML = posts.length ? posts.map((p) => `
       <div class="card" style="margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:start;gap:12px">
-          <div style="flex:1">
+          <div style="flex:1;min-width:0">
             <span class="tag-pill">${p.refType === 'article' ? '📰 Article' : '🚧 Réalisation'}</span>
-            <span class="tag-pill ${p.status === 'published' ? 'pub' : p.status === 'failed' ? 'failed' : 'draft'}">${p.status}</span>
+            <span class="tag-pill ${p.status === 'published' ? 'pub' : p.status === 'failed' ? 'failed' : 'draft'}">${spStatus[p.status] ?? p.status}</span>
+            ${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;margin-top:8px">` : ''}
             <div class="msg-body" style="margin-top:8px" id="sp-content-${p.id}">${esc(p.content)}</div>
+            <div id="sp-edit-${p.id}" style="display:none;margin-top:8px">
+              <textarea class="sp-edit-area" rows="8">${esc(p.content)}</textarea>
+              <div class="form-actions"><button class="btn btn-primary" data-sp-save="${p.id}">Enregistrer</button>
+              <button class="btn" data-sp-cancel="${p.id}">Annuler</button></div>
+            </div>
             ${p.error ? `<div style="color:var(--danger);font-size:12px;margin-top:4px">${esc(p.error)}</div>` : ''}
           </div>
           <div style="white-space:nowrap;display:flex;flex-direction:column;gap:6px">
+            ${p.status === 'draft' ? `<button class="btn btn-sm" data-sp-edit="${p.id}">Modifier</button>` : ''}
             ${p.status !== 'published' ? `<button class="btn btn-sm btn-primary" data-sp-pub="${p.id}">Publier sur FB</button>` : ''}
             <button class="btn btn-sm btn-danger" data-sp-del="${p.id}">✕</button>
           </div>
@@ -1265,6 +1273,22 @@ const base = import.meta.env.BASE_URL;
       try {
         await api.post(`/api/admin/social-posts/${b.dataset.spPub}/publish`, {});
         showAlert('Publié sur Facebook.');
+      } catch (err) { showAlert(err.message, false); }
+      loaders.social();
+    }));
+    document.querySelectorAll('[data-sp-edit]').forEach((b) => b.addEventListener('click', () => {
+      $(`#sp-content-${b.dataset.spEdit}`).style.display = 'none';
+      $(`#sp-edit-${b.dataset.spEdit}`).style.display = 'block';
+    }));
+    document.querySelectorAll('[data-sp-cancel]').forEach((b) => b.addEventListener('click', () => {
+      $(`#sp-edit-${b.dataset.spCancel}`).style.display = 'none';
+      $(`#sp-content-${b.dataset.spCancel}`).style.display = 'block';
+    }));
+    document.querySelectorAll('[data-sp-save]').forEach((b) => b.addEventListener('click', async () => {
+      const content = document.querySelector(`#sp-edit-${b.dataset.spSave} .sp-edit-area`).value.trim();
+      try {
+        await api.put(`/api/admin/social-posts/${b.dataset.spSave}`, { content });
+        showAlert('Post mis à jour.');
       } catch (err) { showAlert(err.message, false); }
       loaders.social();
     }));

@@ -3,7 +3,7 @@
 // les posts restent en brouillon et une notification ntfy est envoyée.
 import { eq, and, isNotNull, lte, gt } from 'drizzle-orm';
 import { db } from '../db.js';
-import { socialPosts, projects, articles, categories } from '../db/schema.js';
+import { socialPosts, projects, articles, categories, settings } from '../db/schema.js';
 import { notify } from './notify.js';
 
 const SITE_URL = (process.env.PUBLIC_SITE_URL || 'https://pepito-services.fr').replace(/\/$/, '');
@@ -14,12 +14,32 @@ export function postLink(refType, item) {
   return `${SITE_URL}/realisations/?categorie=${item.categorySlug ?? ''}#${item.slug}`;
 }
 
-export function buildPostContent(refType, item, siteName = 'Pépito Services') {
+// Infos du BO injectées dans les posts : nom, téléphone, zone, baseline.
+async function loadPostInfo() {
+  const info = { siteName: 'Pépito Services', phone: '', serviceArea: '', baseline: '' };
+  try {
+    const rows = await db.select().from(settings);
+    const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+    info.siteName = map.site_name || info.siteName;
+    info.phone = map.phone || '';
+    info.serviceArea = map.service_area || '';
+    info.baseline = map.baseline || '';
+  } catch (err) {
+    console.error('loadPostInfo:', err.message);
+  }
+  return info;
+}
+
+export function buildPostContent(refType, item, info = {}) {
+  const { siteName = 'Pépito Services', phone = '', serviceArea = '', baseline = '' } = info;
   const parts = [];
   parts.push(refType === 'article' ? `📰 ${item.title}` : `🚧 Nouvelle réalisation : ${item.title}`);
   if (item.summary) parts.push(item.summary);
+  const meta = [item.city && `📍 ${item.city}`, serviceArea && `Zone d'intervention : ${serviceArea}`].filter(Boolean).join(' · ');
+  if (meta) parts.push(meta);
   parts.push(`👉 ${postLink(refType, item)}`);
-  parts.push(`— ${siteName}`);
+  const footer = [`— ${siteName}`, baseline, phone && `📞 ${phone} · Devis gratuit`].filter(Boolean).join('\n');
+  parts.push(footer);
   return parts.join('\n\n');
 }
 
@@ -34,7 +54,8 @@ export async function queueSocialPost(refType, item, categorySlug) {
     const [dup] = await db.select({ id: socialPosts.id }).from(socialPosts)
       .where(and(eq(socialPosts.refType, refType), eq(socialPosts.refId, item.id)));
     if (dup) return;
-    const content = buildPostContent(refType, { ...item, categorySlug });
+    const info = await loadPostInfo();
+    const content = buildPostContent(refType, { ...item, categorySlug }, info);
     await db.insert(socialPosts).values({
       refType,
       refId: item.id,
