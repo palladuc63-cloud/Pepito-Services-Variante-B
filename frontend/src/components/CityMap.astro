@@ -52,7 +52,7 @@ const zone = radiusKm ? { lat: home.lat, lng: home.lng, radius: radiusKm * 1000 
     function initCityMap() {
       var el = document.getElementById('city-map');
       if (!el || el.dataset.done || typeof L === 'undefined') return;
-      el.dataset.done = '1';
+      try {
       var markers = [];
       try { markers = JSON.parse(el.dataset.markers || '[]'); } catch (e) {}
       var map = L.map('city-map', { scrollWheelZoom: false });
@@ -94,13 +94,20 @@ const zone = radiusKm ? { lat: home.lat, lng: home.lng, radius: radiusKm * 1000 
         L.marker(ll, { icon: m.url ? icon : iconSoon }).addTo(map).bindPopup(popup);
       });
       if (zone && zone.radius) {
-        map.fitBounds(L.circle([zone.lat, zone.lng], { radius: zone.radius }).getBounds());
+        // LatLng.toBounds : bounds sans avoir besoin d'une carte (Circle.getBounds exige _map)
+        map.fitBounds(L.latLng(zone.lat, zone.lng).toBounds(zone.radius * 2));
       } else if (bounds.length) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
       else map.setView([45.8567, 3.5489], 9);
       // Navigation SPA : la carte peut être init avant que son conteneur
       // ait sa taille finale → recalcul différé pour forcer le chargement
       setTimeout(function () { map.invalidateSize(); }, 150);
       setTimeout(function () { map.invalidateSize(); }, 600);
+      el.dataset.done = '1';
+      } catch (err) {
+        // Init incomplète : nettoyer la carte partielle pour pouvoir retenter
+        try { if (map && map.remove) map.remove(); } catch (e) {}
+        console.error('CityMap init failed', err);
+      }
     }
     function whenReady() {
       if (typeof L !== 'undefined') initCityMap();
