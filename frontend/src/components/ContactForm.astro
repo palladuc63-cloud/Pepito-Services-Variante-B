@@ -90,6 +90,13 @@ const projectTypes = [
     <span class="form-error" id="error-message" role="alert" aria-live="assertive"></span>
   </div>
 
+  <div class="form-field form-consent">
+    <label for="contact-consent" class="form-consent-label">
+      <input type="checkbox" id="contact-consent" name="consent" />
+      <span>J'accepte d'être recontacté(e) par Pépito Services pour ma demande et ses offres.</span>
+    </label>
+  </div>
+
   <button type="submit" class="btn btn-primary form-submit">
     Envoyer ma demande
   </button>
@@ -178,6 +185,7 @@ const projectTypes = [
             projectType: String(formData.get('projectType') ?? '') || null,
             message,
             source: 'contact',
+            consent: Boolean(formData.get('consent')),
           }),
         });
         if (!res.ok) {
@@ -251,5 +259,27 @@ const projectTypes = [
   .form-success p:first-child {
     font-weight: 600;
     margin-bottom: var(--space-2);
+  }
+
+  .form-consent {
+    margin-bottom: var(--space-4);
+  }
+
+  .form-consent-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.45;
+    cursor: pointer;
+  }
+
+  .form-consent-label input {
+    margin-top: 0.15rem;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    accent-color: var(--color-primary);
   }
 </style>

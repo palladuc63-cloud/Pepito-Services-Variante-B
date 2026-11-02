@@ -87,6 +87,23 @@ export const messages = mysqlTable('messages', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Prospects : contacts dédoublonnés alimentés par tous les canaux
+// (formulaire, chatbot Janus, assistant vocal). Un prospect peut
+// correspondre à plusieurs messages.
+export const prospects = mysqlTable('prospects', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 150 }).notNull(),
+  email: varchar('email', { length: 255 }),
+  phone: varchar('phone', { length: 40 }),
+  source: varchar('source', { length: 40 }).default('contact').notNull(), // contact | janus | voice | manuel
+  projectType: varchar('project_type', { length: 100 }),
+  status: varchar('status', { length: 20 }).default('nouveau').notNull(), // nouveau | contacte | qualifie | gagne | perdu
+  consent: boolean('consent').default(false).notNull(),               // opt-in recontact marketing
+  notes: text('notes'),                                               // suivi commercial
+  lastContactAt: timestamp('last_contact_at'),                        // dernière demande reçue
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Réglages du site (clé/valeur) : coordonnées, réseaux, textes
 export const settings = mysqlTable('settings', {
   key: varchar('key', { length: 80 }).primaryKey(),

@@ -117,6 +117,19 @@ const DDL = [
     replied_at TIMESTAMP NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
   )`,
+  `CREATE TABLE IF NOT EXISTS prospects (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(255),
+    phone VARCHAR(40),
+    source VARCHAR(40) NOT NULL DEFAULT 'contact',
+    project_type VARCHAR(100),
+    status VARCHAR(20) NOT NULL DEFAULT 'nouveau',
+    consent TINYINT(1) NOT NULL DEFAULT 0,
+    notes TEXT,
+    last_contact_at TIMESTAMP NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
   `CREATE TABLE IF NOT EXISTS settings (
     \`key\` VARCHAR(80) PRIMARY KEY,
     value TEXT

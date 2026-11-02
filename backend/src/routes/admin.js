@@ -31,6 +31,9 @@ router.get('/messages', ctrl.listMessages);
 router.put('/messages/:id', ctrl.markMessageRead);
 router.post('/messages/:id/reply', ctrl.replyToMessage);
 router.delete('/messages/:id', ctrl.deleteMessage);
+router.get('/prospects', ctrl.listProspects);
+router.put('/prospects/:id', ctrl.updateProspect);
+router.delete('/prospects/:id', ctrl.deleteProspect);
 
 router.get('/settings', ctrl.getSettings);
 router.put('/settings', ctrl.updateSettings);

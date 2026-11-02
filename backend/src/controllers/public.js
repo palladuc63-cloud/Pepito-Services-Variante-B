@@ -6,6 +6,7 @@ import {
 } from '../db/schema.js';
 import { notify } from '../utils/notify.js';
 import { sendMail } from '../utils/mailer.js';
+import { upsertProspect } from '../utils/prospects.js';
 import { isAdminRequest } from '../utils/auth.js';
 
 async function getSettingsMap() {
@@ -166,7 +167,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function createMessage(req, res) {
   try {
-    const { name, email, phone, projectType, message, source, skipMail } = req.body ?? {};
+    const { name, email, phone, projectType, message, source, skipMail, consent } = req.body ?? {};
     if (!name || typeof name !== 'string' || name.trim().length < 2) {
       return res.status(400).json({ error: 'Nom requis.' });
     }
@@ -184,6 +185,13 @@ export async function createMessage(req, res) {
       projectType: projectType?.slice(0, 100) || null,
       message: message.trim().slice(0, 5000),
       source: ['contact', 'janus', 'voice'].includes(source) ? source : 'contact',
+    });
+
+    // Alimentation de la table prospects (dédoublonnée par email/téléphone).
+    upsertProspect({
+      name: name.trim(), email: email?.trim(), phone: phone?.trim(),
+      projectType, source: ['contact', 'janus', 'voice'].includes(source) ? source : 'contact',
+      consent,
     });
 
     notify(

@@ -2,7 +2,7 @@ import { eq, asc, desc, and } from 'drizzle-orm';
 import { db } from '../db.js';
 import {
   categories, services, projects, articles, messages, settings,
-  projectImages, cityPages, seoMeta, redirects,
+  projectImages, cityPages, seoMeta, redirects, prospects,
 } from '../db/schema.js';
 import { slugify } from '../utils/slug.js';
 import { ensureCityPage, fetchCityInfo } from '../utils/citygen.js';
@@ -381,6 +381,28 @@ export async function replyToMessage(req, res) {
 
 export async function deleteMessage(req, res) {
   await db.delete(messages).where(eq(messages.id, Number(req.params.id)));
+  res.json({ status: 'ok' });
+}
+
+// ─── Prospects ──────────────────────────────────────────────
+export const listProspects = async (_req, res) =>
+  res.json(await db.select().from(prospects).orderBy(desc(prospects.lastContactAt), desc(prospects.createdAt)));
+
+const PROSPECT_STATUSES = ['nouveau', 'contacte', 'qualifie', 'gagne', 'perdu'];
+
+export async function updateProspect(req, res) {
+  const { status, notes, consent } = req.body ?? {};
+  const patch = {};
+  if (status !== undefined && PROSPECT_STATUSES.includes(status)) patch.status = status;
+  if (notes !== undefined) patch.notes = String(notes).slice(0, 5000);
+  if (consent !== undefined) patch.consent = Boolean(consent);
+  if (!Object.keys(patch).length) return res.status(400).json({ error: 'Rien à mettre à jour.' });
+  await db.update(prospects).set(patch).where(eq(prospects.id, Number(req.params.id)));
+  res.json({ status: 'ok' });
+}
+
+export async function deleteProspect(req, res) {
+  await db.delete(prospects).where(eq(prospects.id, Number(req.params.id)));
   res.json({ status: 'ok' });
 }
 
