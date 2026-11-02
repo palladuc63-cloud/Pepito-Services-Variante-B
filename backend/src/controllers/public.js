@@ -5,6 +5,7 @@ import {
   cityPages, seoMeta, redirects,
 } from '../db/schema.js';
 import { notify } from '../utils/notify.js';
+import { sendMail } from '../utils/mailer.js';
 import { isAdminRequest } from '../utils/auth.js';
 
 async function getSettingsMap() {
@@ -189,6 +190,19 @@ export async function createMessage(req, res) {
       `📩 Nouveau message — Pépito Services`,
       `${name.trim()}${projectType ? ` (${projectType})` : ''}\n${message.trim().slice(0, 300)}`,
     );
+
+    sendMail({
+      subject: `📩 Message du site — ${name.trim()}${projectType ? ` (${projectType})` : ''}`,
+      replyTo: email?.trim() || undefined,
+      text: [
+        `Nom : ${name.trim()}`,
+        email?.trim() ? `Email : ${email.trim()}` : null,
+        phone?.trim() ? `Téléphone : ${phone.trim()}` : null,
+        projectType ? `Projet : ${projectType}` : null,
+        '',
+        message.trim(),
+      ].filter((l) => l !== null).join('\n'),
+    }).catch((e) => console.error('mailer:', e.message));
 
     res.status(201).json({ status: 'ok' });
   } catch (err) {
