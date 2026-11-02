@@ -296,9 +296,6 @@ const base = import.meta.env.BASE_URL;
     return Number.isNaN(d.getTime()) ? '' : new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   };
   // Badge « ⏰ programmé » si publication dans le futur
-  const schedBadge = (e) => (e.publishedAt && new Date(e.publishedAt) > new Date())
-    ? ` <span class="tag-pill" title="En ligne le ${new Date(e.publishedAt).toLocaleString('fr-FR')}">⏰ ${new Date(e.publishedAt).toLocaleDateString('fr-FR')}</span>`
-    : '';
   // Pilule de statut à 3 états : Brouillon / ⏰ Programmé / Publié
   const statusBadge = (e) => {
     if (!e.published) return '<span class="tag-pill draft">Brouillon</span>';
@@ -677,7 +674,7 @@ const base = import.meta.env.BASE_URL;
         <td>${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="" />` : ''}</td>
         <td><strong>${esc(p.title)}</strong><br/><span style="color:var(--muted);font-size:12px">${esc(p.summary ?? '')}</span></td>
         <td>${esc(p.category?.label ?? '—')}</td>
-        <td><span class="tag-pill ${p.published ? 'pub' : 'draft'}">${p.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(p)}</td>
+        <td>${statusBadge(p)}</td>
         <td style="text-align:right;white-space:nowrap">
           <a class="btn btn-sm" href="${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
           <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
@@ -689,7 +686,7 @@ const base = import.meta.env.BASE_URL;
        <span class="muted">${esc(p.summary ?? '')}</span>
        <div class="item-card-meta"><span class="tag-pill">${esc(p.category?.label ?? '—')}</span>
          ${p.city ? `<span class="tag-pill">📍 ${esc(p.city)}</span>` : ''}
-         <span class="tag-pill ${p.published ? 'pub' : 'draft'}">${p.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(p)}</div>`,
+         ${statusBadge(p)}</div>`,
       `<a class="btn btn-sm" href="${siteBase}realisations/${p.slug}/?preview=1" target="_blank">Voir</a>
        <button class="btn btn-sm" data-proj-edit="${p.id}">Éditer</button>
        <button class="btn btn-sm btn-danger" data-proj-del="${p.id}">✕</button>`)).join('')
@@ -825,7 +822,7 @@ const base = import.meta.env.BASE_URL;
         <td>${a.imageUrl ? `<img src="${esc(a.imageUrl)}" alt="" />` : ''}</td>
         <td><strong>${esc(a.title)}</strong><br/><span style="color:var(--muted);font-size:12px">/${esc(a.slug)}/</span></td>
         <td>${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('fr-FR') : '—'}</td>
-        <td><span class="tag-pill ${a.published ? 'pub' : 'draft'}">${a.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(a)}</td>
+        <td>${statusBadge(a)}</td>
         <td style="text-align:right;white-space:nowrap">
           <a class="btn btn-sm" href="${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
           <button class="btn btn-sm" data-art-edit="${a.id}">Éditer</button>
@@ -836,7 +833,7 @@ const base = import.meta.env.BASE_URL;
       `<strong>${esc(a.title)}</strong>
        <span class="muted">/${esc(a.slug)}/</span>
        <div class="item-card-meta"><span class="tag-pill">${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('fr-FR') : '—'}</span>
-         <span class="tag-pill ${a.published ? 'pub' : 'draft'}">${a.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(a)}</div>`,
+         ${statusBadge(a)}</div>`,
       `<a class="btn btn-sm" href="${siteBase}actualites/${a.slug}/?preview=1" target="_blank">Voir</a>
        <button class="btn btn-sm" data-art-edit="${a.id}">Éditer</button>
        <button class="btn btn-sm btn-danger" data-art-del="${a.id}">✕</button>`)).join('')
@@ -952,7 +949,7 @@ const base = import.meta.env.BASE_URL;
       <tr>
         <td><code>/${esc(c.serviceSlug)}/${esc(c.slug)}/</code>${c.auto ? '<br/><span class="tag-pill">Auto</span>' : ''}</td>
         <td><strong>${esc(c.title)}</strong><br/><span style="color:var(--muted);font-size:12px">${esc(c.city)}</span></td>
-        <td><span class="tag-pill ${c.published ? 'pub' : 'draft'}">${c.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(c)}</td>
+        <td>${statusBadge(c)}</td>
         <td style="text-align:right;white-space:nowrap">
           ${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
           <a class="btn btn-sm" href="${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
@@ -964,7 +961,7 @@ const base = import.meta.env.BASE_URL;
       `<strong>${esc(c.title)}</strong>
        <span class="muted"><code>/${esc(c.serviceSlug)}/${esc(c.slug)}/</code></span>
        <div class="item-card-meta">${c.auto ? '<span class="tag-pill">Auto</span>' : ''}
-         <span class="tag-pill ${c.published ? 'pub' : 'draft'}">${c.published ? 'Publié' : 'Brouillon'}</span>${schedBadge(c)}</div>`,
+         ${statusBadge(c)}</div>`,
       `${!c.published ? `<button class="btn btn-sm btn-primary" data-city-pub="${c.id}">Publier</button>` : ''}
        <a class="btn btn-sm" href="${siteBase}${c.serviceSlug}/${c.slug}/${c.published ? '' : '?preview=1'}" target="_blank">Voir</a>
        <button class="btn btn-sm" data-city-edit="${c.id}">Éditer</button>
