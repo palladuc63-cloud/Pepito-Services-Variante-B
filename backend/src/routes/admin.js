@@ -1,11 +1,16 @@
 import express from 'express';
 import { authenticateJWT } from '../utils/auth.js';
 import * as ctrl from '../controllers/admin.js';
+import * as support from '../controllers/support.js';
 import * as social from '../controllers/social.js';
 import * as analytics from '../controllers/analytics.js';
+import { rateLimit } from '../utils/rateLimit.js';
 
 const router = express.Router();
 router.use(authenticateJWT);
+
+// Assistant SAV du back-office (widget « ? ») — mêmes auth JWT que le BO.
+router.post('/support', rateLimit({ max: 30, message: 'Trop de requêtes, réessayez dans un instant.' }), support.support);
 
 router.get('/categories', ctrl.listCategories);
 router.post('/categories', ctrl.createCategory);

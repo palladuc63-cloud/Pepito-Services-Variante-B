@@ -1,0 +1,228 @@
+---
+// Assistant SAV du back-office Pépito — bouton « ? » + panneau d'aide.
+// Monté uniquement sur /admin/dashboard (session JWT requise côté API).
+// Périmètre : utilisation du BO + infos techniques basiques — tout le
+// reste est renvoyé vers « Signaler un problème » (ticket au prestataire).
+// Désactivation : PUBLIC_SAV_WIDGET=0 dans l'environnement du frontend.
+const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
+---
+
+{enabled && (
+<>
+<button id="sav-toggle" type="button" aria-label="Ouvrir l'aide">?</button>
+
+<div id="sav-panel" hidden role="dialog" aria-label="Assistant SAV">
+  <div class="sav-head">
+    <div>
+      <strong>Aide</strong>
+      <span>Utilisation du back-office — ou signalez un problème</span>
+    </div>
+    <button id="sav-close" type="button" aria-label="Fermer">✕</button>
+  </div>
+
+  <div id="sav-messages"></div>
+  <div id="sav-actions" hidden></div>
+
+  <form id="sav-escalate" hidden>
+    <p>Décrivez le problème — votre prestataire est notifié par email.</p>
+    <input id="sav-name" required maxlength="120" placeholder="Votre nom" />
+    <input id="sav-contact" required maxlength="200" placeholder="Email ou téléphone" />
+    <textarea id="sav-desc" required maxlength="5000" rows="3" placeholder="Décrivez le problème…"></textarea>
+    <div class="sav-esc-row">
+      <button type="submit" class="sav-primary">Envoyer</button>
+      <button type="button" id="sav-esc-cancel">Annuler</button>
+    </div>
+  </form>
+
+  <form id="sav-form">
+    <input id="sav-input" type="text" maxlength="2000" placeholder="Votre question…" autocomplete="off" />
+    <button type="submit" class="sav-primary" aria-label="Envoyer">→</button>
+  </form>
+</div>
+
+<style>
+  #sav-toggle {
+    position: fixed; bottom: 20px; right: 20px; z-index: 900;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--green); color: #06120b;
+    font: 700 20px/1 var(--font); border: none; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,.45);
+  }
+  #sav-toggle:hover { background: var(--green-dark); }
+  #sav-panel {
+    position: fixed; bottom: 78px; right: 20px; z-index: 900;
+    width: 22rem; max-width: calc(100vw - 2.5rem);
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,.55);
+    font-family: var(--font); color: var(--text);
+  }
+  .sav-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; background: var(--panel-2); border-bottom: 1px solid var(--border);
+  }
+  .sav-head strong { font-size: 14px; display: block; }
+  .sav-head span { font-size: 11px; color: var(--muted); }
+  .sav-head button { background: none; border: none; color: var(--muted); font-size: 15px; cursor: pointer; }
+  .sav-head button:hover { color: var(--text); }
+  #sav-messages { max-height: 320px; min-height: 140px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  #sav-messages .m-user { align-self: flex-end; max-width: 85%; background: var(--green); color: #06120b; border-radius: 12px 12px 4px 12px; padding: 8px 12px; font-size: 13px; }
+  #sav-messages .m-bot { align-self: flex-start; max-width: 90%; background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px 12px 12px 4px; padding: 8px 12px; font-size: 13px; }
+  #sav-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; }
+  #sav-actions .sav-chip, #sav-actions .sav-link {
+    font-size: 12px; padding: 5px 10px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--panel-2); color: var(--text); text-decoration: none;
+  }
+  #sav-actions .sav-chip:hover, #sav-actions .sav-link:hover { border-color: var(--green); }
+  #sav-actions .sav-chip.sav-primary { background: var(--green); border-color: var(--green); color: #06120b; font-weight: 600; }
+  #sav-escalate, #sav-form { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--border); }
+  #sav-escalate { flex-direction: column; }
+  #sav-escalate p { margin: 0; font-size: 12px; color: var(--muted); }
+  #sav-escalate input, #sav-escalate textarea, #sav-form input {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font: 400 13px/1.4 var(--font); padding: 7px 10px; width: 100%;
+  }
+  #sav-escalate textarea { resize: vertical; }
+  #sav-escalate input:focus, #sav-escalate textarea:focus, #sav-form input:focus { outline: none; border-color: var(--green); }
+  .sav-esc-row { display: flex; gap: 8px; }
+  .sav-primary { background: var(--green); border: none; border-radius: 8px; color: #06120b; font-weight: 600; padding: 7px 14px; cursor: pointer; font-size: 13px; }
+  .sav-primary:hover { background: var(--green-dark); }
+  #sav-esc-cancel, #sav-escalate #sav-esc-cancel { background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); padding: 7px 12px; cursor: pointer; font-size: 13px; }
+  #sav-form input { flex: 1; }
+</style>
+
+<script>
+  import { api } from '../lib/adminApi.js';
+
+  const $ = <T extends HTMLElement>(id: string) =>
+    document.getElementById(id) as unknown as T;
+  const toggle = $<HTMLButtonElement>('sav-toggle');
+  const panel = $<HTMLDivElement>('sav-panel');
+  const messages = $<HTMLDivElement>('sav-messages');
+  const actions = $<HTMLDivElement>('sav-actions');
+  const form = $<HTMLFormElement>('sav-form');
+  const input = $<HTMLInputElement>('sav-input');
+  const escForm = $<HTMLFormElement>('sav-escalate');
+  const transcript: { role: string; text: string }[] = [];
+
+  const scrollDown = () => { messages.scrollTop = messages.scrollHeight; };
+
+  // Contenu dynamique via textContent uniquement — jamais innerHTML.
+  function bubble(role: string, text: string) {
+    const d = document.createElement('div');
+    d.className = role === 'user' ? 'm-user' : 'm-bot';
+    d.textContent = text;
+    messages.appendChild(d);
+    scrollDown();
+    transcript.push({ role, text: String(text).slice(0, 2000) });
+    return d;
+  }
+
+  function clearActions() {
+    actions.hidden = true;
+    while (actions.firstChild) actions.removeChild(actions.firstChild);
+  }
+
+  function chip(label: string, onClick: () => void, primary = false) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    b.className = 'sav-chip' + (primary ? ' sav-primary' : '');
+    b.addEventListener('click', onClick);
+    actions.appendChild(b);
+    actions.hidden = false;
+  }
+
+  function tabLink(tab: string) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = 'Ouvrir l\'onglet →';
+    b.className = 'sav-link';
+    b.addEventListener('click', () => {
+      (document.querySelector(`.admin-nav-link[data-tab="${tab}"]`) as HTMLElement | null)?.click();
+      panel.hidden = true;
+    });
+    actions.appendChild(b);
+    actions.hidden = false;
+  }
+
+  function showEscalate(prefill?: string) {
+    escForm.hidden = false;
+    form.hidden = true;
+    clearActions();
+    if (prefill) $<HTMLTextAreaElement>('sav-desc').value = prefill;
+  }
+  function hideEscalate() {
+    escForm.hidden = true;
+    form.hidden = false;
+  }
+
+  toggle.addEventListener('click', () => {
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden && messages.children.length === 0) {
+      bubble('assistant', 'Bonjour — je peux vous aider sur l\'utilisation du back-office (réalisations, articles, messages, paramètres…). Pour tout le reste, je transmets à votre prestataire.');
+    }
+    if (!panel.hidden) input.focus();
+  });
+  $<HTMLButtonElement>('sav-close').addEventListener('click', () => { panel.hidden = true; });
+  $<HTMLButtonElement>('sav-esc-cancel').addEventListener('click', hideEscalate);
+
+  async function ask(message: string) {
+    const r = await api.post('/api/admin/support', { action: 'ask', message });
+    clearActions();
+    if (r.kind === 'answer') {
+      bubble('assistant', r.answer);
+      if (r.tab) tabLink(r.tab);
+      chip('Signaler un problème', () => showEscalate(message));
+    } else {
+      bubble('assistant', 'Je n\'ai pas de réponse certaine — ma base ne couvre que l\'utilisation du back-office. Une piste éventuelle, sinon je transmets à votre prestataire :');
+      for (const s of r.suggestions || []) {
+        chip(s.title, () => {
+          bubble('assistant', s.answer);
+          clearActions();
+          if (s.tab) tabLink(s.tab);
+          chip('Signaler un problème', () => showEscalate(message));
+        });
+      }
+      chip('Signaler un problème', () => showEscalate(message), true);
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    bubble('user', msg);
+    const pending = bubble('assistant', '…');
+    try {
+      await ask(msg);
+    } catch (err) {
+      bubble('assistant', 'Une erreur est survenue — utilisez « Signaler un problème » pour joindre votre prestataire.');
+      chip('Signaler un problème', () => showEscalate(msg), true);
+    } finally {
+      pending.remove();
+      transcript.pop();
+    }
+  });
+
+  escForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await api.post('/api/admin/support', {
+        action: 'escalate',
+        name: $<HTMLInputElement>('sav-name').value.trim(),
+        contact: $<HTMLInputElement>('sav-contact').value.trim(),
+        description: $<HTMLTextAreaElement>('sav-desc').value.trim(),
+        page: location.pathname,
+        transcript: transcript.slice(-10),
+      });
+      hideEscalate();
+      bubble('assistant', 'C\'est transmis — votre prestataire est notifié par email et la demande est visible dans l\'onglet Messages (pastille « SAV »).');
+    } catch {
+      bubble('assistant', 'L\'envoi a échoué — réessayez ou contactez directement votre prestataire.');
+    }
+  });
+</script>
+</>
+)}

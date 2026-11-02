@@ -97,7 +97,7 @@ export const messages = mysqlTable('messages', {
   phone: varchar('phone', { length: 40 }),
   projectType: varchar('project_type', { length: 100 }),
   message: text('message').notNull(),
-  source: varchar('source', { length: 40 }).default('contact').notNull(), // contact | janus | voice
+  source: varchar('source', { length: 40 }).default('contact').notNull(), // contact | janus | voice | sav
   isRead: boolean('is_read').default(false).notNull(),
   repliedAt: timestamp('replied_at'),                             // réponse envoyée depuis le BO
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -111,7 +111,7 @@ export const prospects = mysqlTable('prospects', {
   name: varchar('name', { length: 150 }).notNull(),
   email: varchar('email', { length: 255 }),
   phone: varchar('phone', { length: 40 }),
-  source: varchar('source', { length: 40 }).default('contact').notNull(), // contact | janus | voice | manuel
+  source: varchar('source', { length: 40 }).default('contact').notNull(), // contact | janus | voice | manuel | sav
   projectType: varchar('project_type', { length: 100 }),
   status: varchar('status', { length: 20 }).default('nouveau').notNull(), // nouveau | contacte | qualifie | gagne | perdu
   consent: boolean('consent').default(false).notNull(),               // opt-in recontact marketing

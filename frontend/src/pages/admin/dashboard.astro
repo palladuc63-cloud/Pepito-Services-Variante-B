@@ -1,5 +1,6 @@
 ---
 import '../../styles/admin.css';
+import SupportWidget from '../../components/SupportWidget.astro';
 const base = import.meta.env.BASE_URL;
 ---
 <!doctype html>
@@ -1396,8 +1397,8 @@ const base = import.meta.env.BASE_URL;
     ['nouveau', 'Nouveau'], ['contacte', 'Contacté'], ['qualifie', 'Qualifié'],
     ['gagne', 'Gagné'], ['perdu', 'Perdu'],
   ];
-  const SRC_LABEL = { contact: 'Formulaire', janus: 'Chatbot', voice: 'Téléphone', manuel: 'Manuel' };
-  const SRC_ICON = { contact: '📩', janus: '💬', voice: '📞', manuel: '✏️' };
+  const SRC_LABEL = { contact: 'Formulaire', janus: 'Chatbot', voice: 'Téléphone', manuel: 'Manuel', sav: 'SAV' };
+  const SRC_ICON = { contact: '📩', janus: '💬', voice: '📞', manuel: '✏️', sav: '🛠' };
   loaders.prospects = async () => {
     const prospects = await api.get('/api/admin/prospects');
     $('#prospects-list').innerHTML = prospects.length ? `<div class="prospects-grid">${prospects.map((p) => `
@@ -1713,5 +1714,6 @@ const base = import.meta.env.BASE_URL;
     } catch (e) {}
   })();
 </script>
+  <SupportWidget />
   </body>
 </html>
