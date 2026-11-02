@@ -54,6 +54,8 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
     box-shadow: 0 6px 20px rgba(0,0,0,.45);
   }
   #sav-toggle:hover { background: var(--green-dark); }
+  /* Les règles display:flex des IDs battraient sinon l'attribut hidden. */
+  [hidden] { display: none !important; }
   #sav-panel {
     position: fixed; bottom: 78px; right: 20px; z-index: 900;
     width: 22rem; max-width: calc(100vw - 2.5rem);
