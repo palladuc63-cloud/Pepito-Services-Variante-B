@@ -165,11 +165,12 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
 
   function showEscalate(prefill?: string) {
     escForm.hidden = false;
-    escBody.hidden = true;
-    escHead.setAttribute('aria-expanded', 'false');
+    escBody.hidden = false;
+    escHead.setAttribute('aria-expanded', 'true');
     form.hidden = true;
     clearActions();
     if (prefill) $<HTMLTextAreaElement>('sav-desc').value = prefill;
+    $<HTMLInputElement>('sav-name').focus();
   }
   function hideEscalate() {
     escForm.hidden = true;
