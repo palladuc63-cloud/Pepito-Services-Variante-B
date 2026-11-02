@@ -66,16 +66,17 @@ export const listSlides = async (_req, res) => {
   })));
 };
 
-const slideFields = (b) => ({
-  title: b.title || null,
-  subtitle: b.subtitle || null,
-  imageUrl: b.imageUrl || null,
-  projectId: b.projectId || null,
-  linkUrl: b.linkUrl || null,
-  linkLabel: b.linkLabel || null,
-  ...(b.sortOrder !== undefined && { sortOrder: b.sortOrder }),
-  ...(b.active !== undefined && { active: b.active }),
-});
+// Ne met à jour que les champs présents : un PATCH partiel
+// (ex. { sortOrder } pour réordonner) ne doit pas effacer le reste.
+const slideFields = (b) => {
+  const f = {};
+  for (const k of ['title', 'subtitle', 'imageUrl', 'projectId', 'linkUrl', 'linkLabel']) {
+    if (k in b) f[k] = b[k] || null;
+  }
+  if ('sortOrder' in b) f.sortOrder = b.sortOrder;
+  if ('active' in b) f.active = b.active;
+  return f;
+};
 
 export async function createSlide(req, res) {
   const body = slideFields(req.body ?? {});

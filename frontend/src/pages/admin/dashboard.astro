@@ -106,6 +106,11 @@ const base = import.meta.env.BASE_URL;
             </p>
             <div id="slides-list"></div>
           </div>
+          <div class="card" id="slides-preview-card" hidden>
+            <h2 style="margin:0 0 4px">Aperçu du diaporama</h2>
+            <p class="form-hint" style="margin-top:0">Rendu des slides visibles, dans l'ordre — telles qu'elles apparaîtront sur le site.</p>
+            <div class="slides-preview" id="slides-preview"></div>
+          </div>
         </section>
 
         <!-- RÉALISATIONS -->
@@ -683,6 +688,7 @@ const base = import.meta.env.BASE_URL;
     const el = $('#slides-list');
     if (!slidesList.length) {
       el.innerHTML = '<p class="form-hint">Aucune slide — le hero affiche les 6 premières réalisations publiées.</p>';
+      renderSlidePreview();
       return;
     }
     el.innerHTML = slidesList.map((s, i) => {
@@ -731,7 +737,73 @@ const base = import.meta.env.BASE_URL;
       await api.del(`/api/admin/slides/${b.dataset.slideDel}`);
       loaders.home();
     }));
+
+    renderSlidePreview();
   };
+
+  // Prévisualisation du diaporama — reproduit le hero sans quitter le BO.
+  let spTimer;
+  async function renderSlidePreview() {
+    const card = $('#slides-preview-card');
+    const stage = $('#slides-preview');
+    if (!card || !stage) return;
+    if (spTimer) { clearInterval(spTimer); spTimer = undefined; }
+
+    if (!window._settings) window._settings = await api.get('/api/admin/settings').catch(() => ({}));
+    const st = window._settings || {};
+
+    // Mêmes règles que le site : slides actives avec image, sinon les
+    // 6 premières réalisations publiées.
+    let items = slidesList
+      .filter((s) => s.active && (s.imageUrl || s.projectImageUrl))
+      .map((s) => ({
+        img: s.imageUrl || s.projectImageUrl,
+        title: s.title, subtitle: s.subtitle,
+        linkUrl: s.linkUrl, linkLabel: s.linkLabel,
+      }));
+    let fallback = false;
+    if (!items.length) {
+      const projects = await slideProjects();
+      items = projects.filter((p) => p.published && p.imageUrl).slice(0, 6)
+        .map((p) => ({ img: p.imageUrl }));
+      fallback = true;
+    }
+    if (!items.length) { card.hidden = true; return; }
+    card.hidden = false;
+
+    stage.innerHTML = items.map((s, i) => `
+      <div class="sp-slide${i === 0 ? ' is-active' : ''}">
+        <img src="${esc(s.img)}" alt="" loading="lazy" />
+        <div class="sp-overlay"></div>
+        <div class="sp-content">
+          <h3>${esc(s.title || st.site_name || '')}</h3>
+          ${(s.subtitle || st.baseline) ? `<p class="sp-baseline">${esc(s.subtitle || st.baseline)}</p>` : ''}
+          ${st.description ? `<p class="sp-desc">${esc(st.description)}</p>` : ''}
+          <div class="sp-actions">
+            ${s.linkUrl
+              ? `<a class="sp-btn sp-btn--primary" href="${esc(s.linkUrl)}" target="_blank" rel="noopener">${esc(s.linkLabel || 'Découvrir')}</a><span class="sp-btn sp-btn--ghost">Demander un chiffrage</span>`
+              : `<span class="sp-btn sp-btn--primary">Demander un chiffrage</span><span class="sp-btn sp-btn--ghost">Voir nos réalisations</span>`}
+          </div>
+        </div>
+      </div>`).join('')
+      + (items.length > 1 ? `<div class="sp-dots">${items.map((_, i) => `<button type="button" class="sp-dot${i === 0 ? ' is-active' : ''}" data-sp-dot="${i}" aria-label="Slide ${i + 1}"></button>`).join('')}</div>` : '')
+      + (fallback ? '<span class="sp-badge">Réalisations par défaut</span>' : '');
+
+    if (items.length <= 1) return;
+    const slides = stage.querySelectorAll('.sp-slide');
+    const dots = stage.querySelectorAll('[data-sp-dot]');
+    let cur = 0;
+    const go = (n) => {
+      cur = (n + items.length) % items.length;
+      slides.forEach((s, i) => s.classList.toggle('is-active', i === cur));
+      dots.forEach((d, i) => d.classList.toggle('is-active', i === cur));
+    };
+    const play = () => { spTimer = setInterval(() => go(cur + 1), 4000); };
+    stage.addEventListener('mouseenter', () => clearInterval(spTimer));
+    stage.addEventListener('mouseleave', play);
+    dots.forEach((d, i) => d.addEventListener('click', () => { clearInterval(spTimer); go(i); play(); }));
+    play();
+  }
 
   function slideForm(s, projects) {
     return `
