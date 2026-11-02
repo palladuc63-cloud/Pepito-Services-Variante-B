@@ -9,6 +9,7 @@ import authRouter from './routes/auth.js';
 import publicRouter from './routes/public.js';
 import adminRouter from './routes/admin.js';
 import uploadRouter from './routes/upload.js';
+import { sweepDueSocialPosts } from './utils/social.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -61,4 +62,7 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
 app.listen(PORT, () => {
   console.log(`pepito-backend écoute sur le port ${PORT}`);
+  // Brouillons FB pour les publications programmées arrivées à échéance
+  sweepDueSocialPosts();
+  setInterval(sweepDueSocialPosts, 15 * 60 * 1000);
 });

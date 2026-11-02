@@ -1,14 +1,13 @@
 import { eq, asc, desc, and } from 'drizzle-orm';
 import { db } from '../db.js';
 import {
-  categories, services, projects, articles, messages, settings, socialPosts,
+  categories, services, projects, articles, messages, settings,
   projectImages, cityPages, seoMeta, redirects,
 } from '../db/schema.js';
 import { slugify } from '../utils/slug.js';
 import { ensureCityPage, fetchCityInfo } from '../utils/citygen.js';
 import { nextSlot, backfillDrafts } from '../utils/schedule.js';
-import { buildPostContent, postLink } from '../utils/social.js';
-import { notify } from '../utils/notify.js';
+import { queueSocialPost } from '../utils/social.js';
 import { sendMail } from '../utils/mailer.js';
 import { sanitizeRichHtml } from '../utils/sanitize.js';
 
@@ -22,25 +21,6 @@ async function uniqueSlug(table, base, excludeId) {
     const clash = rows.find((r) => r.slug === candidate && r.id !== excludeId);
     if (!clash) return candidate;
     candidate = `${slug}-${i++}`;
-  }
-}
-
-// Crée un brouillon de post FB quand un contenu est (re)publié
-async function queueSocialPost(refType, item, categorySlug) {
-  try {
-    const SITE = (process.env.PUBLIC_SITE_URL || 'https://pepito-services.fr').replace(/\/$/, '');
-    const content = buildPostContent(refType, { ...item, categorySlug });
-    await db.insert(socialPosts).values({
-      refType,
-      refId: item.id,
-      content,
-      imageUrl: item.imageUrl ? `${SITE}${item.imageUrl}` : null,
-      linkUrl: postLink(refType, { ...item, categorySlug }),
-      status: 'draft',
-    });
-    notify('📝 Post Facebook prêt — Pépito', `${item.title}\nÀ valider dans le back-office.`);
-  } catch (err) {
-    console.error('queueSocialPost:', err.message);
   }
 }
 
