@@ -204,4 +204,9 @@ const base = import.meta.env.BASE_URL;
     }
   }
 
+  /* Thème Nature : pas d'en-tête dans la section À propos */
+  :global([data-theme='nature']) #a-propos .section-header {
+    display: none;
+  }
+
 </style>
