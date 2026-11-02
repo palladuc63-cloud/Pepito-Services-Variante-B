@@ -27,7 +27,6 @@ const base = import.meta.env.BASE_URL;
         <button class="admin-nav-link" data-tab="projects">🚧 Réalisations</button>
         <button class="admin-nav-link" data-tab="citypages">📍 Pages villes</button>
         <button class="admin-nav-link" data-tab="articles">📰 Articles</button>
-        <button class="admin-nav-link" data-tab="services">🛠️ Services</button>
         <button class="admin-nav-link" data-tab="social">📣 Réseaux</button>
         <button class="admin-nav-link" data-tab="settings">⚙️ Paramètres</button>
         <button class="admin-nav-link" id="btn-logout">🚪 Déconnexion</button>
@@ -134,6 +133,18 @@ const base = import.meta.env.BASE_URL;
             </div>
             <div id="projects-cards" class="item-cards" hidden></div>
           </div>
+          <div class="card" style="margin-top:16px">
+            <h2>🗂️ Catégories de réalisations</h2>
+            <table class="admin-table">
+              <thead><tr><th>Slug</th><th>Label</th><th>Ordre</th><th>Active</th><th></th></tr></thead>
+              <tbody id="categories-body"></tbody>
+            </table>
+            <form id="category-form" class="form-row cols-3" style="margin-top:16px;align-items:end">
+              <div><label class="form-label">Nouveau label</label><input class="form-input" id="cat-label" required /></div>
+              <div><label class="form-label">Ordre</label><input class="form-input" id="cat-order" type="number" value="0" /></div>
+              <button class="btn btn-primary" type="submit">+ Ajouter</button>
+            </form>
+          </div>
         </section>
 
         <!-- ARTICLES -->
@@ -159,18 +170,6 @@ const base = import.meta.env.BASE_URL;
           </div>
         </section>
 
-        <!-- SERVICES -->
-        <section id="tab-services" hidden>
-          <div class="card">
-            <h2>Services affichés sur la homepage</h2>
-            <table class="admin-table">
-              <thead><tr><th></th><th>Titre</th><th>Ordre</th><th>Actif</th><th></th></tr></thead>
-              <tbody id="services-body"></tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- CATÉGORIES -->
         <!-- PAGES VILLES -->
         <section id="tab-citypages" hidden>
           <div class="card">
@@ -261,16 +260,11 @@ const base = import.meta.env.BASE_URL;
           </div>
 
           <div class="card" style="margin-top:16px">
-            <h2>🗂️ Catégories de réalisations</h2>
+            <h2>�️ Services affichés sur la homepage</h2>
             <table class="admin-table">
-              <thead><tr><th>Slug</th><th>Label</th><th>Ordre</th><th>Active</th><th></th></tr></thead>
-              <tbody id="categories-body"></tbody>
+              <thead><tr><th></th><th>Titre</th><th>Ordre</th><th>Actif</th><th></th></tr></thead>
+              <tbody id="services-body"></tbody>
             </table>
-            <form id="category-form" class="form-row cols-3" style="margin-top:16px;align-items:end">
-              <div><label class="form-label">Nouveau label</label><input class="form-input" id="cat-label" required /></div>
-              <div><label class="form-label">Ordre</label><input class="form-input" id="cat-order" type="number" value="0" /></div>
-              <button class="btn btn-primary" type="submit">+ Ajouter</button>
-            </form>
           </div>
 
           <div class="card" style="margin-top:16px">
