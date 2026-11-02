@@ -452,3 +452,6 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 
 .tour-actions { display: flex; gap: 8px; margin-top: 16px; align-items: center; }
 .tour-spacer { flex: 1; }
+
+/* Étapes centrées : assombrit tout l'écran (pas de spotlight) */
+#tour-root.tour-dim { background: rgb(0 0 0 / 0.62); }

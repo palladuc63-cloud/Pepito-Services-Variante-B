@@ -1644,7 +1644,8 @@ const base = import.meta.env.BASE_URL;
 
     function placeCard(r) {
       card.classList.toggle('tour-centered', !r);
-      if (!r) return;
+      root.classList.toggle('tour-dim', !r);
+      if (!r) { card.style.top = ''; card.style.left = ''; return; }
       var cw = card.offsetWidth, ch = card.offsetHeight;
       var top = r.bottom + 14;
       if (top + ch > window.innerHeight - 12) top = Math.max(12, r.top - ch - 14);
