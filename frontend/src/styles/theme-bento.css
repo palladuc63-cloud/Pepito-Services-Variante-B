@@ -50,6 +50,18 @@
   :root[data-theme='bento'] .desktop-nav {
     margin-top: 0.9rem;
   }
+
+  /* Logo grand à l'ouverture, réduit au scroll */
+  :root[data-theme='bento'] .site-logo {
+    width: 11.5rem;
+    height: 4.5rem;
+    transition: width 0.35s ease, height 0.35s ease;
+  }
+
+  :root[data-theme='bento'] .site-header.is-scrolled .site-logo {
+    width: 8rem;
+    height: 3.25rem;
+  }
 }
 
 :root[data-theme='bento'] .desktop-nav {

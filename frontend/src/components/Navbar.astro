@@ -151,6 +151,15 @@ const navLinks = settings.nav.map((link) => ({
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') closeMenu();
     });
+
+    // Logo rétractable : classe sur le header passé un seuil de scroll
+    const header = document.querySelector('.site-header');
+    if (header) {
+      const onScroll = () =>
+        header.classList.toggle('is-scrolled', window.scrollY > 28);
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
   })();
 </script>
 
