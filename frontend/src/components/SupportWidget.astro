@@ -167,13 +167,40 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
   $<HTMLButtonElement>('sav-close').addEventListener('click', () => { panel.hidden = true; });
   $<HTMLButtonElement>('sav-esc-cancel').addEventListener('click', hideEscalate);
 
+  function thanks() {
+    clearActions();
+    bubble('assistant', 'Parfait — n\'hésitez pas si vous avez une autre question.');
+  }
+
+  // L'escalade n'apparaît qu'en second recours : « Ce n'est pas ça » ou
+  // « Aucune de ces pistes », jamais en face d'une réponse utile —
+  // sauf si la réponse renvoie elle-même vers l'escalade (bug, mot de
+  // passe, suppression : entrées KB marquées `escalate`).
+  function showFeedback(message: string) {
+    chip('C\'est bon, merci', thanks);
+    chip('Ce n\'est pas ça', () => {
+      clearActions();
+      bubble('assistant', 'Désolé — reformulez autrement, ou transmettez votre demande à votre prestataire :');
+      chip('Signaler un problème', () => showEscalate(message), true);
+    });
+  }
+
+  function afterAnswer(entry: { answer: string; tab?: string | null; escalate?: boolean }, message: string) {
+    bubble('assistant', entry.answer);
+    if (entry.tab) tabLink(entry.tab);
+    if (entry.escalate) {
+      chip('Signaler un problème', () => showEscalate(message), true);
+      chip('C\'est bon, merci', thanks);
+    } else {
+      showFeedback(message);
+    }
+  }
+
   async function ask(message: string) {
     const r = await api.post('/api/admin/support', { action: 'ask', message });
     clearActions();
     if (r.kind === 'answer') {
-      bubble('assistant', r.answer);
-      if (r.tab) tabLink(r.tab);
-      chip('Signaler un problème', () => showEscalate(message));
+      afterAnswer(r, message);
     } else {
       const sugg = r.suggestions || [];
       bubble('assistant', sugg.length
@@ -181,13 +208,19 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
         : 'Ça sort de mon périmètre — je ne réponds qu\'aux questions d\'utilisation du back-office. Je peux transmettre votre demande à votre prestataire :');
       for (const s of sugg) {
         chip(s.title, () => {
-          bubble('assistant', s.answer);
           clearActions();
-          if (s.tab) tabLink(s.tab);
-          chip('Signaler un problème', () => showEscalate(message));
+          afterAnswer(s, message);
         });
       }
-      chip('Signaler un problème', () => showEscalate(message), true);
+      if (sugg.length) {
+        chip('Aucune de ces pistes', () => {
+          clearActions();
+          bubble('assistant', 'Pas de souci — transmettez votre demande à votre prestataire, il est notifié par email :');
+          showEscalate(message);
+        });
+      } else {
+        chip('Signaler un problème', () => showEscalate(message), true);
+      }
     }
   }
 

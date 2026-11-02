@@ -31,7 +31,9 @@ function scoreEntry(message, entry) {
   return score;
 }
 
-const ANSWER_THRESHOLD = 5;
+// Seuil : 4 = verbe + sujet (« créer un article ») ou deux mots-clés —
+// en-dessous on propose des pistes plutôt qu'une réponse fausse.
+const ANSWER_THRESHOLD = 4;
 
 export function findKbAnswer(message) {
   const scored = KB

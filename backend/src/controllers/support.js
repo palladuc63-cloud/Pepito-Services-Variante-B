@@ -21,11 +21,11 @@ export async function support(req, res) {
       const r = findKbAnswer(message);
       if (r.kind === 'answer') {
         const e = r.entry;
-        return res.json({ kind: 'answer', entryId: e.id, title: e.title, answer: e.answer, tab: e.tab || null });
+        return res.json({ kind: 'answer', entryId: e.id, title: e.title, answer: e.answer, tab: e.tab || null, escalate: !!e.escalate });
       }
       return res.json({
         kind: 'suggestions',
-        suggestions: r.suggestions.map((s) => ({ id: s.id, title: s.title, answer: s.answer, tab: s.tab || null })),
+        suggestions: r.suggestions.map((s) => ({ id: s.id, title: s.title, answer: s.answer, tab: s.tab || null, escalate: !!s.escalate })),
       });
     }
 

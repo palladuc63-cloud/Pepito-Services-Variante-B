@@ -17,7 +17,7 @@ export const KB = [
   {
     id: 'slides',
     title: 'Modifier le diaporama d\'accueil',
-    keywords: ['diaporama', 'slide', 'slides', 'image', 'images', 'photo', 'accueil', 'bandeau', 'bannière'],
+    keywords: ['diaporama', 'slide', 'slides', 'image', 'images', 'photo', 'accueil', 'bandeau', 'bannière', 'ajout', 'chang', 'modif'],
     phrases: ['changer les photos d\'accueil', 'diaporama d\'accueil', 'modifier la bannière', 'image de la page d\'accueil'],
     answer: 'Onglet « 🏠 Accueil » : ajoutez une slide, réordonnez-la avec les flèches ↑↓, ou masquez-la sans la supprimer (interrupteur). Titre et sous-titre vides = les textes généraux du site.',
     tab: 'home',
@@ -25,7 +25,7 @@ export const KB = [
   {
     id: 'messages',
     title: 'Lire et répondre aux messages',
-    keywords: ['message', 'messages', 'contact', 'demande', 'répondre', 'mail', 'email', 'courriel', 'formulaire', 'devis', 'client'],
+    keywords: ['message', 'messages', 'contact', 'demande', 'répondre', 'mail', 'email', 'courriel', 'formulaire', 'devis', 'client', 'ecri', 'envoy', 'rappel'],
     phrases: ['répondre à un message', 'répondre à un email', 'répondre à un mail', 'répondre à un client', 'un client m\'a écrit', 'message de contact', 'demande de devis', 'messages non lus'],
     answer: 'Onglet « 📩 Messages » : toutes les demandes arrivent ici (formulaire, chatbot, rappel téléphonique). Cliquez sur un message pour y répondre par email en un clic — il est ensuite marqué « Répondu ».',
     tab: 'messages',
@@ -41,8 +41,8 @@ export const KB = [
   {
     id: 'projects',
     title: 'Publier une réalisation',
-    keywords: ['réalisation', 'réalisations', 'chantier', 'portfolio', 'projet', 'photo', 'publier', 'clôture'],
-    phrases: ['publier une réalisation', 'ajouter une réalisation', 'ajouter un chantier', 'mettre en ligne une réalisation', 'programmer une réalisation'],
+    keywords: ['réalisation', 'réalisations', 'chantier', 'portfolio', 'projet', 'photo', 'publier', 'clôture', 'creer', 'ajout', 'nouv', 'modif', 'supprim', 'publi'],
+    phrases: ['publier une réalisation', 'ajouter une réalisation', 'ajouter un chantier', 'créer une réalisation', 'nouvelle réalisation', 'modifier une réalisation', 'mettre en ligne une réalisation', 'programmer une réalisation'],
     answer: 'Onglet « 🚧 Réalisations » → « + Nouvelle réalisation » : titre, catégorie, photos → publiez tout de suite ou programmez la date. Un brouillon reste invisible du site. Chaque réalisation peut aussi générer une page ville automatiquement.',
     tab: 'projects',
   },
@@ -57,15 +57,15 @@ export const KB = [
   {
     id: 'articles',
     title: 'Écrire un article',
-    keywords: ['article', 'articles', 'blog', 'actualité', 'actualités', 'news', 'rédiger', 'écrire'],
-    phrases: ['écrire un article', 'publier un article', 'ajouter une actualité', 'rédiger un article'],
+    keywords: ['article', 'articles', 'blog', 'actualité', 'actualités', 'news', 'rédiger', 'écrire', 'creer', 'ajout', 'nouv', 'modif', 'chang', 'faire', 'publi', 'supprim'],
+    phrases: ['écrire un article', 'publier un article', 'créer un article', 'nouvel article', 'ajouter un article', 'modifier un article', 'ajouter une actualité', 'rédiger un article'],
     answer: 'Onglet « 📰 Articles » → « + Nouvel article » : chantiers récents, conseils, vie de l\'entreprise. Publication immédiate ou programmée — un brouillon n\'est pas visible du site.',
     tab: 'articles',
   },
   {
     id: 'services',
     title: 'Gérer les services',
-    keywords: ['service', 'services', 'prestation', 'prestations', 'offre', 'clôture', 'portail', 'terrassement'],
+    keywords: ['service', 'services', 'prestation', 'prestations', 'offre', 'clôture', 'portail', 'terrassement', 'modif', 'ajout', 'supprim'],
     phrases: ['modifier un service', 'ajouter un service', 'liste des prestations'],
     answer: 'Onglet « 🛠️ Services » : la liste des prestations affichées sur le site (clôtures, portails, terrassement…). Chaque service a sa page dédiée ; modifiez le libellé, la description et l\'ordre d\'affichage.',
     tab: 'services',
@@ -81,7 +81,7 @@ export const KB = [
   {
     id: 'settings',
     title: 'Modifier coordonnées et paramètres',
-    keywords: ['paramètre', 'paramètres', 'coordonnées', 'téléphone', 'adresse', 'horaire', 'horaires', 'zone', 'email', 'réglages'],
+    keywords: ['paramètre', 'paramètres', 'coordonnées', 'téléphone', 'adresse', 'horaire', 'horaires', 'zone', 'email', 'réglages', 'modif', 'chang'],
     phrases: ['changer mes coordonnées', 'modifier mes horaires', 'changer le numéro', 'changer mon numéro', 'modifier le téléphone', 'numéro de téléphone', 'zone d\'intervention'],
     answer: 'Onglet « ⚙️ Paramètres » : vos coordonnées, horaires et zone d\'intervention — tout changement se répercute sur l\'ensemble du site. Plus bas dans l\'onglet : planification, catégories et SEO.',
     tab: 'settings',
@@ -109,11 +109,12 @@ export const KB = [
     phrases: ['mot de passe oublié', 'j\'ai perdu mon mot de passe', 'changer mon mot de passe', 'impossible de me connecter'],
     answer: 'Il n\'y a pas de réinitialisation en libre-service — signalez-le via « Signaler un problème » ci-dessous et votre prestataire vous en génère un nouveau rapidement.',
     tab: '',
+    escalate: true,
   },
   {
     id: 'device',
     title: 'Accès mobile / navigateur',
-    keywords: ['mobile', 'téléphone', 'tablette', 'navigateur', 'chrome', 'safari', 'ordinateur'],
+    keywords: ['mobile', 'téléphone', 'tablette', 'navigateur', 'chrome', 'safari', 'ordinateur', 'portable', 'smartphone'],
     phrases: ['depuis mon téléphone', 'sur mobile', 'quel navigateur', 'depuis ma tablette'],
     answer: 'Le back-office fonctionne depuis n\'importe quel navigateur récent (Chrome, Safari, Edge, Firefox), sur ordinateur comme sur mobile — utilisez le menu ☰ en haut sur petit écran.',
     tab: '',
@@ -125,6 +126,7 @@ export const KB = [
     phrases: ['données perdues', 'récupérer un contenu', 'est-ce sauvegardé', 'j\'ai supprimé par erreur'],
     answer: 'Tout ce que vous enregistrez est conservé côté serveur. Pour une suppression par erreur, signalez-la via « Signaler un problème » — une restauration peut être possible selon le contenu.',
     tab: '',
+    escalate: true,
   },
   {
     id: 'guide',
@@ -149,5 +151,6 @@ export const KB = [
     phrases: ['ça ne marche pas', 'le site est cassé', 'j\'ai une erreur', 'c\'est bloqué', 'ça bug', 'ça plante'],
     answer: 'Désolé pour la gêne — c\'est probablement un problème technique. Utilisez « Signaler un problème » ci-dessous : décrivez ce que vous faisiez et ce qui s\'est affiché, votre prestataire est notifié immédiatement.',
     tab: '',
+    escalate: true,
   },
 ];
