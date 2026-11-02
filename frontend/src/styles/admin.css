@@ -258,6 +258,9 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 
   .view-toggle { flex-wrap: wrap; }
 
+  /* En-têtes de cards avec contrôles : passage à la ligne */
+  .card > div[style*="justify-content:space-between"] { flex-wrap: wrap; gap: 8px; }
+
   /* Calendrier resserré */
   .cal-day { min-height: 54px; padding: 3px 4px; }
   .cal-pill { font-size: 10px; padding: 2px 4px; }
