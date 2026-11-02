@@ -13,6 +13,7 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
 
 <div id="sav-panel" hidden role="dialog" aria-label="Assistant SAV">
   <div class="sav-head">
+    <img src="/point-logo.svg" alt="POINT" class="sav-logo" width="26" height="26" />
     <div>
       <strong>Aide</strong>
       <span>Utilisation du back-office — ou signalez un problème</span>
@@ -68,6 +69,8 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
     display: flex; justify-content: space-between; align-items: center;
     padding: 10px 14px; background: var(--panel-2); border-bottom: 1px solid var(--border);
   }
+  .sav-head .sav-logo { width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; }
+  .sav-head > div { flex: 1; min-width: 0; }
   .sav-head strong { font-size: 14px; display: block; }
   .sav-head span { font-size: 11px; color: var(--muted); }
   .sav-head button { background: none; border: none; color: var(--muted); font-size: 15px; cursor: pointer; }
