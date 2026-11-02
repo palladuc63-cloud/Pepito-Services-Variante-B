@@ -538,12 +538,14 @@ const base = import.meta.env.BASE_URL;
   const burger = $('#nav-burger');
   burger?.addEventListener('click', () => {
     const open = side.classList.toggle('nav-open');
+    document.body.style.overflow = open ? 'hidden' : '';
     burger.setAttribute('aria-expanded', String(open));
     burger.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
   });
   document.querySelectorAll('.admin-nav-link[data-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
       side.classList.remove('nav-open');
+      document.body.style.overflow = '';
       burger?.setAttribute('aria-expanded', 'false');
       document.querySelectorAll('.admin-nav-link').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');

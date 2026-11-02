@@ -231,13 +231,24 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .admin-logo { width: 96px; margin-bottom: 0; padding: 0 4px; flex: 0 0 auto; }
   #nav-burger { display: inline-flex; margin-left: auto; }
   .admin-nav-link { display: none; }
+
+  /* Menu ouvert : plein écran */
+  .admin-side.nav-open {
+    position: fixed; inset: 0; z-index: 100;
+    height: 100dvh;
+    align-content: flex-start;
+    background: var(--bg);
+    overflow-y: auto;
+    gap: 4px;
+    padding: 8px 10px 24px;
+  }
   .admin-side.nav-open .admin-nav-link {
     display: flex; align-items: center;
     width: 100%; order: 2;
-    min-height: 44px; padding: 10px 14px;
+    min-height: 56px; padding: 14px 18px;
+    font-size: 17px;
   }
-  .admin-side.nav-open { gap: 4px; padding-bottom: 12px; }
-  .admin-side.nav-open #btn-logout { margin-top: 8px; margin-left: 0; }
+  .admin-side.nav-open #btn-logout { margin-top: 16px; margin-left: 0; }
 
   .admin-main { padding: 16px 12px; }
   .admin-top { flex-wrap: wrap; gap: 10px; }
