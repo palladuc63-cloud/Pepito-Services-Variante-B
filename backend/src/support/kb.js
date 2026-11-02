@@ -41,9 +41,9 @@ export const KB = [
   {
     id: 'projects',
     title: 'Publier une réalisation',
-    keywords: ['réalisation', 'réalisations', 'chantier', 'portfolio', 'projet', 'photo', 'publier', 'clôture', 'creer', 'ajout', 'nouv', 'modif', 'supprim', 'publi'],
+    keywords: ['réalisation', 'réalisations', 'chantier', 'portfolio', 'projet', 'photo', 'publier', 'clôture', 'creer', 'ajout', 'nouv', 'modif', 'supprim', 'publi', 'catégorie', 'catégories'],
     phrases: ['publier une réalisation', 'ajouter une réalisation', 'ajouter un chantier', 'créer une réalisation', 'nouvelle réalisation', 'modifier une réalisation', 'mettre en ligne une réalisation', 'programmer une réalisation'],
-    answer: 'Onglet « 🚧 Réalisations » → « + Nouvelle réalisation » : titre, catégorie, photos → publiez tout de suite ou programmez la date. Un brouillon reste invisible du site. Chaque réalisation peut aussi générer une page ville automatiquement.',
+    answer: 'Onglet « 🚧 Réalisations » → « + Nouvelle réalisation » : titre, catégorie, photos → publiez tout de suite ou programmez la date. Un brouillon reste invisible du site. La carte « Catégories » en bas de l\'onglet gère les catégories de réalisations.',
     tab: 'projects',
   },
   {
@@ -67,8 +67,8 @@ export const KB = [
     title: 'Gérer les services',
     keywords: ['service', 'services', 'prestation', 'prestations', 'offre', 'clôture', 'portail', 'terrassement', 'modif', 'ajout', 'supprim'],
     phrases: ['modifier un service', 'ajouter un service', 'liste des prestations'],
-    answer: 'Onglet « 🛠️ Services » : la liste des prestations affichées sur le site (clôtures, portails, terrassement…). Chaque service a sa page dédiée ; modifiez le libellé, la description et l\'ordre d\'affichage.',
-    tab: 'services',
+    answer: 'Onglet « ⚙️ Paramètres », carte « 🛠️ Services affichés sur la homepage » : la liste des prestations visibles en page d\'accueil — réordonnez, activez ou masquez chaque service.',
+    tab: 'settings',
   },
   {
     id: 'social',
