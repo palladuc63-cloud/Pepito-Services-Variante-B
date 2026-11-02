@@ -16,7 +16,7 @@ const { settings } = await getSite();
     <div class="page-header">
       <h1 class="section-title">Politique de confidentialité</h1>
       <p class="section-subtitle">
-        Cette page décrit la gestion des données personnelles sur le site
+        Cette page décrit la gestion des données personnelles sur le site{' '}
         {settings.name}, conformément au Règlement Général sur la Protection
         des Données (RGPD).
       </p>
@@ -28,8 +28,7 @@ const { settings } = await getSite();
         <p>
           Le responsable du traitement des données collectées sur ce site
           est <strong>Pépito Services — Sylvain Palladuc</strong>, joignable
-          par email à
-          {settings.contact.email && <a href={`mailto:${settings.contact.email}`}>{settings.contact.email}</a>}
+          par email à{' '}{settings.contact.email && <a href={`mailto:${settings.contact.email}`}>{settings.contact.email}</a>}
           {settings.contact.phone && <> ou par téléphone au <a href={`tel:${settings.contact.phone.replace(/\s+/g, '')}`}>{settings.contact.phone}</a></>}.
         </p>
       </section>
@@ -75,8 +74,7 @@ const { settings } = await getSite();
         <h2>Durée de conservation</h2>
         <p>
           Les messages de contact sont conservés le temps nécessaire au
-          traitement de votre demande, puis supprimés au plus tard
-          <strong>12 mois</strong> après le dernier échange si aucune relation
+          traitement de votre demande, puis supprimés au plus tard{' '}<strong>12 mois</strong> après le dernier échange si aucune relation
           commerciale ne s’instaure. Les données relatives aux clients sont
           conservées pendant la durée de la relation commerciale, puis selon
           les obligations légales applicables (comptabilité, garanties).
@@ -97,8 +95,7 @@ const { settings } = await getSite();
         <h2>Cookies et mesure d'audience</h2>
         <p>
           Ce site n’utilise <strong>aucun cookie</strong> ni traceur
-          publicitaire. La mesure d’audience est assurée par
-          <strong>Umami</strong>, un outil de statistiques auto-hébergé sur
+          publicitaire. La mesure d’audience est assurée par{' '}<strong>Umami</strong>, un outil de statistiques auto-hébergé sur
           nos serveurs : les données ne sont transmises à aucun tiers. Umami
           ne dépose aucun cookie, ne collecte aucune donnée personnelle et
           anonymise l’adresse IP. Ce dispositif relève de l’exemption de
@@ -113,14 +110,12 @@ const { settings } = await getSite();
           Conformément au RGPD, vous disposez d’un droit d’accès, de
           rectification, de suppression, de limitation, d’opposition et de
           portabilité des données vous concernant. Pour exercer ces droits,
-          contactez-nous à
-          {settings.contact.email && <a href={`mailto:${settings.contact.email}`}>{settings.contact.email}</a>}.
+          contactez-nous à{' '}{settings.contact.email && <a href={`mailto:${settings.contact.email}`}>{settings.contact.email}</a>}.
           Une réponse vous sera apportée dans un délai maximum d’un mois.
         </p>
         <p>
           Si vous estimez que vos droits ne sont pas respectés, vous pouvez
-          introduire une réclamation auprès de la
-          <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">CNIL</a>
+          introduire une réclamation auprès de la{' '}<a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">CNIL</a>
           (Commission Nationale de l'Informatique et des Libertés).
         </p>
       </section>
