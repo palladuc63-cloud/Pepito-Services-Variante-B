@@ -257,11 +257,12 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 
   .form-row.cols-2, .form-row.cols-3 { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
-  .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .stat-card { padding: 10px 8px; }
+  .stat-card strong { font-size: 18px; }
+  .stat-card span { font-size: 10px; }
   .item-cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .item-card-actions .btn { padding: 8px 10px; font-size: 12px; }
-  .stat-card { padding: 10px 12px; }
-  .stat-card strong { font-size: 20px; }
 
   /* Tables : scroll horizontal dans un conteneur (colonnes alignées) */
   .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
