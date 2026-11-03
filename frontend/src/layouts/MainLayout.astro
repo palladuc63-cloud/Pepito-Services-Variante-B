@@ -66,8 +66,13 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
     <main id="main-content">
       <slot />
     </main>
-    <div class="footer-fence" aria-hidden="true">
-      <ArrowDivider direction="up" fill="var(--basalt-dark)" height="44px" />
+    <div class="footer-wave" aria-hidden="true">
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M0 48 L0 26 C180 10 360 44 540 34 C720 24 840 2 1080 16 C1260 26 1380 40 1440 30 L1440 48 Z"
+          fill="var(--basalt-dark)"
+        />
+      </svg>
     </div>
     <Footer settings={settings} />
     <ThemeSwitcher />
