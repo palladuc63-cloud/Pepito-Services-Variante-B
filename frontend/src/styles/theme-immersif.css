@@ -180,6 +180,18 @@
   }
 }
 
+/* À propos : texte aligné sous le titre, mesure confortable */
+:root[data-theme='immersif'] #a-propos .about-content {
+  max-width: 62ch;
+  margin-inline: 0;
+}
+
+:root[data-theme='immersif'] #a-propos .prose p {
+  font-size: 1.12rem;
+  line-height: 1.8;
+  color: var(--stone);
+}
+
 /* ═══ Grille éditoriale asymétrique des réalisations ═══ */
 
 @media (min-width: 760px) {
@@ -279,7 +291,11 @@
 
 /* ═══ Sections : alternance clair/sombre ═══ */
 
+/* position: relative — les sections (fond opaque) repeintent au-dessus
+   du hero : sa parallaxe GSAP (yPercent + transform) créait un contexte
+   d'empilement qui le faisait recouvrir le titre suivant au scroll. */
 :root[data-theme='immersif'] .section {
+  position: relative;
   padding-block: var(--space-16, 6rem);
 }
 
