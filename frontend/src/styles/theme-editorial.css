@@ -184,14 +184,18 @@
   :root[data-theme='editorial'] #realisations .section-header {
     grid-column: 1;
     grid-row: 1 / span 3;
-    position: sticky;
-    top: 8rem;
     margin: 0;
-    /* Fond opaque + z-index : le titre collant ne doit jamais se
-       superposer au contenu au-dessus (hero) — bug sticky-in-grid Safari */
-    z-index: 2;
     padding-block: 0.5rem 1rem;
     background: var(--paper);
+  }
+
+  /* Sticky réservé aux sections longues : sous Safari, sticky dans un
+     grid épinglait le titre au-dessus du hero (« À propos ») */
+  :root[data-theme='editorial'] #services .section-header,
+  :root[data-theme='editorial'] #realisations .section-header {
+    position: sticky;
+    top: 8rem;
+    z-index: 2;
   }
 
   :root[data-theme='editorial'] #a-propos > .container > :not(.section-header),
