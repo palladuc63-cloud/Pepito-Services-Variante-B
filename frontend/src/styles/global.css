@@ -324,6 +324,27 @@ a:focus-visible {
   height: 5rem;
 }
 
+/* Dérive lente des deux crêtes, en sens opposés (chemins prolongés
+   au-delà du viewBox pour ne jamais révéler les bords). */
+@keyframes nature-wave-drift {
+  from { transform: translateX(0) translateY(0); }
+  to { transform: translateX(-70px) translateY(-4px); }
+}
+
+.footer-wave path:first-child {
+  animation: nature-wave-drift 15s ease-in-out infinite alternate;
+}
+
+.footer-wave path:last-child {
+  animation: nature-wave-drift 11s ease-in-out infinite alternate-reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-wave path {
+    animation: none;
+  }
+}
+
 /* La vague touche le footer : pas de liseré de fond entre les deux. */
 :root[data-theme='nature'] .site-footer {
   margin-top: 0;
