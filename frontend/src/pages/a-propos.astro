@@ -1,29 +1,177 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
 import Section from '../components/Section.astro';
+import Icon from '../components/Icon.astro';
+import CityMap from '../components/CityMap.astro';
+import { getSite } from '../lib/site.js';
+import { getCityPages } from '../lib/api.js';
+import type { CityPage, Service } from '../data/types';
+
+const { settings, services } = await getSite();
+const cityPages = ((await getCityPages()) as CityPage[]).filter((c) => c.published);
+const cities = [...new Set(cityPages.map((c) => c.city))];
+// L'API ne renvoie que les services actifs — on exclut le service technique
+const activeServices = services.filter((s: Service) => s.slug !== 'clotures-portails');
+const base = import.meta.env.BASE_URL;
+const siteUrl = settings.siteUrl.replace(/\/$/, '');
+const area = settings.contact.serviceArea || 'Thiers et sa région';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: `À propos — ${settings.name}`,
+    url: `${siteUrl}/a-propos/`,
+    description: `Présentation de ${settings.name}, artisan en clôtures, portails et petits terrassements — ${area}.`,
+    about: { '@id': `${siteUrl}/#business` },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'HomeAndConstructionBusiness',
+    '@id': `${siteUrl}/#business`,
+    name: settings.name,
+    url: siteUrl,
+    image: `${siteUrl}/pepito-logo.svg`,
+    ...(settings.contact.phone && { telephone: settings.contact.phone }),
+    ...(settings.contact.email && { email: settings.contact.email }),
+    ...(settings.contact.address && { address: settings.contact.address }),
+    areaServed: cities.length
+      ? cities.map((c) => ({ '@type': 'City', name: c }))
+      : [{ '@type': 'Place', name: area }],
+    knowsAbout: activeServices.map((s: Service) => s.title),
+    ...(settings.sameAs?.length && { sameAs: settings.sameAs }),
+  },
+];
+
+const points = [
+  'Travail sur mesure, adapté à votre terrain',
+  'Un seul interlocuteur, du devis à la pose',
+  'Matériaux durables, pensés pour durer',
+  'Devis gratuit et estimation personnalisée',
+];
 ---
 
 <MainLayout
-  title="A propos"
-  description="Présentation de Pépito Services : clôtures, portails et petits terrassements sur mesure à Thiers et sa région."
+  title="À propos"
+  description={`Présentation de ${settings.name} : artisan local — clôtures, portails et petits terrassements sur mesure — ${area}.`}
   canonicalPath="/a-propos"
+  jsonLd={jsonLd}
 >
   <Section>
     <div class="page-header">
-      <h1 class="section-title">A propos de Pépito Services</h1>
+      <h1 class="section-title">À propos de Pépito Services</h1>
       <p class="section-subtitle">
         Artisan local à Thiers : clôtures, portails et petits
         terrassements sur mesure, pensés pour durer.
       </p>
     </div>
 
-    <div class="prose">
-      <p>
-        Pépito Services accompagne les particuliers dans la pose et la
-        fabrication de clôtures rigides, palissades, portillons et
-        aménagements extérieurs. Les détails de l’activité, de l’expérience et
-        des valeurs seront ajoutés ici prochainement.
+    <div class="about-grid">
+      <div class="prose">
+        <p>
+          {settings.aboutText ||
+            `${settings.name} accompagne les particuliers dans la pose et la
+            fabrication de clôtures rigides, palissades, portails, portillons
+            et petits travaux de terrassement.`}
+        </p>
+        <p>
+          Basés à Thiers, nous intervenons dans tout le Livradois-Forez et le
+          Puy-de-Dôme — de l'étude de votre terrain à la pose, avec le souci
+          du détail qui fait la différence sur un ouvrage fait pour durer.
+        </p>
+      </div>
+
+      <aside class="fact-card">
+        <h2 class="fact-title">En bref</h2>
+        <ul class="fact-list">
+          <li>
+            <Icon name="pin" size={16} />
+            <span>{area}</span>
+          </li>
+          {settings.contact.phone && (
+            <li>
+              <Icon name="phone" size={16} />
+              <a href={`tel:${settings.contact.phone.replace(/\s/g, '')}`}>
+                {settings.contact.phone}
+              </a>
+            </li>
+          )}
+          {settings.contact.hours && (
+            <li>
+              <Icon name="clock" size={16} />
+              <span>{settings.contact.hours}</span>
+            </li>
+          )}
+          <li>
+            <Icon name="check" size={16} />
+            <span>Devis gratuit et sans engagement</span>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </Section>
+
+  <Section class="section-alt">
+    <div class="section-header">
+      <h2 class="section-title">Nos savoir-faire</h2>
+      <p class="section-subtitle">
+        Trois métiers, une même exigence : des extérieurs propres, solides et
+        durables.
       </p>
+    </div>
+    <div class="skills-grid">
+      {activeServices.map((s: Service) => (
+        <a href={`${base}realisations/`} class="skill-card card">
+          <h3 class="skill-title">{s.title}</h3>
+          {s.summary && <p class="skill-text">{s.summary}</p>}
+        </a>
+      ))}
+    </div>
+  </Section>
+
+  <Section>
+    <div class="section-header">
+      <h2 class="section-title">Pourquoi faire appel à nous</h2>
+      <p class="section-subtitle">
+        Une entreprise artisanale, proche de ses clients et de son territoire.
+      </p>
+    </div>
+    <ul class="values-grid">
+      {points.map((p) => (
+        <li class="value-item">
+          <Icon name="check" size={18} class="value-icon" />
+          <span>{p}</span>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section class="section-alt">
+    <div class="section-header">
+      <h2 class="section-title">Notre zone d'intervention</h2>
+      <p class="section-subtitle">
+        Nous intervenons à {area}. Cliquez sur une ville pour découvrir nos
+        prestations locales.
+      </p>
+    </div>
+    {cityPages.length > 0 && <CityMap pages={cityPages} />}
+    {cityPages.length > 0 && (
+      <ul class="city-links">
+        {cityPages.map((c) => (
+          <li><a href={`${base}${c.serviceSlug}/${c.slug}/`}>{c.city}</a></li>
+        ))}
+      </ul>
+    )}
+  </Section>
+
+  <Section class="section-cta">
+    <div class="cta-box">
+      <h2 class="section-title">Un projet d'aménagement ?</h2>
+      <p class="cta-text">
+        Parlez-nous de votre terrain : nous vous proposons une estimation
+        personnalisée pour votre clôture, portail ou aménagement extérieur.
+      </p>
+      <a href={`${base}contact/`} class="btn btn-primary">Demander un chiffrage</a>
     </div>
   </Section>
 </MainLayout>
@@ -37,5 +185,146 @@ import Section from '../components/Section.astro';
     max-width: 70ch;
     color: var(--color-text);
     line-height: var(--leading-relaxed);
+  }
+
+  .prose p + p {
+    margin-top: var(--space-4);
+  }
+
+  .about-grid {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 900px) {
+    .about-grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: start;
+      gap: var(--space-12);
+    }
+  }
+
+  .fact-card {
+    padding: var(--space-6);
+    background: var(--basalt);
+    color: var(--on-dark);
+    border-radius: var(--radius-md, 12px);
+  }
+
+  .fact-title {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--copper-light);
+  }
+
+  .fact-list {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fact-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .fact-list svg {
+    flex-shrink: 0;
+    color: var(--copper-light);
+  }
+
+  .fact-list a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .skills-grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 720px) {
+    .skills-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .skill-card {
+    display: block;
+    padding: var(--space-6);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .skill-title {
+    margin-bottom: var(--space-2);
+    font-size: var(--text-lg);
+  }
+
+  .skill-text {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .values-grid {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 720px) {
+    .values-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6) var(--space-10);
+    }
+  }
+
+  .value-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-weight: 500;
+    line-height: var(--leading-relaxed);
+  }
+
+  .value-icon {
+    flex-shrink: 0;
+    margin-top: 0.15em;
+    color: var(--forest);
+  }
+
+  .city-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .city-links a {
+    display: inline-block;
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: inherit;
+    font-size: var(--text-sm);
+    text-decoration: none;
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  .city-links a:hover {
+    border-color: var(--forest);
+    color: var(--forest);
   }
 </style>
