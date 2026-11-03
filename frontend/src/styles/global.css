@@ -324,6 +324,11 @@ a:focus-visible {
   height: 5rem;
 }
 
+/* La vague touche le footer : pas de liseré de fond entre les deux. */
+:root[data-theme='nature'] .site-footer {
+  margin-top: 0;
+}
+
 :root[data-theme='nature'] .footer-wave {
   display: block;
 }
