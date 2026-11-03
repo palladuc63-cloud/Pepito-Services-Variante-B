@@ -1,6 +1,6 @@
 ---
 import logo from '../assets/pepito-logo-white.svg';
-import gateWood from '../assets/gate-wood.webp';
+import gateWood from '../assets/gate-metal.webp';
 ---
 
 <div class="gate-intro" aria-hidden="true">
@@ -46,8 +46,8 @@ import gateWood from '../assets/gate-wood.webp';
     perspective: 1500px;
   }
 
-  /* Portail battant bois : vraie texture photographique (Poly Haven,
-     CC0 — planches clouées + traverse) tuilée sur la hauteur du battant. */
+  /* Portail battant métal : texture photographique tôle (Poly Haven,
+     CC0 — panneaux soudés + usure) tuilée sur la hauteur du battant. */
   .gate-panel {
     position: absolute;
     top: 0;
@@ -59,9 +59,9 @@ import gateWood from '../assets/gate-wood.webp';
     background-image:
       linear-gradient(
         180deg,
-        rgb(255 220 160 / 0.07),
+        rgb(190 215 235 / 0.1),
         transparent 26%,
-        rgb(0 0 0 / 0.2) 74%,
+        rgb(0 0 0 / 0.22) 74%,
         rgb(0 0 0 / 0.55)
       ),
       var(--gateWood);
@@ -78,9 +78,9 @@ import gateWood from '../assets/gate-wood.webp';
     left: 0;
     transform-origin: left center;
     box-shadow:
-      inset 12px 0 0 rgb(20 12 5 / 0.85),
-      inset 0 14px 0 rgb(20 12 5 / 0.8),
-      inset 0 -14px 0 rgb(20 12 5 / 0.8);
+      inset 12px 0 0 rgb(10 12 15 / 0.9),
+      inset 0 14px 0 rgb(10 12 15 / 0.85),
+      inset 0 -14px 0 rgb(10 12 15 / 0.85);
   }
 
   .gate-right {
@@ -90,9 +90,9 @@ import gateWood from '../assets/gate-wood.webp';
       0 0,
       -340px 0;
     box-shadow:
-      inset -12px 0 0 rgb(20 12 5 / 0.85),
-      inset 0 14px 0 rgb(20 12 5 / 0.8),
-      inset 0 -14px 0 rgb(20 12 5 / 0.8);
+      inset -12px 0 0 rgb(10 12 15 / 0.9),
+      inset 0 14px 0 rgb(10 12 15 / 0.85),
+      inset 0 -14px 0 rgb(10 12 15 / 0.85);
   }
 
   /* Gonds fer noir sur le bord extérieur de chaque battant */
