@@ -308,6 +308,15 @@ a:focus-visible {
   }
 }
 
+/* Séparateur Nature : frise de piquets qui sortent du pied de page */
+:root[data-theme='nature'] .site-footer::before {
+  display: block;
+  top: -1.35rem;
+  height: 1.35rem;
+  -webkit-mask: var(--picket-mask) 0 0 / 8px 21.5px repeat-x;
+  mask: var(--picket-mask) 0 0 / 8px 21.5px repeat-x;
+}
+
 .section-title {
   font-size: clamp(1.75rem, 3.6vw, 2.5rem);
   color: var(--color-heading);
