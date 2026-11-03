@@ -188,6 +188,11 @@ a:hover {
 .content a,
 .prose a,
 .link-underline {
+  text-decoration: none;
+}
+.content a:hover,
+.prose a:hover,
+.link-underline:hover {
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }

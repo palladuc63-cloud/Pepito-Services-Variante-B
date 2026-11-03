@@ -1,5 +1,12 @@
 # Pépito Services — notes projet
 
+## Préférences de style (demande explicite du client)
+
+- **Jamais de texte souligné au repos** — ni dans le BO ni sur le site
+  public. Le souligné est toléré uniquement comme effet de survol sur
+  les liens. Pour marquer un élément actif, préférer `border-bottom`
+  ou la couleur plutôt que `text-decoration: underline`.
+
 ## Assistant SAV du back-office
 
 Widget d'aide intégré au BO (bouton « ? » en bas à droite du dashboard

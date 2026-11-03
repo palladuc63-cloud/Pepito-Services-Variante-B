@@ -144,6 +144,7 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   font-size: 13px;
   font-family: var(--font);
   cursor: pointer;
+  text-decoration: none;
 }
 .btn:hover { border-color: var(--green); }
 .btn-primary { background: var(--green); border-color: var(--green); color: #06120b; font-weight: 600; }
@@ -152,8 +153,7 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .btn-danger:hover { border-color: var(--danger); }
 .btn-link {
   background: none; border: none; padding: 4px 6px;
-  color: var(--muted); text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--muted); text-decoration: none;
 }
 .btn-link:hover { color: var(--green); }
 .btn-sm { padding: 5px 10px; font-size: 12px; }
