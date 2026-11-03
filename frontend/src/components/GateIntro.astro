@@ -45,8 +45,9 @@ import logo from '../assets/pepito-logo-white.svg';
     perspective: 1500px;
   }
 
-  /* Portail battant aluminium à lames ajourées : chaque lame a un bord
-     clair / corps / bord sombre, les jours laissent voir le fond noir. */
+  /* Portail battant bois : planches verticales à teintes alternées,
+     veinage procédural (feTurbulence), écharpe diagonale et
+     quincaillerie fer noir. */
   .gate-panel {
     position: absolute;
     top: 0;
@@ -58,42 +59,103 @@ import logo from '../assets/pepito-logo-white.svg';
     background:
       linear-gradient(
         180deg,
-        rgb(255 255 255 / 0.07),
-        transparent 24%,
-        rgb(0 0 0 / 0.16) 72%,
+        rgb(255 220 160 / 0.1),
+        transparent 28%,
+        rgb(0 0 0 / 0.18) 74%,
         rgb(0 0 0 / 0.5)
       ),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='600'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.35' numOctaves='4' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='260' height='600' filter='url(%23g)'/%3E%3C/svg%3E"),
       repeating-linear-gradient(
         90deg,
-        #0e110e 0 5px,
-        #5d6d55 5px 7px,
-        #46523f 7px 14px,
-        #38432f 14px 25px,
-        #222a20 25px 30px,
-        #0e110e 30px 35px
+        #241708 0 4px,
+        #9a7449 4px 7px,
+        #7d5b34 7px 30px,
+        #54381c 30px 34px,
+        #241708 34px 38px,
+        #a5825a 38px 41px,
+        #8a6844 41px 64px,
+        #5f4226 64px 68px
       );
   }
 
-  /* Cadre : traverses haut/bas + montant extérieur */
+  /* Cadre bois : traverses haut/bas + montant extérieur */
   .gate-left {
     left: 0;
     transform-origin: left center;
     box-shadow:
-      inset 12px 0 0 #1c221a,
-      inset 0 16px 0 #1c221a,
-      inset 0 -16px 0 #1c221a;
+      inset 12px 0 0 #3a2a16,
+      inset 0 16px 0 #3a2a16,
+      inset 0 -16px 0 #3a2a16;
+    /* Écharpe : du bas de la charnière vers le haut de la jointure */
+    background-image:
+      linear-gradient(
+        135deg,
+        transparent 43%,
+        #3e2c14 43% 45%,
+        #63482a 45% 55%,
+        #3e2c14 55% 57%,
+        transparent 57%
+      ),
+      linear-gradient(
+        180deg,
+        rgb(255 220 160 / 0.1),
+        transparent 28%,
+        rgb(0 0 0 / 0.18) 74%,
+        rgb(0 0 0 / 0.5)
+      ),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='600'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.35' numOctaves='4' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='260' height='600' filter='url(%23g)'/%3E%3C/svg%3E"),
+      repeating-linear-gradient(
+        90deg,
+        #241708 0 4px,
+        #9a7449 4px 7px,
+        #7d5b34 7px 30px,
+        #54381c 30px 34px,
+        #241708 34px 38px,
+        #a5825a 38px 41px,
+        #8a6844 41px 64px,
+        #5f4226 64px 68px
+      );
   }
 
   .gate-right {
     right: 0;
     transform-origin: right center;
     box-shadow:
-      inset -12px 0 0 #1c221a,
-      inset 0 16px 0 #1c221a,
-      inset 0 -16px 0 #1c221a;
+      inset -12px 0 0 #3a2a16,
+      inset 0 16px 0 #3a2a16,
+      inset 0 -16px 0 #3a2a16;
+    /* Écharpe miroir */
+    background-image:
+      linear-gradient(
+        45deg,
+        transparent 43%,
+        #3e2c14 43% 45%,
+        #63482a 45% 55%,
+        #3e2c14 55% 57%,
+        transparent 57%
+      ),
+      linear-gradient(
+        180deg,
+        rgb(255 220 160 / 0.1),
+        transparent 28%,
+        rgb(0 0 0 / 0.18) 74%,
+        rgb(0 0 0 / 0.5)
+      ),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='600'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.35' numOctaves='4' seed='8'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='260' height='600' filter='url(%23g)'/%3E%3C/svg%3E"),
+      repeating-linear-gradient(
+        90deg,
+        #241708 0 4px,
+        #9a7449 4px 7px,
+        #7d5b34 7px 30px,
+        #54381c 30px 34px,
+        #241708 34px 38px,
+        #a5825a 38px 41px,
+        #8a6844 41px 64px,
+        #5f4226 64px 68px
+      );
   }
 
-  /* Gonds sur le bord extérieur de chaque battant */
+  /* Gonds fer noir sur le bord extérieur de chaque battant */
   .gate-panel::after {
     content: '';
     position: absolute;
@@ -101,8 +163,8 @@ import logo from '../assets/pepito-logo-white.svg';
     bottom: 0;
     width: 12px;
     background:
-      radial-gradient(circle 4px at 6px 13%, #7b8a6f 0 3px, #11150f 4px 5px, transparent 6px),
-      radial-gradient(circle 4px at 6px 87%, #7b8a6f 0 3px, #11150f 4px 5px, transparent 6px);
+      radial-gradient(circle 4px at 6px 13%, #3a3a34 0 3px, #0c0c0b 4px 5px, transparent 6px),
+      radial-gradient(circle 4px at 6px 87%, #3a3a34 0 3px, #0c0c0b 4px 5px, transparent 6px);
     background-repeat: no-repeat;
   }
 
@@ -120,7 +182,7 @@ import logo from '../assets/pepito-logo-white.svg';
     top: 0;
     bottom: 0;
     width: 12px;
-    background: linear-gradient(90deg, #14190f, #46543a 45%, #13170d);
+    background: linear-gradient(90deg, #141210, #3d3a30 45%, #13110d);
   }
 
   .gate-rim::before {
