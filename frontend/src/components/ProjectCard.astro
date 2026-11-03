@@ -120,6 +120,26 @@ const gallery = project.images?.length
     text-decoration: underline;
   }
 
+  /* ═══ Nature : titre sans souligné + bloc texte entièrement cliquable ═══ */
+
+  :global([data-theme='nature']) .card-title-link:hover {
+    text-decoration: none;
+    color: var(--forest);
+  }
+
+  /* Le lien du titre étire sa zone cliquable sur tout le .card-body —
+     les photos gardent leur comportement (galerie au survol). */
+  :global([data-theme='nature']) .card-body {
+    position: relative;
+    cursor: pointer;
+  }
+
+  :global([data-theme='nature']) .card-title-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
   .card-media {
     position: relative;
   }
