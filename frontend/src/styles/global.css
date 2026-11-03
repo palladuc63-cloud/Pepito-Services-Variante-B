@@ -269,57 +269,43 @@ a:focus-visible {
   color: var(--basalt-dark);
 }
 
-/* ═══ Nature : carte artisanale flottante ═══ */
+/* ═══ Nature : grand « ? » en filigrane animé derrière le CTA ═══ */
+
+@keyframes nature-cta-q {
+  from { transform: translateY(-50%) rotate(-9deg); }
+  to   { transform: translateY(-55%) rotate(5deg); }
+}
 
 :root[data-theme='nature'] .section-cta {
-  background-color: transparent;
-  background-image: none;
-  padding-block: var(--space-8) var(--space-16);
-}
-
-:root[data-theme='nature'] .section-cta > .container {
   position: relative;
   overflow: hidden;
-  border-radius: 1.5rem;
-  padding: clamp(2.75rem, 6vw, 4.5rem) clamp(1.5rem, 5vw, 4rem) clamp(3.5rem, 6.5vw, 5.25rem);
-  background-color: var(--basalt);
-  background-image: radial-gradient(
-      circle at 88% -12%,
-      rgb(232 180 140 / 0.16),
-      transparent 55%
-    ),
-    var(--cta-img);
-  box-shadow: 0 30px 70px -28px rgb(31 43 26 / 0.5);
 }
 
-/* Frise de piquets cuivrés en bas de la carte — signature clôture */
-:root[data-theme='nature'] .section-cta > .container::after {
-  content: '';
+:root[data-theme='nature'] .section-cta::before {
+  content: '?';
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1.5rem;
-  background: var(--copper-light);
-  opacity: 0.45;
-  -webkit-mask: var(--picket-mask) center bottom / 8px 16px repeat-x;
-  mask: var(--picket-mask) center bottom / 8px 16px repeat-x;
-}
-
-:root[data-theme='nature'] .section-cta .cta-box::before {
-  content: 'Artisan local — estimation personnalisée';
-  display: block;
-  margin-bottom: var(--space-4);
-  font-size: 0.78rem;
+  top: 50%;
+  right: 7%;
+  font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  font-size: clamp(14rem, 32vw, 25rem);
+  line-height: 1;
   color: var(--copper-light);
+  opacity: 0.14;
+  transform: translateY(-50%) rotate(-9deg);
+  animation: nature-cta-q 11s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
-:root[data-theme='nature'] .section-cta .cta-text {
-  max-width: 52ch;
-  margin-inline: auto;
+:root[data-theme='nature'] .section-cta .cta-box {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme='nature'] .section-cta::before {
+    animation: none;
+  }
 }
 
 .section-title {
