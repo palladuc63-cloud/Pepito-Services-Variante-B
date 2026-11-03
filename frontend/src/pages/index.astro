@@ -211,32 +211,32 @@ const jsonLd = [{
     flex-shrink: 0;
   }
 
-  :global([data-theme='nature']) #a-propos .about-content {
+  :global([data-theme='nature'] #a-propos) .about-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-6);
   }
 
-  :global([data-theme='nature']) #a-propos .about-logo {
+  :global([data-theme='nature'] #a-propos) .about-logo {
     display: block;
   }
 
   @media (min-width: 768px) {
-    :global([data-theme='nature']) #a-propos .about-content {
+    :global([data-theme='nature'] #a-propos) .about-content {
       flex-direction: row;
       align-items: flex-start;
       gap: var(--space-10);
       text-align: left;
     }
 
-    :global([data-theme='nature']) #a-propos .about-logo {
+    :global([data-theme='nature'] #a-propos) .about-logo {
       max-width: 250px;
     }
   }
 
   /* Thème Nature : pas d'en-tête dans la section À propos */
-  :global([data-theme='nature']) #a-propos .section-header {
+  :global([data-theme='nature'] #a-propos) .section-header {
     display: none;
   }
 
