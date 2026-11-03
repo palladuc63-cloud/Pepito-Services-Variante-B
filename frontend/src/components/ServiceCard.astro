@@ -80,4 +80,67 @@ const base = import.meta.env.BASE_URL;
   .service-link:hover {
     color: var(--copper-dark);
   }
+
+  /* ═══ Nature : CTA « pilule » qui se remplit au survol ═══ */
+
+  :global([data-theme='nature']) .service-link {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1.15rem;
+    border: 1.5px solid var(--forest);
+    border-bottom-width: 1.5px;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    transition: color 0.35s ease;
+  }
+
+  /* Balayage de fond gauche → droite */
+  :global([data-theme='nature']) .service-link::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--forest);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  :global([data-theme='nature']) .service-link::after {
+    content: '→';
+    font-weight: 700;
+    transition: transform 0.35s ease;
+  }
+
+  :global([data-theme='nature']) .service-link:hover,
+  :global([data-theme='nature']) .service-link:focus-visible {
+    color: var(--on-dark);
+  }
+
+  :global([data-theme='nature']) .service-link:hover::before,
+  :global([data-theme='nature']) .service-link:focus-visible::before {
+    transform: scaleX(1);
+  }
+
+  :global([data-theme='nature']) .service-link:hover::after,
+  :global([data-theme='nature']) .service-link:focus-visible::after {
+    transform: translateX(4px);
+  }
+
+  :global([data-theme='nature']) .service-link:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-theme='nature']) .service-link::before,
+    :global([data-theme='nature']) .service-link::after {
+      transition: none;
+    }
+  }
 </style>
