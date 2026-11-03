@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import ArrowDivider from '../components/ArrowDivider.astro';
 import ThemeSwitcher from '../components/ThemeSwitcher.astro';
+import GateIntro from '../components/GateIntro.astro';
 import { getSite } from '../lib/site.js';
 import type { SeoMeta } from '../data/types';
 
@@ -36,6 +37,12 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
         if (themes.indexOf(fromUrl) !== -1) localStorage.setItem('pepito-theme', fromUrl);
         var t = localStorage.getItem('pepito-theme');
         if (themes.indexOf(t) !== -1) document.documentElement.dataset.theme = t;
+        var qp = new URLSearchParams(location.search);
+        if (qp.get('intro') === '1') sessionStorage.removeItem('pepito-intro-seen');
+        var introSeen = sessionStorage.getItem('pepito-intro-seen');
+        var noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!introSeen && !noMotion && qp.get('nointro') !== '1')
+          document.documentElement.classList.add('gate-intro-pending');
       } catch (e) {}
     </script>
     <ClientRouter />
@@ -81,6 +88,7 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
     </div>
     <Footer settings={settings} />
     <ThemeSwitcher />
+    <GateIntro />
     <script>
       // Nature : vagues « eau » — la forme du séparateur ondule (somme de
       // sinus recalculée à chaque frame), pas une simple translation.

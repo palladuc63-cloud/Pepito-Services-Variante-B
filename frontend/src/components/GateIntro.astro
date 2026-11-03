@@ -1,0 +1,243 @@
+---
+import logo from '../assets/pepito-logo.svg';
+---
+
+<div class="gate-intro" aria-hidden="true">
+  <div class="gate-veil"></div>
+  <div class="gate-scene">
+    <div class="gate-panel gate-left">
+      <span class="gate-rim"></span>
+      <img class="gate-logo" src={logo.src} alt="" width="553" height="256" />
+    </div>
+    <div class="gate-panel gate-right">
+      <span class="gate-rim"></span>
+      <img class="gate-logo" src={logo.src} alt="" width="553" height="256" />
+    </div>
+  </div>
+  <div class="gate-seam"></div>
+  <p class="gate-skip">Cliquer pour entrer</p>
+</div>
+
+<style>
+  .gate-intro {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    cursor: pointer;
+  }
+
+  :global(html.gate-intro-pending) .gate-intro {
+    display: block;
+  }
+
+  .gate-veil {
+    position: absolute;
+    inset: 0;
+    background: rgb(10 14 8 / 0.92);
+  }
+
+  .gate-scene {
+    position: absolute;
+    inset: 0;
+    perspective: 1500px;
+  }
+
+  .gate-panel {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    overflow: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
+    background:
+      linear-gradient(
+        90deg,
+        rgb(0 0 0 / 0.3),
+        transparent 12%,
+        transparent 88%,
+        rgb(0 0 0 / 0.45)
+      ),
+      repeating-linear-gradient(90deg, #30422a 0 30px, #283722 30px 34px);
+    box-shadow:
+      inset 0 14px 0 rgb(0 0 0 / 0.4),
+      inset 0 -14px 0 rgb(0 0 0 / 0.4);
+  }
+
+  .gate-left {
+    left: 0;
+    transform-origin: left center;
+  }
+
+  .gate-right {
+    right: 0;
+    transform-origin: right center;
+  }
+
+  /* Montant métallique le long de la jointure */
+  .gate-rim {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    background: linear-gradient(90deg, #14190f, #46543a 45%, #13170d);
+  }
+
+  .gate-left .gate-rim {
+    right: 0;
+  }
+
+  .gate-right .gate-rim {
+    left: 0;
+  }
+
+  /* Chaque battant porte une moitié du logo, centré sur la jointure :
+     l'ouverture le scinde en deux. */
+  .gate-logo {
+    --gate-logo-w: min(300px, 62vw);
+    position: absolute;
+    top: 50%;
+    width: var(--gate-logo-w);
+    height: auto;
+    transform: translateY(-50%);
+    filter: drop-shadow(0 4px 18px rgb(0 0 0 / 0.55));
+  }
+
+  .gate-left .gate-logo {
+    right: calc(var(--gate-logo-w) / -2);
+  }
+
+  .gate-right .gate-logo {
+    left: calc(var(--gate-logo-w) / -2);
+  }
+
+  /* Halo de lumière qui s'infiltre par la fente */
+  .gate-seam {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 26px;
+    opacity: 0;
+    transform: translateX(-50%);
+    background: radial-gradient(
+      ellipse at center,
+      rgb(233 241 214 / 0.95),
+      rgb(233 241 214 / 0) 70%
+    );
+    filter: blur(6px);
+    pointer-events: none;
+  }
+
+  .gate-skip {
+    position: absolute;
+    left: 50%;
+    bottom: 6%;
+    margin: 0;
+    transform: translateX(-50%);
+    color: rgb(233 241 214 / 0.75);
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  function __playGate() {
+    const root = document.querySelector<HTMLElement>('.gate-intro');
+    const pending = document.documentElement.classList.contains('gate-intro-pending');
+    if (!root || !pending) return;
+    document.documentElement.classList.remove('gate-intro-pending');
+    try {
+      sessionStorage.setItem('pepito-intro-seen', '1');
+    } catch (e) {}
+
+    const left = root.querySelector<HTMLElement>('.gate-left');
+    const right = root.querySelector<HTMLElement>('.gate-right');
+    const veil = root.querySelector<HTMLElement>('.gate-veil');
+    const seam = root.querySelector<HTMLElement>('.gate-seam');
+    const skip = root.querySelector<HTMLElement>('.gate-skip');
+    const main = document.getElementById('main-content');
+    if (!left || !right || !veil || !seam) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const swing: KeyframeAnimationOptions = {
+      duration: 1050,
+      delay: 480,
+      easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+      fill: 'forwards',
+    };
+    const anims: Animation[] = [
+      left.animate(
+        [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(112deg)' }],
+        swing
+      ),
+      right.animate(
+        [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-112deg)' }],
+        swing
+      ),
+      veil.animate([{ opacity: 0.92 }, { opacity: 0 }], {
+        duration: 750,
+        delay: 820,
+        easing: 'ease-out',
+        fill: 'forwards',
+      }),
+      seam.animate(
+        [
+          { opacity: 0, transform: 'translateX(-50%) scaleX(0.2)' },
+          { opacity: 1, transform: 'translateX(-50%) scaleX(1)', offset: 0.35 },
+          { opacity: 0, transform: 'translateX(-50%) scaleX(2.6)' },
+        ],
+        { duration: 1000, delay: 380, easing: 'ease-out', fill: 'forwards' }
+      ),
+    ];
+    const fadeOut = root.animate(
+      [{ opacity: 1 }, { opacity: 1, offset: 0.86 }, { opacity: 0 }],
+      { duration: 1900, fill: 'forwards' }
+    );
+    anims.push(fadeOut);
+    if (main) {
+      anims.push(
+        main.animate(
+          [
+            { transform: 'scale(1.045)' },
+            { transform: 'scale(1)' },
+          ],
+          { duration: 1150, delay: 620, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'backwards' }
+        )
+      );
+    }
+    if (skip) {
+      anims.push(
+        skip.animate([{ opacity: 1 }, { opacity: 0 }], {
+          duration: 400,
+          delay: 1400,
+          fill: 'forwards',
+        })
+      );
+    }
+
+    let done = false;
+    const onSkip = () => finish();
+    const finish = () => {
+      if (done) return;
+      done = true;
+      anims.forEach((a) => a.cancel());
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('pointerdown', onSkip);
+      window.removeEventListener('keydown', onSkip);
+      root.remove();
+    };
+    window.addEventListener('pointerdown', onSkip, { once: true });
+    window.addEventListener('keydown', onSkip, { once: true });
+    fadeOut.finished.then(finish).catch(finish);
+    setTimeout(finish, 3000);
+    document.addEventListener('astro:before-swap', finish, { once: true });
+  }
+
+  document.addEventListener('astro:page-load', __playGate);
+</script>
