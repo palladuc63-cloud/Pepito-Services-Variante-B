@@ -26,11 +26,11 @@
   --forest-dark: #263521;
   --forest-soft: #e4ecd9;
 
-  /* Accent chaud (terre cuite) */
-  --copper: #b5653a;
-  --copper-dark: #9a4d28;
-  --copper-light: #e8b48c;
-  --copper-soft: #f6e6d8;
+  /* Accent « sauge » — le nom --copper est conservé pour compat */
+  --copper: #7d9a5c;
+  --copper-dark: #5f7a42;
+  --copper-light: #c9d9b0;
+  --copper-soft: #eef3e2;
 
   /* Métal (non utilisé dans ce thème, gardé pour compat) */
   --steel: #3b342a;
