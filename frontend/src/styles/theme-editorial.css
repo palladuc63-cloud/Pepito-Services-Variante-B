@@ -187,6 +187,11 @@
     position: sticky;
     top: 8rem;
     margin: 0;
+    /* Fond opaque + z-index : le titre collant ne doit jamais se
+       superposer au contenu au-dessus (hero) — bug sticky-in-grid Safari */
+    z-index: 2;
+    padding-block: 0.5rem 1rem;
+    background: var(--paper);
   }
 
   :root[data-theme='editorial'] #a-propos > .container > :not(.section-header),
@@ -385,13 +390,15 @@
 }
 
 /* À propos : un chapeau en grand serif */
+:root[data-theme='editorial'] #a-propos {
+  position: relative;
+  z-index: 1;
+  background: var(--paper);
+}
+
 :root[data-theme='editorial'] #a-propos .about-content {
-  flex-direction: column;
-  align-items: flex-start;
   max-width: none;
   margin: 0;
-  gap: 2rem;
-  text-align: left;
 }
 
 :root[data-theme='editorial'] #a-propos .about-logo {
@@ -399,8 +406,12 @@
 }
 
 :root[data-theme='editorial'] #a-propos .prose {
-  max-width: none;
+  max-width: 62ch;
   margin: 0;
+}
+
+:root[data-theme='editorial'] #a-propos .prose p {
+  text-wrap: pretty;
 }
 
 :root[data-theme='editorial'] #a-propos .prose p,

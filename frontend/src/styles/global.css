@@ -219,6 +219,7 @@ a:focus-visible {
 
 .section {
   padding-block: var(--space-12);
+  scroll-margin-top: 5.5rem;
 }
 
 @media (min-width: 1024px) {
