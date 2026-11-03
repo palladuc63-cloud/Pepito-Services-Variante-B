@@ -12,7 +12,6 @@ const preview = Astro.url.searchParams.get('preview') === '1';
 const headers = preview ? { cookie: Astro.request.headers.get('cookie') ?? '' } : undefined;
 const [projects, cityPagesRaw] = await Promise.all([getProjects({ preview, headers }), getCityPages()]);
 const cityPages = cityPagesRaw as CityPage[];
-const base = import.meta.env.BASE_URL;
 ---
 
 <MainLayout
@@ -41,11 +40,6 @@ const base = import.meta.env.BASE_URL;
           Cliquez sur une ville pour découvrir nos réalisations et prestations locales.
         </p>
         <CityMap pages={cityPages} />
-        <ul class="zone-links">
-          {cityPages.map((c) => (
-            <li><a href={`${base}${c.serviceSlug}/${c.slug}/`}>{c.city}</a></li>
-          ))}
-        </ul>
       </section>
     )}
   </Section>
@@ -58,24 +52,6 @@ const base = import.meta.env.BASE_URL;
 
   .zone-section {
     margin-top: var(--space-12);
-  }
-
-  .zone-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    list-style: none;
-    padding: 0;
-    margin-top: var(--space-5);
-  }
-
-  .zone-links a {
-    display: inline-block;
-    padding: 6px 14px;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    text-decoration: none;
-    color: inherit;
   }
 
   .preview-banner {
