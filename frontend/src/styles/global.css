@@ -269,6 +269,59 @@ a:focus-visible {
   color: var(--basalt-dark);
 }
 
+/* ═══ Nature : carte artisanale flottante ═══ */
+
+:root[data-theme='nature'] .section-cta {
+  background-color: transparent;
+  background-image: none;
+  padding-block: var(--space-8) var(--space-16);
+}
+
+:root[data-theme='nature'] .section-cta > .container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  padding: clamp(2.75rem, 6vw, 4.5rem) clamp(1.5rem, 5vw, 4rem) clamp(3.5rem, 6.5vw, 5.25rem);
+  background-color: var(--basalt);
+  background-image: radial-gradient(
+      circle at 88% -12%,
+      rgb(232 180 140 / 0.16),
+      transparent 55%
+    ),
+    var(--cta-img);
+  box-shadow: 0 30px 70px -28px rgb(31 43 26 / 0.5);
+}
+
+/* Frise de piquets cuivrés en bas de la carte — signature clôture */
+:root[data-theme='nature'] .section-cta > .container::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5rem;
+  background: var(--copper-light);
+  opacity: 0.45;
+  -webkit-mask: var(--picket-mask) center bottom / 8px 16px repeat-x;
+  mask: var(--picket-mask) center bottom / 8px 16px repeat-x;
+}
+
+:root[data-theme='nature'] .section-cta .cta-box::before {
+  content: 'Artisan local — estimation personnalisée';
+  display: block;
+  margin-bottom: var(--space-4);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--copper-light);
+}
+
+:root[data-theme='nature'] .section-cta .cta-text {
+  max-width: 52ch;
+  margin-inline: auto;
+}
+
 .section-title {
   font-size: clamp(1.75rem, 3.6vw, 2.5rem);
   color: var(--color-heading);
