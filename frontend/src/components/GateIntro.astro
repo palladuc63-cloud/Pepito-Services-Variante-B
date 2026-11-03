@@ -149,7 +149,6 @@ import logo from '../assets/pepito-logo-white.svg';
     const root = document.querySelector<HTMLElement>('.gate-intro');
     const pending = document.documentElement.classList.contains('gate-intro-pending');
     if (!root || !pending) return;
-    document.documentElement.classList.remove('gate-intro-pending');
     try {
       sessionStorage.setItem('pepito-intro-seen', '1');
     } catch (e) {}
@@ -230,6 +229,7 @@ import logo from '../assets/pepito-logo-white.svg';
       document.body.style.overflow = prevOverflow;
       window.removeEventListener('pointerdown', onSkip);
       window.removeEventListener('keydown', onSkip);
+      document.documentElement.classList.remove('gate-intro-pending');
       root.remove();
     };
     window.addEventListener('pointerdown', onSkip, { once: true });
