@@ -279,6 +279,7 @@ a:focus-visible {
 :root[data-theme='nature'] .section-cta {
   position: relative;
   overflow: hidden;
+  background-image: none;
 }
 
 :root[data-theme='nature'] .section-cta::before {
