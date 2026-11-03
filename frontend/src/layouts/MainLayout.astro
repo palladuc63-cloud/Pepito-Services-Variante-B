@@ -4,6 +4,7 @@ import { ClientRouter } from 'astro:transitions';
 import SeoHead from '../components/SeoHead.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
+import ArrowDivider from '../components/ArrowDivider.astro';
 import ThemeSwitcher from '../components/ThemeSwitcher.astro';
 import { getSite } from '../lib/site.js';
 import type { SeoMeta } from '../data/types';
@@ -65,6 +66,9 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
     <main id="main-content">
       <slot />
     </main>
+    <div class="footer-fence" aria-hidden="true">
+      <ArrowDivider direction="up" fill="var(--basalt-dark)" height="44px" />
+    </div>
     <Footer settings={settings} />
     <ThemeSwitcher />
     <script>
