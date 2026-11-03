@@ -5,7 +5,6 @@ import ArrowDivider from '../components/ArrowDivider.astro';
 import Section from '../components/Section.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import logo from '../assets/pepito-logo.svg';
 import { getSite } from '../lib/site.js';
 import { getProjects } from '../lib/api.js';
 import type { Project, Service } from '../data/types';
@@ -58,12 +57,6 @@ const jsonLd = [{
     </div>
 
     <div class="about-content">
-      <img
-        src={logo.src}
-        alt="Pépito Services"
-        class="about-logo"
-        loading="lazy"
-      />
       <div class="prose">
         <p>{settings.aboutText || settings.description}</p>
       </div>
@@ -198,31 +191,8 @@ const jsonLd = [{
   }
 
   .about-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-8);
     max-width: 80ch;
     margin-inline: auto;
-  }
-
-  .about-logo {
-    width: 100%;
-    max-width: 264px;
-    height: auto;
-    flex-shrink: 0;
-  }
-
-  @media (min-width: 768px) {
-    .about-content {
-      flex-direction: row;
-      align-items: flex-start;
-      text-align: left;
-    }
-
-    .about-logo {
-      max-width: 288px;
-    }
   }
 
   /* Thème Nature : pas d'en-tête dans la section À propos */
