@@ -94,38 +94,40 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
         const svg = document.querySelector<SVGSVGElement>('.footer-wave svg');
         if (!svg) return;
         const paths = Array.from(svg.querySelectorAll('path'));
-        const specs = [
-          {
-            base: 54,
-            terms: [
-              [13, 0.0042, 0.55, 0],
-              [6, 0.0092, -0.4, 1.7],
-              [3.5, 0.017, 0.32, 3.1],
-            ],
-          },
-          {
-            base: 64,
-            terms: [
-              [9, 0.0032, 0.42, 0.9],
-              [4.5, 0.0075, -0.3, 2.6],
-            ],
-          },
-        ];
+        // La crête sombre mène ; la sauge est son éco décalé vers le haut
+        // (+ frémissement propre) pour qu'elle reste toujours visible.
+        const dark = {
+          base: 64,
+          terms: [
+            [9, 0.0032, 0.42, 0.9],
+            [4.5, 0.0075, -0.3, 2.6],
+            [2.5, 0.013, 0.18, 4.1],
+          ],
+        };
+        const sage = {
+          offset: 17,
+          terms: [
+            [2.5, 0.011, -0.25, 0.5],
+            [1.5, 0.02, 0.15, 2.2],
+          ],
+        };
         const W = 1440;
         const STEP = 20;
         const frame = (now: number) => {
           const t = now / 1000;
+          const sum = (base: number, terms: number[][], x: number) =>
+            base +
+            terms.reduce(
+              (s, term) => s + term[0] * Math.sin(term[1] * x + term[2] * t + term[3]),
+              0
+            );
+          const yOf = (i: number, x: number) => {
+            const darkY = sum(dark.base, dark.terms, x);
+            return i === 1 ? darkY : darkY - sage.offset + sum(0, sage.terms, x);
+          };
           paths.forEach((path, i) => {
-            const spec = specs[i];
-            if (!spec) return;
-            const y = (x: number) =>
-              spec.base +
-              spec.terms.reduce(
-                (s, term) => s + term[0] * Math.sin(term[1] * x + term[2] * t + term[3]),
-                0
-              );
-            let d = `M0 150 L0 ${y(0).toFixed(1)}`;
-            for (let x = STEP; x <= W; x += STEP) d += ` L${x} ${y(x).toFixed(1)}`;
+            let d = `M0 150 L0 ${yOf(i, 0).toFixed(1)}`;
+            for (let x = STEP; x <= W; x += STEP) d += ` L${x} ${yOf(i, x).toFixed(1)}`;
             path.setAttribute('d', d + ' L1440 150 Z');
           });
           __waveRaf = requestAnimationFrame(frame);
