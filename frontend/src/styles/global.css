@@ -313,8 +313,8 @@ a:focus-visible {
   display: block;
   top: -1.35rem;
   height: 1.35rem;
-  -webkit-mask: var(--picket-mask) 0 0 / 8px 21.5px repeat-x;
-  mask: var(--picket-mask) 0 0 / 8px 21.5px repeat-x;
+  -webkit-mask: var(--picket-mask) 0 0 / 13px 21.5px repeat-x;
+  mask: var(--picket-mask) 0 0 / 13px 21.5px repeat-x;
 }
 
 .section-title {
