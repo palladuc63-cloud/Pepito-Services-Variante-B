@@ -8,6 +8,7 @@ const themes = [
 ---
 
 <div class="theme-switcher" role="group" aria-label="Choisir le thème du site">
+  <span class="theme-switcher__icon" aria-hidden="true">🎨</span>
   <span class="theme-switcher__title">Thème</span>
   {
     themes.map((theme) => (
@@ -71,6 +72,11 @@ const themes = [
     border-radius: 999px;
     box-shadow: var(--shadow-md);
     font-size: var(--text-xs);
+  }
+
+  .theme-switcher__icon {
+    font-size: 0.95rem;
+    line-height: 1;
   }
 
   .theme-switcher__title {
