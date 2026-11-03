@@ -324,19 +324,25 @@ a:focus-visible {
   height: 5rem;
 }
 
-/* Dérive lente des deux crêtes, en sens opposés (chemins prolongés
-   au-delà du viewBox pour ne jamais révéler les bords). */
-@keyframes nature-wave-drift {
-  from { transform: translateX(0) translateY(0); }
-  to { transform: translateX(-70px) translateY(-4px); }
+/* Écoulement continu des deux crêtes : les chemins sont périodiques,
+   la translation d'exactement une période boucle sans couture et les
+   vitesses différentes donnent un léger parallaxe. */
+@keyframes nature-wave-flow-720 {
+  from { transform: translateX(0); }
+  to { transform: translateX(-720px); }
+}
+
+@keyframes nature-wave-flow-960 {
+  from { transform: translateX(0); }
+  to { transform: translateX(-960px); }
 }
 
 .footer-wave path:first-child {
-  animation: nature-wave-drift 15s ease-in-out infinite alternate;
+  animation: nature-wave-flow-720 24s linear infinite;
 }
 
 .footer-wave path:last-child {
-  animation: nature-wave-drift 11s ease-in-out infinite alternate-reverse;
+  animation: nature-wave-flow-960 32s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
