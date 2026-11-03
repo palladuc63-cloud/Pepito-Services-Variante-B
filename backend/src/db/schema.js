@@ -168,7 +168,7 @@ export const socialPosts = mysqlTable('social_posts', {
   id: serial('id').primaryKey(),
   refType: mysqlEnum('ref_type', ['project', 'article']).notNull(),
   refId: int('ref_id').notNull(),
-  platform: mysqlEnum('platform', ['facebook']).default('facebook').notNull(),
+  platform: mysqlEnum('platform', ['facebook', 'google']).default('facebook').notNull(),
   content: text('content').notNull(),
   imageUrl: varchar('image_url', { length: 500 }),
   linkUrl: varchar('link_url', { length: 500 }),

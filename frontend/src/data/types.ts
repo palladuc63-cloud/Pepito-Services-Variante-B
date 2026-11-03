@@ -29,6 +29,10 @@ export interface SiteSettings {
   };
   aboutText: string;
   nav: NavLink[];
+  /** URL publique de la fiche Google Business (peut être vide). */
+  googleProfileUrl: string;
+  /** Profils externes pour le maillage SEO (sameAs JSON-LD). */
+  sameAs: string[];
 }
 
 export interface Category {

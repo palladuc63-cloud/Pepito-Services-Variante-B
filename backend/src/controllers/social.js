@@ -24,6 +24,9 @@ export async function publishPost(req, res) {
   const id = Number(req.params.id);
   const [post] = await db.select().from(socialPosts).where(eq(socialPosts.id, id));
   if (!post) return res.status(404).json({ error: 'Post introuvable' });
+  if (post.platform !== 'facebook') {
+    return res.status(400).json({ error: 'La fiche Google se publie à la main — copiez le texte et collez-le dans votre fiche.' });
+  }
 
   try {
     const { id: fbPostId } = await publishToFacebook(post);

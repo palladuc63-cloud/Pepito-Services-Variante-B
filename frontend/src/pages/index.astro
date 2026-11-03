@@ -14,12 +14,33 @@ const { settings, services, slides } = await getSite();
 const projects = await getProjects();
 const previewProjects = projects.slice(0, 3);
 const base = import.meta.env.BASE_URL;
+
+// Entité locale canonique (@id #business, référencée par les pages villes
+// et réalisations). sameAs relie la fiche Google et les réseaux au site —
+// Google s'en sert pour associer l'entité web à la fiche Business Profile.
+const siteUrl = settings.siteUrl.replace(/\/$/, '');
+const jsonLd = [{
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': `${siteUrl}/#business`,
+  name: settings.name,
+  url: siteUrl,
+  image: `${siteUrl}/pepito-logo.svg`,
+  ...(settings.contact.phone && { telephone: settings.contact.phone }),
+  ...(settings.contact.email && { email: settings.contact.email }),
+  ...(settings.contact.address && {
+    address: { '@type': 'PostalAddress', streetAddress: settings.contact.address, addressCountry: 'FR' },
+  }),
+  ...(settings.contact.serviceArea && { areaServed: settings.contact.serviceArea }),
+  ...(settings.sameAs?.length && { sameAs: settings.sameAs }),
+}];
 ---
 
 <MainLayout
   title={settings.name}
   description={settings.description}
   canonicalPath="/"
+  jsonLd={jsonLd}
 >
   <HeroSlideshow settings={settings} projects={projects} slides={slides} />
 

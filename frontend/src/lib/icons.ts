@@ -49,6 +49,9 @@ export const ICONS: Record<string, string> = {
     '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
   instagram:
     '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',
+  // Épingle de carte (fiche Google / Google Maps)
+  google:
+    '<path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
 };
 
 // Slug catégorie/service → picto métier (fallback : grille).

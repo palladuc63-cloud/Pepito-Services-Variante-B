@@ -246,6 +246,10 @@ const base = import.meta.env.BASE_URL;
                 <div><label class="form-label">URL Facebook</label><input class="form-input" name="facebook_url" /></div>
                 <div><label class="form-label">URL Instagram</label><input class="form-input" name="instagram_url" /></div>
               </div>
+              <div class="form-row">
+                <div><label class="form-label">URL de la fiche Google</label><input class="form-input" name="google_profile_url" placeholder="https://share.google/… ou https://g.page/…" />
+                  <p class="form-hint">Lien public de la fiche Google Business — affiché dans le pied de page et le maillage SEO (sameAs).</p></div>
+              </div>
               <button class="btn btn-primary" type="submit">Enregistrer</button>
             </form>
           </div>
@@ -1525,11 +1529,14 @@ const base = import.meta.env.BASE_URL;
     st.textContent = configured
       ? '✅ Facebook connecté — les posts peuvent être publiés.'
       : '⚠️ Facebook non connecté — les posts restent en brouillon (tokens à configurer côté serveur).';
+    if (!window._settings) window._settings = await api.get('/api/admin/settings').catch(() => ({}));
+    const gpUrl = window._settings?.google_profile_url || 'https://business.google.com/';
     const spStatus = { draft: 'Brouillon', published: 'Publié', failed: 'Échec' };
     $('#social-list').innerHTML = posts.length ? posts.map((p) => `
       <div class="card" style="margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:start;gap:12px">
           <div style="flex:1;min-width:0">
+            <span class="tag-pill">${p.platform === 'google' ? '🗺️ Fiche Google' : '📘 Facebook'}</span>
             <span class="tag-pill">${p.refType === 'article' ? '📰 Article' : '🚧 Réalisation'}</span>
             <span class="tag-pill ${p.status === 'published' ? 'pub' : p.status === 'failed' ? 'failed' : 'draft'}">${spStatus[p.status] ?? p.status}</span>
             ${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;margin-top:8px">` : ''}
@@ -1543,7 +1550,14 @@ const base = import.meta.env.BASE_URL;
           </div>
           <div style="white-space:nowrap;display:flex;flex-direction:column;gap:6px">
             ${p.status === 'draft' ? `<button class="btn btn-sm" data-sp-edit="${p.id}">Modifier</button>` : ''}
-            ${p.status !== 'published' ? `<button class="btn btn-sm btn-primary" data-sp-pub="${p.id}">Publier sur FB</button>` : ''}
+            ${p.platform === 'google' ? `
+              <button class="btn btn-sm" data-sp-copy="${p.id}">📋 Copier</button>
+              ${p.status !== 'published' ? `
+                <a class="btn btn-sm btn-primary" href="${esc(gpUrl)}" target="_blank" rel="noopener">Ouvrir la fiche</a>
+                <button class="btn btn-sm" data-sp-done="${p.id}">Marquer publié</button>` : ''}
+            ` : `
+              ${p.status !== 'published' ? `<button class="btn btn-sm btn-primary" data-sp-pub="${p.id}">Publier sur FB</button>` : ''}
+            `}
             <button class="btn btn-sm btn-danger" data-sp-del="${p.id}">✕</button>
           </div>
         </div>
@@ -1574,6 +1588,15 @@ const base = import.meta.env.BASE_URL;
     document.querySelectorAll('[data-sp-del]').forEach((b) => b.addEventListener('click', async () => {
       if (!confirm('Supprimer ce post ?')) return;
       await api.del(`/api/admin/social-posts/${b.dataset.spDel}`);
+      loaders.social();
+    }));
+    document.querySelectorAll('[data-sp-copy]').forEach((b) => b.addEventListener('click', async () => {
+      const post = posts.find((x) => String(x.id) === b.dataset.spCopy);
+      await navigator.clipboard.writeText(post?.content ?? '');
+      showAlert('Texte copié — collez-le dans votre fiche Google.');
+    }));
+    document.querySelectorAll('[data-sp-done]').forEach((b) => b.addEventListener('click', async () => {
+      await api.put(`/api/admin/social-posts/${b.dataset.spDone}`, { status: 'published' });
       loaders.social();
     }));
   };

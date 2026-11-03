@@ -47,24 +47,56 @@ export function facebookConfigured() {
   return Boolean(process.env.FB_PAGE_ID && process.env.FB_PAGE_ACCESS_TOKEN);
 }
 
-// Crée un brouillon de post FB quand un contenu est (re)publié.
-// Anti-doublon : un seul post par (refType, refId).
+// Texte calibré « actualité » Google Business Profile : concis,
+// local, pas de lien dans le corps (le CTA de la fiche le porte).
+export function buildGooglePostContent(refType, item, info = {}) {
+  const { siteName = 'Pépito Services', phone = '', serviceArea = '', baseline = '' } = info;
+  const parts = [];
+  parts.push(refType === 'article'
+    ? item.title
+    : `${item.city ? `Chantier à ${item.city} — ` : ''}${item.title}`);
+  if (item.summary) parts.push(item.summary);
+  const footer = [
+    `${siteName}${baseline ? ` — ${baseline}` : ''}`,
+    [serviceArea && `Zone : ${serviceArea}`, phone && `Devis gratuit : ${phone}`].filter(Boolean).join(' · '),
+  ].filter(Boolean).join('\n');
+  parts.push(footer);
+  // GBP accepte ~1500 caractères ; on reste en dessous.
+  return parts.join('\n\n').slice(0, 1400);
+}
+
+// Crée les brouillons FB + fiche Google quand un contenu est (re)publié.
+// Anti-doublon : un seul post par (refType, refId, platform).
 export async function queueSocialPost(refType, item, categorySlug) {
   try {
-    const [dup] = await db.select({ id: socialPosts.id }).from(socialPosts)
-      .where(and(eq(socialPosts.refType, refType), eq(socialPosts.refId, item.id)));
-    if (dup) return;
     const info = await loadPostInfo();
-    const content = buildPostContent(refType, { ...item, categorySlug }, info);
-    await db.insert(socialPosts).values({
-      refType,
-      refId: item.id,
-      content,
-      imageUrl: item.imageUrl ? `${SITE_URL}${item.imageUrl}` : null,
-      linkUrl: postLink(refType, { ...item, categorySlug }),
-      status: 'draft',
-    });
-    notify('📝 Post Facebook prêt — Pépito', `${item.title}\nÀ valider dans le back-office.`);
+    const linkUrl = postLink(refType, { ...item, categorySlug });
+    const imageUrl = item.imageUrl ? `${SITE_URL}${item.imageUrl}` : null;
+    let created = 0;
+    for (const platform of ['facebook', 'google']) {
+      const [dup] = await db.select({ id: socialPosts.id }).from(socialPosts)
+        .where(and(
+          eq(socialPosts.refType, refType),
+          eq(socialPosts.refId, item.id),
+          eq(socialPosts.platform, platform),
+        ));
+      if (dup) continue;
+      await db.insert(socialPosts).values({
+        refType,
+        refId: item.id,
+        platform,
+        content: platform === 'google'
+          ? buildGooglePostContent(refType, item, info)
+          : buildPostContent(refType, { ...item, categorySlug }, info),
+        imageUrl,
+        linkUrl,
+        status: 'draft',
+      });
+      created++;
+    }
+    if (created) {
+      notify('📝 Posts réseaux prêts — Pépito', `${item.title}\nÀ valider dans le back-office.`);
+    }
   } catch (err) {
     console.error('queueSocialPost:', err.message);
   }

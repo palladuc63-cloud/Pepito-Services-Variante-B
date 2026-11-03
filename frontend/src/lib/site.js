@@ -9,6 +9,7 @@ export async function getSite() {
   const socials = [];
   if (s.facebook_url) socials.push({ name: 'Facebook', url: s.facebook_url });
   if (s.instagram_url) socials.push({ name: 'Instagram', url: s.instagram_url });
+  if (s.google_profile_url) socials.push({ name: 'Google', url: s.google_profile_url });
 
   const nav = [
     { label: 'Accueil', href: '/', icon: 'home' },
@@ -50,6 +51,9 @@ export async function getSite() {
       },
       aboutText: s.about_text || '',
       nav,
+      // Profils externes vérifiés — maillage SEO (sameAs JSON-LD).
+      googleProfileUrl: s.google_profile_url || '',
+      sameAs: socials.map((so) => so.url),
     },
   };
 }

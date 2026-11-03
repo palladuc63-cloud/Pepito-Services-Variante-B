@@ -89,6 +89,7 @@ const jsonLd = [{
         address: { '@type': 'PostalAddress', streetAddress: settings.contact.address, addressCountry: 'FR' },
       }),
       ...(settings.contact.serviceArea && { areaServed: settings.contact.serviceArea }),
+      ...(settings.sameAs?.length && { sameAs: settings.sameAs }),
     },
     {
       '@type': 'Service',

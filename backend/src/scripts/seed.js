@@ -150,7 +150,7 @@ const DDL = [
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     ref_type ENUM('project','article') NOT NULL,
     ref_id INT NOT NULL,
-    platform ENUM('facebook') NOT NULL DEFAULT 'facebook',
+    platform ENUM('facebook','google') NOT NULL DEFAULT 'facebook',
     content TEXT NOT NULL,
     image_url VARCHAR(500),
     link_url VARCHAR(500),
