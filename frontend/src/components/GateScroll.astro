@@ -29,6 +29,8 @@ import wallImg from '../assets/gate-wall.webp';
   }
 
   :global([data-theme='nature']) .gs__sticky {
+    --glh: min(50vh, 38vw);
+    --gwh: calc(var(--glh) * 1.22);
     position: sticky; top: 0; height: 100vh; overflow: hidden;
     background: var(--color-surface, #f3efe5);
   }
@@ -52,29 +54,29 @@ import wallImg from '../assets/gate-wall.webp';
     pointer-events: none;
   }
   :global([data-theme='nature']) .gs__wall {
-    display: block; position: absolute; top: 50%;
-    height: min(50vh, 38vw);
-    width: max(0px, calc(50% - (min(50vh, 38vw) * 1.1058) + 4vw));
-    transform: translateY(-50%);
+    display: block; position: absolute;
+    top: calc(50% + var(--glh) / 2 - var(--gwh));
+    height: var(--gwh);
+    width: max(0px, calc(50% - (var(--glh) * 1.1058) + 4vw));
     overflow: hidden;
   }
   .gs__wall--l { left: -4vw; }
   .gs__wall--r { right: -4vw; }
   .gs__wall img {
     width: 100%; height: 100%; object-fit: cover;
-    object-position: 100% 50%; display: block;
+    object-position: 100% 0; display: block;
   }
   .gs__wall--r img { transform: scaleX(-1); }
 
   .gs__leaf {
-    height: min(50vh, 38vw);
+    height: var(--glh);
     aspect-ratio: 512/463;
     will-change: transform;
     backface-visibility: hidden;
   }
   .gs__leaf img { display: block; width: 100%; height: 100%; }
-  .gs__leaf--l { transform-origin: left center; box-shadow: -18px 0 40px -12px rgba(0,0,0,.55); }
-  .gs__leaf--r { transform-origin: right center; box-shadow: 18px 0 40px -12px rgba(0,0,0,.55); }
+  .gs__leaf--l { translate: -8px 0; transform-origin: left center; box-shadow: -18px 0 40px -12px rgba(0,0,0,.55); }
+  .gs__leaf--r { translate: 8px 0; transform-origin: right center; box-shadow: 18px 0 40px -12px rgba(0,0,0,.55); }
 
   :global([data-theme='nature']) .gs__hint {
     display: block;
@@ -92,7 +94,7 @@ import wallImg from '../assets/gate-wall.webp';
   @media (max-width: 700px) {
     :global([data-theme='nature']) .gs__scene { perspective: 900px; }
     :global([data-theme='nature']) .gs__wall { display: none; }
-    .gs__leaf { height: min(44vh, 52vw); }
+    :global([data-theme='nature']) .gs__sticky { --glh: min(44vh, 52vw); }
   }
 
   @media (prefers-reduced-motion: reduce) {
