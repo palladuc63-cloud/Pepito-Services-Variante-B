@@ -32,7 +32,7 @@ import wallImg from '../assets/gate-wall.webp';
 
   :global([data-theme='nature']) .gs__sticky {
     --glh: min(50vh, 38vw);
-    --gwh: calc(50% + var(--glh) / 2);
+    --gwh: calc(var(--gs-head) + var(--glh));
     position: sticky; top: 0; height: 100vh; overflow: hidden;
   }
 
@@ -51,7 +51,8 @@ import wallImg from '../assets/gate-wall.webp';
 
   :global([data-theme='nature']) .gs__scene {
     display: flex; position: absolute; inset: 0;
-    align-items: center; justify-content: center;
+    align-items: flex-start; justify-content: center;
+    padding-top: var(--gs-head);
     perspective: 1400px; perspective-origin: 50% 50%;
     pointer-events: none;
   }
