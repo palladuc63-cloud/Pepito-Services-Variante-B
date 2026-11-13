@@ -1,7 +1,6 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
 import HeroSlideshow from '../components/HeroSlideshow.astro';
-import GateScroll from '../components/GateScroll.astro';
 import ArrowDivider from '../components/ArrowDivider.astro';
 import Section from '../components/Section.astro';
 import ServiceCard from '../components/ServiceCard.astro';
@@ -50,28 +49,27 @@ const jsonLd = [{
     prolongement
   />
 
-  <GateScroll>
-    <Section id="a-propos" class="section-alt">
-      <div class="section-header">
-        <h2 class="section-title">À propos de Pépito Services</h2>
-        <p class="section-subtitle">
-          Une entreprise artisanale au service de vos projets extérieurs.
-        </p>
-      </div>
+  {/* GateScroll en pause — remonter ce composant autour de #a-propos pour réactiver le portail au scroll */}
+  <Section id="a-propos" class="section-alt">
+    <div class="section-header">
+      <h2 class="section-title">À propos de Pépito Services</h2>
+      <p class="section-subtitle">
+        Une entreprise artisanale au service de vos projets extérieurs.
+      </p>
+    </div>
 
-      <div class="about-content">
-        <img
-          src={logo.src}
-          alt="Pépito Services"
-          class="about-logo"
-          loading="lazy"
-        />
-        <div class="prose">
-          <p>{settings.aboutText || settings.description}</p>
-        </div>
+    <div class="about-content">
+      <img
+        src={logo.src}
+        alt="Pépito Services"
+        class="about-logo"
+        loading="lazy"
+      />
+      <div class="prose">
+        <p>{settings.aboutText || settings.description}</p>
       </div>
-    </Section>
-  </GateScroll>
+    </div>
+  </Section>
 
   <ArrowDivider
     fill="var(--color-surface)"
@@ -243,9 +241,6 @@ const jsonLd = [{
     display: none;
   }
 
-  /* Thème Nature : le portail se raccorde directement au hero, sans bandeau */
-  :global([data-theme='nature'] .arrow-divider--prolongement) {
-    display: none;
-  }
+
 
 </style>
