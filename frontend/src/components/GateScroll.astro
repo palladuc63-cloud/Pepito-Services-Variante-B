@@ -26,7 +26,8 @@ import wallImg from '../assets/gate-wall.webp';
 
   :global([data-theme='nature']) .gs {
     display: block; height: 240vh; position: relative;
-    margin-top: -14vh; z-index: 4;
+    --gs-head: 22vh;
+    margin-top: calc(-1 * var(--gs-head)); z-index: 4;
   }
 
   :global([data-theme='nature']) .gs__sticky {
@@ -36,7 +37,7 @@ import wallImg from '../assets/gate-wall.webp';
   }
 
   :global([data-theme='nature']) .gs__back {
-    position: absolute; left: 0; right: 0; top: 14vh; bottom: 0;
+    position: absolute; left: 0; right: 0; top: var(--gs-head); bottom: 0;
     overflow: hidden; background: var(--color-surface, #f3efe5);
   }
   .gs__reveal {
@@ -44,8 +45,8 @@ import wallImg from '../assets/gate-wall.webp';
     justify-content: center; will-change: transform;
   }
   :global([data-theme='nature']) .gs__reveal > :global(.section) {
-    min-height: 100vh; display: flex; flex-direction: column;
-    justify-content: center;
+    min-height: calc(100vh - var(--gs-head)); display: flex;
+    flex-direction: column; justify-content: center;
   }
 
   :global([data-theme='nature']) .gs__scene {
@@ -113,8 +114,6 @@ import wallImg from '../assets/gate-wall.webp';
       const l = sec.querySelector<HTMLElement>('.gs__leaf--l')!;
       const r = sec.querySelector<HTMLElement>('.gs__leaf--r')!;
       const hint = sec.querySelector<HTMLElement>('.gs__hint')!;
-      const back = sec.querySelector<HTMLElement>('.gs__back')!;
-      const reveal = sec.querySelector<HTMLElement>('.gs__reveal')!;
       const fixed = new URLSearchParams(location.search).get('gs');
       if (fixed !== null) {
         const sticky = sec.querySelector<HTMLElement>('.gs__sticky')!;
@@ -132,16 +131,11 @@ import wallImg from '../assets/gate-wall.webp';
         if (fixed === null && (rect.bottom < -100 || rect.top > innerHeight + 100)) return;
 
         const op = ease(Math.min(1, Math.max(0, (p - .08) / .52)));   // ouverture 8%→60%
-        const a = op * 80;
+        const a = op * 86;
         l.style.transform = `rotateY(${a}deg) scaleX(1.02)`;
         r.style.transform = `rotateY(${-a}deg) scaleX(1.02)`;
 
         hint.style.opacity = String(Math.max(0, 1 - p * 5));
-
-        // fin de course : le contenu défile dans le cadre s'il dépasse
-        const over = Math.max(0, reveal.scrollHeight - back.clientHeight);
-        const ip = Math.min(1, Math.max(0, (p - .62) / .38));
-        reveal.style.transform = over > 0 ? `translateY(${-over * ip}px)` : '';
       };
     });
     let tick = false;
