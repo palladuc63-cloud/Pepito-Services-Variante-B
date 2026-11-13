@@ -44,33 +44,36 @@ const navLinks = settings.nav.map((link) => ({
         {
           navLinks.map((link, i) => (
             <li role="none" class:list={['nav-item', { 'nav-item--has-dd': link.children?.length }]}>
-              <a
-                href={link.href}
-                class:list={[
-                  'nav-link inline-flex items-center rounded-[var(--r-btn)] px-4 py-2 text-sm font-semibold tracking-wide no-underline transition-colors',
-                  link.isActive
-                    ? 'text-[color:var(--forest-dark)] bg-[color:var(--nav-active-bg)] nav-link--active'
-                    : 'text-[color:var(--ink)] hover:bg-[color:var(--forest-soft)] hover:text-[color:var(--forest-dark)]',
-                ]}
-                aria-current={link.isActive ? 'page' : undefined}
-                role="menuitem"
-              >
-                {link.icon && <Icon name={link.icon} size={15} class="nav-icon" />}
-                {link.label}
-              </a>
-              {link.children?.length && (
+              {link.children?.length ? (
                 <>
                   <button
                     type="button"
-                    class="nav-dd-toggle"
+                    class:list={[
+                      'nav-link nav-dd-parent inline-flex items-center rounded-[var(--r-btn)] px-4 py-2 text-sm font-semibold tracking-wide transition-colors',
+                      link.isActive
+                        ? 'text-[color:var(--forest-dark)] bg-[color:var(--nav-active-bg)] nav-link--active'
+                        : 'text-[color:var(--ink)] hover:bg-[color:var(--forest-soft)] hover:text-[color:var(--forest-dark)]',
+                    ]}
                     aria-expanded="false"
+                    aria-haspopup="menu"
                     aria-controls={`nav-dd-${i}`}
-                    aria-label={`Ouvrir le sous-menu ${link.label}`}
                   >
+                    {link.icon && <Icon name={link.icon} size={15} class="nav-icon" />}
+                    {link.label}
                     <Icon name="chevron-down" size={13} class="nav-dd-caret" />
                   </button>
                   <div class="nav-dd" id={`nav-dd-${i}`} role="menu" aria-label={`Sous-menu ${link.label}`}>
                     <div class="nav-dd__grid">
+                      <div class="nav-dd__item" role="none">
+                        <a href={link.href} class="nav-dd__link" role="menuitem">
+                          <span class="nav-dd__media">
+                            <Icon name="grid" size={18} class="nav-dd__icon" />
+                          </span>
+                          <span class="nav-dd__label">
+                            {link.label === 'Réalisations' ? 'Toutes les réalisations' : 'Tout voir'}
+                          </span>
+                        </a>
+                      </div>
                       {link.children.map((child) => (
                         <div class="nav-dd__item" role="none">
                           <a href={child.href} class="nav-dd__link" role="menuitem">
@@ -98,6 +101,21 @@ const navLinks = settings.nav.map((link) => ({
                     </div>
                   </div>
                 </>
+              ) : (
+                <a
+                  href={link.href}
+                  class:list={[
+                    'nav-link inline-flex items-center rounded-[var(--r-btn)] px-4 py-2 text-sm font-semibold tracking-wide no-underline transition-colors',
+                    link.isActive
+                      ? 'text-[color:var(--forest-dark)] bg-[color:var(--nav-active-bg)] nav-link--active'
+                      : 'text-[color:var(--ink)] hover:bg-[color:var(--forest-soft)] hover:text-[color:var(--forest-dark)]',
+                  ]}
+                  aria-current={link.isActive ? 'page' : undefined}
+                  role="menuitem"
+                >
+                  {link.icon && <Icon name={link.icon} size={15} class="nav-icon" />}
+                  {link.label}
+                </a>
               )}
             </li>
           ))
@@ -141,27 +159,23 @@ const navLinks = settings.nav.map((link) => ({
         >
           {link.children?.length ? (
             <>
-              <div class="mobile-menu__row">
-                <a
-                  href={link.href}
-                  class="mobile-menu__link"
-                  aria-current={link.isActive ? 'page' : undefined}
-                  role="menuitem"
-                >
-                  {link.icon && <Icon name={link.icon} size={20} class="mobile-nav-icon" />}
-                  {link.label}
-                </a>
-                <button
-                  type="button"
-                  class="mobile-sub-toggle"
-                  aria-expanded="false"
-                  aria-controls={`mobile-sub-${i}`}
-                  aria-label={`Ouvrir le sous-menu ${link.label}`}
-                >
-                  <Icon name="chevron-down" size={18} />
-                </button>
-              </div>
+              <button
+                type="button"
+                class="mobile-menu__link mobile-sub-toggle"
+                aria-expanded="false"
+                aria-controls={`mobile-sub-${i}`}
+              >
+                {link.icon && <Icon name={link.icon} size={20} class="mobile-nav-icon" />}
+                {link.label}
+                <Icon name="chevron-down" size={18} class="mobile-sub-caret" />
+              </button>
               <ul class="mobile-sub-list" id={`mobile-sub-${i}`} role="menu">
+                <li class="mobile-sub-item" role="none">
+                  <a href={link.href} class="mobile-sub-link" role="menuitem">
+                    <Icon name="grid" size={16} class="mobile-nav-icon" />
+                    {link.label === 'Réalisations' ? 'Toutes les réalisations' : 'Tout voir'}
+                  </a>
+                </li>
                 {link.children.map((child) => (
                   <li class="mobile-sub-item" role="none">
                     <a href={child.href} class="mobile-sub-link" role="menuitem">
@@ -237,7 +251,7 @@ const navLinks = settings.nav.map((link) => ({
       document.querySelectorAll('.nav-item--has-dd.is-open').forEach((item) => {
         item.classList.remove('is-open');
         item
-          .querySelector('.nav-dd-toggle')
+          .querySelector('.nav-dd-parent')
           ?.setAttribute('aria-expanded', 'false');
       });
     }
@@ -245,14 +259,14 @@ const navLinks = settings.nav.map((link) => ({
     document.addEventListener('click', (e) => {
       const el = e.target as HTMLElement;
 
-      const ddToggle = el.closest('.nav-dd-toggle');
-      if (ddToggle) {
-        const item = ddToggle.closest('.nav-item--has-dd');
+      const ddParent = el.closest('.nav-dd-parent');
+      if (ddParent) {
+        const item = ddParent.closest('.nav-item--has-dd');
         if (item) {
           const willOpen = !item.classList.contains('is-open');
           closeDropdowns();
           item.classList.toggle('is-open', willOpen);
-          ddToggle.setAttribute('aria-expanded', String(willOpen));
+          ddParent.setAttribute('aria-expanded', String(willOpen));
         }
         return;
       }
@@ -280,6 +294,10 @@ const navLinks = settings.nav.map((link) => ({
 
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
+        const openItem = document.querySelector('.nav-item--has-dd.is-open');
+        if (openItem?.contains(document.activeElement)) {
+          (openItem.querySelector('.nav-dd-parent') as HTMLElement | null)?.focus();
+        }
         closeDropdowns();
         closeMenu();
       }
@@ -510,26 +528,12 @@ const navLinks = settings.nav.map((link) => ({
     margin-bottom: -0.7rem;
   }
 
-  .nav-dd-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.5rem;
-    height: 1.5rem;
-    margin-left: -0.45rem;
-    padding: 0;
-    border: none;
-    border-radius: 999px;
-    background: transparent;
-    color: var(--stone);
+  .nav-dd-parent {
     cursor: pointer;
-    transition: background-color var(--transition-fast), color var(--transition-fast);
   }
 
-  .nav-dd-toggle:hover,
-  .nav-dd-toggle:focus-visible {
-    background: var(--forest-soft);
-    color: var(--forest-dark);
+  .nav-dd-parent :global(.nav-dd-caret) {
+    margin-left: 0.15rem;
   }
 
   :global(.nav-dd-caret) {
@@ -794,38 +798,26 @@ const navLinks = settings.nav.map((link) => ({
   }
 
   /* ─── Sous-menu mobile (accordéon) ─── */
-  .mobile-menu__row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
-
-  .mobile-menu__row .mobile-menu__link {
-    flex: 1;
-  }
-
   .mobile-sub-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    flex-shrink: 0;
+    display: flex;
+    width: 100%;
+    text-align: left;
+    background: none;
     border: none;
-    border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--color-warm-white);
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.25s ease;
   }
 
   .mobile-sub-toggle:hover,
   .mobile-sub-toggle:focus-visible {
-    background: rgba(255, 255, 255, 0.2);
+    color: var(--color-sand);
   }
 
-  .mobile-menu__item--has-sub.is-open .mobile-sub-toggle {
+  .mobile-sub-toggle :global(.mobile-sub-caret) {
+    margin-left: auto;
+    transition: transform 0.2s ease;
+  }
+
+  .mobile-menu__item--has-sub.is-open .mobile-sub-toggle :global(.mobile-sub-caret) {
     transform: rotate(180deg);
   }
 
