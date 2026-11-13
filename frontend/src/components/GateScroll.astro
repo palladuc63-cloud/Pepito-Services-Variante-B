@@ -2,7 +2,8 @@
 import { Image } from 'astro:assets';
 import leafLeft from '../assets/gate-scroll-left.webp';
 import leafRight from '../assets/gate-scroll-right.webp';
-import wallImg from '../assets/gate-wall.webp';
+import fenceImg from '../assets/gate-fence.webp';
+import pillarImg from '../assets/gate-pillar.webp';
 ---
 
 <section class="gs" data-gs>
@@ -10,8 +11,10 @@ import wallImg from '../assets/gate-wall.webp';
     <div class="gs__back">
       <div class="gs__reveal"><slot /></div>
     </div>
-    <div class="gs__wall gs__wall--l" aria-hidden="true"><Image src={wallImg} alt="" widths={[720]} loading="eager" /></div>
-    <div class="gs__wall gs__wall--r" aria-hidden="true"><Image src={wallImg} alt="" widths={[720]} loading="eager" /></div>
+    <div class="gs__wall gs__wall--l" aria-hidden="true"><Image src={fenceImg} alt="" widths={[1024]} loading="eager" /></div>
+    <div class="gs__wall gs__wall--r" aria-hidden="true"><Image src={fenceImg} alt="" widths={[1024]} loading="eager" /></div>
+    <div class="gs__pillar gs__pillar--l" aria-hidden="true"><Image src={pillarImg} alt="" widths={[560]} loading="eager" /></div>
+    <div class="gs__pillar gs__pillar--r" aria-hidden="true"><Image src={pillarImg} alt="" widths={[560]} loading="eager" /></div>
     <div class="gs__scene" aria-hidden="true">
       <div class="gs__leaf gs__leaf--l"><Image src={leafLeft} alt="" widths={[560]} loading="eager" /></div>
       <div class="gs__leaf gs__leaf--r"><Image src={leafRight} alt="" widths={[560]} loading="eager" /></div>
@@ -33,6 +36,7 @@ import wallImg from '../assets/gate-wall.webp';
   :global([data-theme='nature']) .gs__sticky {
     --glh: min(50vh, 38vw);
     --gwh: calc(var(--gs-head) + var(--glh));
+    --gfh: calc(var(--glh) * .88);
     position: sticky; top: 0; height: 100vh; overflow: hidden;
   }
 
@@ -58,18 +62,28 @@ import wallImg from '../assets/gate-wall.webp';
   }
   :global([data-theme='nature']) .gs__wall {
     display: block; position: absolute;
-    top: 0;
-    height: var(--gwh);
-    width: max(0px, calc(50% - (var(--glh) * 1.1058) + 4vw + 30px));
+    top: calc(var(--gs-head) + var(--glh) - var(--gfh));
+    height: var(--gfh);
+    width: max(0px, calc(50% - (var(--glh) * 1.1058) + 4vw + 10px));
     overflow: hidden;
   }
   .gs__wall--l { left: -4vw; }
   .gs__wall--r { right: -4vw; }
   .gs__wall img {
     width: 100%; height: 100%; object-fit: cover;
-    object-position: 100% 0; display: block;
+    object-position: 100% 100%; display: block;
   }
   .gs__wall--r img { transform: scaleX(-1); }
+
+  :global([data-theme='nature']) .gs__pillar {
+    display: block; position: absolute;
+    top: 0; height: var(--gwh);
+  }
+  .gs__pillar img { height: 100%; width: auto; display: block; }
+  .gs__pillar--l { right: calc(50% + var(--glh) * 1.1058 - 24px); }
+  .gs__pillar--l img { transform: scaleX(.62); transform-origin: right center; }
+  .gs__pillar--r { left: calc(50% + var(--glh) * 1.1058 - 24px); }
+  .gs__pillar--r img { transform: scaleX(-.62); transform-origin: left center; }
 
   .gs__leaf {
     height: var(--glh);
@@ -95,7 +109,8 @@ import wallImg from '../assets/gate-wall.webp';
 
   @media (max-width: 700px) {
     :global([data-theme='nature']) .gs__scene { perspective: 900px; }
-    :global([data-theme='nature']) .gs__wall { display: none; }
+    :global([data-theme='nature']) .gs__wall,
+    :global([data-theme='nature']) .gs__pillar { display: none; }
     :global([data-theme='nature']) .gs__sticky { --glh: min(44vh, 52vw); }
   }
 
