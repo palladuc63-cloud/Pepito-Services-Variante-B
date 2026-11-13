@@ -1,6 +1,7 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
 import HeroSlideshow from '../components/HeroSlideshow.astro';
+import GateScroll from '../components/GateScroll.astro';
 import ArrowDivider from '../components/ArrowDivider.astro';
 import Section from '../components/Section.astro';
 import ServiceCard from '../components/ServiceCard.astro';
@@ -43,6 +44,8 @@ const jsonLd = [{
   jsonLd={jsonLd}
 >
   <HeroSlideshow settings={settings} projects={projects} slides={slides} />
+
+  <GateScroll />
 
   <ArrowDivider
     background="var(--color-surface)"
