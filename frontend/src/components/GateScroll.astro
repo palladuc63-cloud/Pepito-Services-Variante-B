@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import leafLeft from '../assets/gate-scroll-left.webp';
 import leafRight from '../assets/gate-scroll-right.webp';
+import wallImg from '../assets/gate-wall.webp';
 ---
 
 <section class="gs" data-gs>
@@ -9,6 +10,8 @@ import leafRight from '../assets/gate-scroll-right.webp';
     <div class="gs__back">
       <div class="gs__reveal"><slot /></div>
     </div>
+    <div class="gs__wall gs__wall--l" aria-hidden="true"><Image src={wallImg} alt="" widths={[720]} loading="eager" /></div>
+    <div class="gs__wall gs__wall--r" aria-hidden="true"><Image src={wallImg} alt="" widths={[720]} loading="eager" /></div>
     <div class="gs__scene" aria-hidden="true">
       <div class="gs__leaf gs__leaf--l"><Image src={leafLeft} alt="" widths={[560]} loading="eager" /></div>
       <div class="gs__leaf gs__leaf--r"><Image src={leafRight} alt="" widths={[560]} loading="eager" /></div>
@@ -48,8 +51,22 @@ import leafRight from '../assets/gate-scroll-right.webp';
     perspective: 1400px; perspective-origin: 50% 50%;
     pointer-events: none;
   }
+  :global([data-theme='nature']) .gs__wall {
+    display: block; position: absolute; top: 50%;
+    height: min(50vh, 38vw);
+    width: max(0px, calc(50% - (min(50vh, 38vw) * 1.1058) + 4vw));
+    transform: translateY(-50%);
+    overflow: hidden;
+  }
+  .gs__wall--l { left: -4vw; }
+  .gs__wall--r { right: -4vw; transform: translateY(-50%) scaleX(-1); }
+  .gs__wall img {
+    width: 100%; height: 100%; object-fit: cover;
+    object-position: 100% 50%; display: block;
+  }
+
   .gs__leaf {
-    height: min(58vh, 47vw);
+    height: min(50vh, 38vw);
     aspect-ratio: 512/463;
     will-change: transform;
     backface-visibility: hidden;
@@ -71,8 +88,9 @@ import leafRight from '../assets/gate-scroll-right.webp';
   }
   @keyframes gs-pulse { 0%,100% { opacity: .55 } 50% { opacity: 1 } }
 
-  @media (max-width: 640px) {
+  @media (max-width: 700px) {
     :global([data-theme='nature']) .gs__scene { perspective: 900px; }
+    :global([data-theme='nature']) .gs__wall { display: none; }
     .gs__leaf { height: min(44vh, 52vw); }
   }
 
