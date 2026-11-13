@@ -7,12 +7,12 @@ import gateWood from '../assets/gate-metal.webp';
   <div class="gate-veil"></div>
   <div class="gate-scene">
     <div class="gate-panel gate-left">
-      <span class="gate-rim"></span>
+      <span class="gate-rim"><i class="gate-latch"></i></span>
       <span class="gate-shade"></span>
       <img class="gate-logo" src={logo.src} alt="" width="553" height="256" />
     </div>
     <div class="gate-panel gate-right">
-      <span class="gate-rim"></span>
+      <span class="gate-rim"><i class="gate-latch"></i></span>
       <span class="gate-shade"></span>
       <img class="gate-logo" src={logo.src} alt="" width="553" height="256" />
     </div>
@@ -125,8 +125,8 @@ import gateWood from '../assets/gate-metal.webp';
     background: linear-gradient(90deg, #0e1013, #3a3f46 45%, #0d0f12);
   }
 
-  .gate-rim::before {
-    content: '';
+  /* Loquet : vrai élément animable — il se retire avant le battement */
+  .gate-latch {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -187,7 +187,7 @@ import gateWood from '../assets/gate-metal.webp';
     left: calc(var(--gate-logo-w) / -2);
   }
 
-  /* Halo de lumière qui s'infiltre par la fente */
+  /* Halo de lumière qui s'infiltre par la fente — s'élargit avec l'écart */
   .gate-seam {
     position: absolute;
     top: 0;
@@ -198,10 +198,10 @@ import gateWood from '../assets/gate-metal.webp';
     transform: translateX(-50%);
     background: radial-gradient(
       ellipse at center,
-      rgb(233 241 214 / 0.95),
-      rgb(233 241 214 / 0) 70%
+      rgb(255 246 224 / 0.98),
+      rgb(255 246 224 / 0) 70%
     );
-    filter: blur(6px);
+    filter: blur(7px);
     pointer-events: none;
   }
 
@@ -232,68 +232,105 @@ import gateWood from '../assets/gate-metal.webp';
     const right = root.querySelector<HTMLElement>('.gate-right');
     const veil = root.querySelector<HTMLElement>('.gate-veil');
     const seam = root.querySelector<HTMLElement>('.gate-seam');
+    const scene = root.querySelector<HTMLElement>('.gate-scene');
     const skip = root.querySelector<HTMLElement>('.gate-skip');
     const shadeL = left?.querySelector<HTMLElement>('.gate-shade');
     const shadeR = right?.querySelector<HTMLElement>('.gate-shade');
+    const latchL = left?.querySelector<HTMLElement>('.gate-latch');
+    const latchR = right?.querySelector<HTMLElement>('.gate-latch');
     const main = document.getElementById('main-content');
     if (!left || !right || !veil || !seam) return;
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    const swing: KeyframeAnimationOptions = {
-      duration: 1050,
-      delay: 480,
-      easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-      fill: 'forwards',
-    };
-    const anims: Animation[] = [
-      left.animate(
-        [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(112deg)' }],
-        swing
-      ),
-      right.animate(
-        [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-112deg)' }],
-        { ...swing, delay: 565 }
-      ),
+    const anims: Animation[] = [];
+
+    // Phase 0 — le loquet se retire (petit a-coup vers le haut puis sortie)
+    for (const latch of [latchL, latchR]) {
+      if (!latch) continue;
+      anims.push(
+        latch.animate(
+          [
+            { transform: 'translateY(0)', opacity: 1 },
+            { transform: 'translateY(-4px)', opacity: 1, offset: 0.45 },
+            { transform: 'translateY(-14px)', opacity: 0 },
+          ],
+          { duration: 300, delay: 160, easing: 'ease-in', fill: 'forwards' }
+        )
+      );
+    }
+
+    // Phase 1 — battement réaliste : la charnière « prend » lentement,
+    // la course accélère, le battant dépasse légèrement sa butée et se
+    // stabilise (décalage droite plus tardif = vantaux pas synchrones).
+    const swingKeys = (dir: number) => [
+      { transform: 'rotateY(0deg)', easing: 'cubic-bezier(0.55, 0, 0.85, 0.4)', offset: 0 },
+      { transform: `rotateY(${5 * dir}deg)`, easing: 'cubic-bezier(0.3, 0.4, 0.5, 1)', offset: 0.2 },
+      { transform: `rotateY(${96 * dir}deg)`, easing: 'cubic-bezier(0.3, 0.6, 0.4, 1)', offset: 0.78 },
+      { transform: `rotateY(${112 * dir}deg)`, easing: 'ease-out', offset: 0.92 },
+      { transform: `rotateY(${108 * dir}deg)`, offset: 1 },
+    ];
+    anims.push(
+      left.animate(swingKeys(1), { duration: 1250, delay: 460, fill: 'forwards' }),
+      right.animate(swingKeys(-1), { duration: 1250, delay: 600, fill: 'forwards' })
+    );
+
+    // Le voile se lève pendant la course — le site apparaît par l'écart.
+    anims.push(
       veil.animate([{ opacity: 0.92 }, { opacity: 0 }], {
-        duration: 750,
-        delay: 820,
+        duration: 850,
+        delay: 700,
         easing: 'ease-out',
         fill: 'forwards',
-      }),
+      })
+    );
+
+    // Lumière de la fente : s'allume puis s'élargit avec l'écart des
+    // vantaux, puis se dissout quand on « passe ».
+    anims.push(
       seam.animate(
         [
-          { opacity: 0, transform: 'translateX(-50%) scaleX(0.2)' },
-          { opacity: 1, transform: 'translateX(-50%) scaleX(1)', offset: 0.35 },
-          { opacity: 0, transform: 'translateX(-50%) scaleX(2.6)' },
+          { opacity: 0, transform: 'translateX(-50%) scaleX(0.3)' },
+          { opacity: 0.95, transform: 'translateX(-50%) scaleX(1)', offset: 0.3 },
+          { opacity: 0.9, transform: 'translateX(-50%) scaleX(5)', offset: 0.72 },
+          { opacity: 0, transform: 'translateX(-50%) scaleX(8)' },
         ],
-        { duration: 1000, delay: 380, easing: 'ease-out', fill: 'forwards' }
-      ),
-    ];
+        { duration: 1500, delay: 460, easing: 'ease-out', fill: 'forwards' }
+      )
+    );
+
+    // Ombre portée suivant le rythme du battement
     if (shadeL) {
       anims.push(
-        shadeL.animate([{ opacity: 0 }, { opacity: 0.55 }], {
-          duration: 900,
-          delay: 560,
-          easing: 'ease-out',
-          fill: 'forwards',
-        })
+        shadeL.animate(
+          [{ opacity: 0 }, { opacity: 0.2, offset: 0.4 }, { opacity: 0.55 }],
+          { duration: 1000, delay: 560, easing: 'ease-out', fill: 'forwards' }
+        )
       );
     }
     if (shadeR) {
       anims.push(
-        shadeR.animate([{ opacity: 0 }, { opacity: 0.55 }], {
-          duration: 900,
-          delay: 640,
-          easing: 'ease-out',
-          fill: 'forwards',
-        })
+        shadeR.animate(
+          [{ opacity: 0 }, { opacity: 0.2, offset: 0.4 }, { opacity: 0.55 }],
+          { duration: 1000, delay: 700, easing: 'ease-out', fill: 'forwards' }
+        )
       );
     }
+
+    // Phase 2 — traversée : la caméra avance dans l'ouverture.
+    if (scene) {
+      anims.push(
+        scene.animate(
+          [{ transform: 'scale(1)' }, { transform: 'scale(1.085)' }],
+          { duration: 800, delay: 1250, easing: 'cubic-bezier(0.6, 0, 0.8, 0.4)', fill: 'forwards' }
+        )
+      );
+    }
+
     const fadeOut = root.animate(
-      [{ opacity: 1 }, { opacity: 1, offset: 0.86 }, { opacity: 0 }],
-      { duration: 1900, fill: 'forwards' }
+      [{ opacity: 1 }, { opacity: 1, offset: 0.88 }, { opacity: 0 }],
+      { duration: 2250, fill: 'forwards' }
     );
     anims.push(fadeOut);
     if (main) {
@@ -332,7 +369,7 @@ import gateWood from '../assets/gate-metal.webp';
     window.addEventListener('pointerdown', onSkip, { once: true });
     window.addEventListener('keydown', onSkip, { once: true });
     fadeOut.finished.then(finish).catch(finish);
-    setTimeout(finish, 3000);
+    setTimeout(finish, 3200);
     document.addEventListener('astro:before-swap', finish, { once: true });
   }
 
