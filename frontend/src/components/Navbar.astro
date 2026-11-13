@@ -650,11 +650,15 @@ const navLinks = settings.nav.map((link) => ({
 
   :global([data-theme='immersif']) .nav-dd__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+    /* Une seule ligne : auto-flow column + colonnes égales, quel que
+       soit le nombre d'items. Si un jour il y en a trop, scroll-x. */
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
     gap: var(--space-6);
     max-width: 72rem;
     margin: 0 auto;
     padding: var(--space-6) var(--space-4);
+    overflow-x: auto;
   }
 
   :global([data-theme='immersif']) .nav-dd__link {
