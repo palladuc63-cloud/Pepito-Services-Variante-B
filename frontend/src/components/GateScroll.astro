@@ -2,19 +2,12 @@
 import { Image } from 'astro:assets';
 import leafLeft from '../assets/gate-scroll-left.webp';
 import leafRight from '../assets/gate-scroll-right.webp';
-import backdrop from '../assets/gate-scroll-backdrop.webp';
 ---
 
-<section class="gs" id="portail" data-gs>
+<section class="gs" data-gs>
   <div class="gs__sticky">
     <div class="gs__back">
-      <Image class="gs__backimg" src={backdrop} alt="Portail aluminium anthracite posé par Pépito Services" widths={[960, 1600]} sizes="100vw" loading="lazy" />
-      <div class="gs__inner">
-        <p class="gs__kicker">Clôtures &amp; portails sur mesure</p>
-        <h2 class="gs__title">Entrez, vous êtes chez vous</h2>
-        <p class="gs__sub">Chaque entrée mérite un portail à sa hauteur — posé, motorisé, garanti.</p>
-        <a class="gs__cta" href="/realisations">Voir nos réalisations</a>
-      </div>
+      <div class="gs__reveal"><slot /></div>
     </div>
     <div class="gs__scene" aria-hidden="true">
       <div class="gs__leaf gs__leaf--l"><Image src={leafLeft} alt="" widths={[560]} loading="eager" /></div>
@@ -25,86 +18,68 @@ import backdrop from '../assets/gate-scroll-backdrop.webp';
 </section>
 
 <style>
-  .gs { display: none; }
-  :global([data-theme='nature']) .gs { display: block; height: 240vh; position: relative; }
+  .gs { display: contents; }
+  .gs__scene, .gs__hint { display: none; }
 
-  .gs__sticky {
+  :global([data-theme='nature']) .gs {
+    display: block; height: 240vh; position: relative;
+  }
+
+  :global([data-theme='nature']) .gs__sticky {
     position: sticky; top: 0; height: 100vh; overflow: hidden;
-    background: #14181a;
+    background: var(--color-surface, #f3efe5);
   }
 
-  .gs__back { position: absolute; inset: 0; }
-  .gs__backimg {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    object-fit: cover; filter: brightness(.62) saturate(.95);
-    transform: scale(1.12); transform-origin: center;
-    will-change: transform;
+  :global([data-theme='nature']) .gs__back {
+    position: absolute; inset: 0; overflow: hidden;
+  }
+  .gs__reveal {
+    min-height: 100%; display: flex; flex-direction: column;
+    justify-content: center; will-change: transform;
+  }
+  :global([data-theme='nature']) .gs__reveal > :global(.section) {
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center;
   }
 
-  .gs__inner {
-    position: absolute; inset: 0; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; text-align: center;
-    padding: 0 1.5rem; gap: .9rem;
-    opacity: 0; transform: translateY(14px);
-    will-change: opacity, transform;
-  }
-  .gs__kicker {
-    margin: 0; font-family: var(--font-heading); font-size: .8rem;
-    letter-spacing: .32em; text-transform: uppercase;
-    color: #cfe3c9;
-  }
-  .gs__title {
-    margin: 0; font-family: var(--font-heading);
-    font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 600;
-    color: #f5f1e6; letter-spacing: .01em;
-    text-shadow: 0 2px 30px rgba(0,0,0,.45);
-  }
-  .gs__sub {
-    margin: 0; max-width: 34rem; color: rgba(245,241,230,.82);
-    font-size: clamp(.95rem, 1.6vw, 1.1rem); line-height: 1.55;
-  }
-  .gs__cta {
-    margin-top: .6rem; display: inline-block;
-    padding: .8rem 1.9rem; border-radius: 999px;
-    background: var(--color-primary, #3a7d44); color: #fff;
-    font-weight: 600; font-size: .95rem; text-decoration: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,.35);
-    transition: transform .25s ease, box-shadow .25s ease;
-  }
-  .gs__cta:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(0,0,0,.4); }
-
-  .gs__scene {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
+  :global([data-theme='nature']) .gs__scene {
+    display: flex; position: absolute; inset: 0;
+    align-items: center; justify-content: center;
     perspective: 1400px; perspective-origin: 50% 50%;
+    pointer-events: none;
   }
   .gs__leaf {
     height: min(58vh, 47vw);
-    aspect-ratio: var(--ar);
+    aspect-ratio: 512/463;
     will-change: transform;
     backface-visibility: hidden;
   }
   .gs__leaf img { display: block; width: 100%; height: 100%; }
-  .gs__leaf--l { --ar: 512/463; transform-origin: left center; box-shadow: -18px 0 40px -12px rgba(0,0,0,.55); }
-  .gs__leaf--r { --ar: 512/463; transform-origin: right center; box-shadow: 18px 0 40px -12px rgba(0,0,0,.55); }
+  .gs__leaf--l { transform-origin: left center; box-shadow: -18px 0 40px -12px rgba(0,0,0,.55); }
+  .gs__leaf--r { transform-origin: right center; box-shadow: 18px 0 40px -12px rgba(0,0,0,.55); }
 
-  .gs__hint {
+  :global([data-theme='nature']) .gs__hint {
+    display: block;
     position: absolute; left: 0; right: 0; bottom: 4.5vh; margin: 0;
-    text-align: center; color: rgba(245,241,230,.75);
+    text-align: center; color: rgba(60,70,60,.75);
     font-size: .78rem; letter-spacing: .22em; text-transform: uppercase;
-    animation: gs-pulse 2.4s ease-in-out infinite;
     will-change: opacity;
   }
-  .gs__hint span { border-bottom: 1px solid rgba(245,241,230,.35); padding-bottom: .35rem; }
+  .gs__hint span {
+    border-bottom: 1px solid rgba(60,70,60,.35); padding-bottom: .35rem;
+    animation: gs-pulse 2.4s ease-in-out infinite; display: inline-block;
+  }
   @keyframes gs-pulse { 0%,100% { opacity: .55 } 50% { opacity: 1 } }
 
   @media (max-width: 640px) {
-    .gs__scene { perspective: 900px; }
+    :global([data-theme='nature']) .gs__scene { perspective: 900px; }
     .gs__leaf { height: min(44vh, 52vw); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global([data-theme='nature']) .gs { display: none; }
+    :global([data-theme='nature']) .gs { display: contents; }
+    :global([data-theme='nature']) .gs__scene,
+    :global([data-theme='nature']) .gs__hint { display: none; }
   }
 </style>
 
@@ -117,8 +92,8 @@ import backdrop from '../assets/gate-scroll-backdrop.webp';
       const l = sec.querySelector<HTMLElement>('.gs__leaf--l')!;
       const r = sec.querySelector<HTMLElement>('.gs__leaf--r')!;
       const hint = sec.querySelector<HTMLElement>('.gs__hint')!;
-      const backimg = sec.querySelector<HTMLElement>('.gs__backimg')!;
-      const inner = sec.querySelector<HTMLElement>('.gs__inner')!;
+      const back = sec.querySelector<HTMLElement>('.gs__back')!;
+      const reveal = sec.querySelector<HTMLElement>('.gs__reveal')!;
       const fixed = new URLSearchParams(location.search).get('gs');
       if (fixed !== null) {
         const sticky = sec.querySelector<HTMLElement>('.gs__sticky')!;
@@ -127,6 +102,7 @@ import backdrop from '../assets/gate-scroll-backdrop.webp';
         sticky.style.zIndex = '9999';
       }
       return () => {
+        if (getComputedStyle(sec).display === 'contents') return;
         const rect = sec.getBoundingClientRect();
         const total = rect.height - innerHeight;
         const p = fixed !== null
@@ -142,10 +118,10 @@ import backdrop from '../assets/gate-scroll-backdrop.webp';
 
         hint.style.opacity = String(Math.max(0, 1 - p * 5));
 
-        backimg.style.transform = `scale(${1.12 - .12 * op})`;        // traversée : zoom vers l'ouverture
-        const ip = Math.min(1, Math.max(0, (op - .45) / .4));         // contenu visible à mi-ouverture
-        inner.style.opacity = String(ip);
-        inner.style.transform = `translateY(${14 - 14 * ip}px)`;
+        // fin de course : le contenu défile dans le cadre s'il dépasse
+        const over = Math.max(0, reveal.scrollHeight - back.clientHeight);
+        const ip = Math.min(1, Math.max(0, (p - .62) / .38));
+        reveal.style.transform = over > 0 ? `translateY(${-over * ip}px)` : '';
       };
     });
     let tick = false;

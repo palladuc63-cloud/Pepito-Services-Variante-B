@@ -45,33 +45,33 @@ const jsonLd = [{
 >
   <HeroSlideshow settings={settings} projects={projects} slides={slides} />
 
-  <GateScroll />
-
   <ArrowDivider
     background="var(--color-surface)"
     prolongement
   />
 
-  <Section id="a-propos" class="section-alt">
-    <div class="section-header">
-      <h2 class="section-title">À propos de Pépito Services</h2>
-      <p class="section-subtitle">
-        Une entreprise artisanale au service de vos projets extérieurs.
-      </p>
-    </div>
-
-    <div class="about-content">
-      <img
-        src={logo.src}
-        alt="Pépito Services"
-        class="about-logo"
-        loading="lazy"
-      />
-      <div class="prose">
-        <p>{settings.aboutText || settings.description}</p>
+  <GateScroll>
+    <Section id="a-propos" class="section-alt">
+      <div class="section-header">
+        <h2 class="section-title">À propos de Pépito Services</h2>
+        <p class="section-subtitle">
+          Une entreprise artisanale au service de vos projets extérieurs.
+        </p>
       </div>
-    </div>
-  </Section>
+
+      <div class="about-content">
+        <img
+          src={logo.src}
+          alt="Pépito Services"
+          class="about-logo"
+          loading="lazy"
+        />
+        <div class="prose">
+          <p>{settings.aboutText || settings.description}</p>
+        </div>
+      </div>
+    </Section>
+  </GateScroll>
 
   <ArrowDivider
     fill="var(--color-surface)"
