@@ -266,14 +266,14 @@ import gateWood from '../assets/gate-metal.webp';
     // stabilise (décalage droite plus tardif = vantaux pas synchrones).
     const swingKeys = (dir: number) => [
       { transform: 'rotateY(0deg)', easing: 'cubic-bezier(0.55, 0, 0.85, 0.4)', offset: 0 },
-      { transform: `rotateY(${5 * dir}deg)`, easing: 'cubic-bezier(0.3, 0.4, 0.5, 1)', offset: 0.2 },
+      { transform: `rotateY(${5 * dir}deg)`, easing: 'cubic-bezier(0.3, 0.4, 0.5, 1)', offset: 0.24 },
       { transform: `rotateY(${96 * dir}deg)`, easing: 'cubic-bezier(0.3, 0.6, 0.4, 1)', offset: 0.78 },
-      { transform: `rotateY(${112 * dir}deg)`, easing: 'ease-out', offset: 0.92 },
-      { transform: `rotateY(${108 * dir}deg)`, offset: 1 },
+      { transform: `rotateY(${114 * dir}deg)`, easing: 'ease-out', offset: 0.93 },
+      { transform: `rotateY(${106 * dir}deg)`, offset: 1 },
     ];
     anims.push(
-      left.animate(swingKeys(1), { duration: 1250, delay: 460, fill: 'forwards' }),
-      right.animate(swingKeys(-1), { duration: 1250, delay: 600, fill: 'forwards' })
+      left.animate(swingKeys(1), { duration: 1450, delay: 460, fill: 'forwards' }),
+      right.animate(swingKeys(-1), { duration: 1450, delay: 640, fill: 'forwards' })
     );
 
     // Le voile se lève pendant la course — le site apparaît par l'écart.
@@ -323,14 +323,14 @@ import gateWood from '../assets/gate-metal.webp';
       anims.push(
         scene.animate(
           [{ transform: 'scale(1)' }, { transform: 'scale(1.085)' }],
-          { duration: 800, delay: 1250, easing: 'cubic-bezier(0.6, 0, 0.8, 0.4)', fill: 'forwards' }
+          { duration: 850, delay: 1400, easing: 'cubic-bezier(0.6, 0, 0.8, 0.4)', fill: 'forwards' }
         )
       );
     }
 
     const fadeOut = root.animate(
       [{ opacity: 1 }, { opacity: 1, offset: 0.88 }, { opacity: 0 }],
-      { duration: 2250, fill: 'forwards' }
+      { duration: 2500, fill: 'forwards' }
     );
     anims.push(fadeOut);
     if (main) {
@@ -369,7 +369,7 @@ import gateWood from '../assets/gate-metal.webp';
     window.addEventListener('pointerdown', onSkip, { once: true });
     window.addEventListener('keydown', onSkip, { once: true });
     fadeOut.finished.then(finish).catch(finish);
-    setTimeout(finish, 3200);
+    setTimeout(finish, 3500);
     document.addEventListener('astro:before-swap', finish, { once: true });
   }
 
