@@ -7,7 +7,13 @@ export interface NavLink {
   label: string;
   href: string;
   icon?: string;
-  children?: { label: string; href: string; image?: string; icon?: string }[];
+  children?: {
+    label: string;
+    href: string;
+    image?: string;
+    icon?: string;
+    subs?: { label: string; href: string }[];
+  }[];
 }
 
 export interface SiteSettings {

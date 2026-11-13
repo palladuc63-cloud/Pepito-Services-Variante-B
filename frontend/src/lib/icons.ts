@@ -9,6 +9,12 @@ export const ICONS: Record<string, string> = {
     '<path d="M3 21V5"/><path d="M21 21V5"/><path d="M5 21V9h6v12"/><path d="M13 21V9h6v12"/><path d="m5 9 6 12"/><path d="m19 9-6 12"/>',
   digger:
     '<rect x="3" y="17" width="8" height="4" rx="2"/><path d="M5 17v-4h4v4"/><path d="M5 13V9h3v4"/><path d="m10 11.5 5-3.5 4 3.5"/><path d="m19 11.5 1 3.5h-3"/><path d="M13.5 21h7.5"/>',
+  // Palissade : lames verticales jointives entre deux poteaux
+  palissade:
+    '<path d="M3 21V4"/><path d="M21 21V4"/><path d="M5.5 21V7h3.5v14"/><path d="M11.5 21V7H15v14"/><path d="M17.5 21V7H21"/><path d="M5.5 10.5H21"/><path d="M5.5 16H21"/>',
+  // Motorisation portail : pignon d'entraînement
+  motor:
+    '<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.2"/><path d="M12 18.8V21"/><path d="M3 12h2.2"/><path d="M18.8 12H21"/><path d="m5.6 5.6 1.6 1.6"/><path d="m16.8 16.8 1.6 1.6"/><path d="m18.4 5.6-1.6 1.6"/><path d="m7.2 16.8-1.6 1.6"/>',
   // ── Navigation ──
   home:
     '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>',
@@ -43,6 +49,7 @@ export const ICONS: Record<string, string> = {
   'arrow-right': '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
   'chevron-left': '<path d="m15 18-6-6 6-6"/>',
   'chevron-right': '<path d="m9 18 6-6-6-6"/>',
+  'chevron-down': '<path d="m6 9 6 6 6-6"/>',
   external:
     '<path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5"/>',
   facebook:
@@ -58,8 +65,10 @@ export const ICONS: Record<string, string> = {
 const CATEGORY_ICONS: Record<string, string> = {
   clotures: 'fence',
   'clotures-palissades': 'fence',
+  'clotures-alu-palissades': 'palissade',
   portails: 'gate',
   'portails-portillons': 'gate',
+  'motorisation-portail': 'motor',
   terrassements: 'digger',
   'petits-terrassements': 'digger',
 };

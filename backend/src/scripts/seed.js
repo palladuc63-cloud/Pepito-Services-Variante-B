@@ -195,9 +195,11 @@ async function main() {
 
   // 2. Catégories — activités réelles : clôtures / portails / petits terrassements
   const cats = [
-    { slug: 'clotures', label: 'Clôtures & palissades', sortOrder: 0 },
-    { slug: 'portails', label: 'Portails & portillons', sortOrder: 1 },
-    { slug: 'terrassements', label: 'Petits terrassements', sortOrder: 2 },
+    { slug: 'clotures', label: 'Clôtures', sortOrder: 0 },
+    { slug: 'clotures-alu-palissades', label: 'Clôtures alu & palissades', sortOrder: 1 },
+    { slug: 'portails', label: 'Portails & portillons', sortOrder: 2 },
+    { slug: 'motorisation-portail', label: 'Motorisation portail', sortOrder: 3 },
+    { slug: 'terrassements', label: 'Terrassement mini-pelle', sortOrder: 4 },
   ];
   const catIds = {};
   for (const c of cats) {
@@ -252,16 +254,16 @@ async function main() {
 
   // 4. Réalisations — migration des projets existants (catégories recalées)
   const projets = [
-    { title: 'Clôture rigide — chantier résidentiel', cat: 'clotures', img: '526667199_1193094866166061_2591278162826548176_n.jpg', summary: 'Pose d’un ensemble de panneaux rigides pour clôturer un jardin.' },
-    { title: 'Palissade d’occultation', cat: 'clotures', img: '526747947_1193094626166085_5444967661889720550_n.jpg', summary: 'Palissade en lames pour préserver l’intimité d’une terrasse.' },
-    { title: 'Portillon d’accès', cat: 'portails', img: '548881804_1230845459057668_4375543893482562231_n.jpg', summary: 'Portillon intégré à une clôture pour un accès piéton.' },
-    { title: 'Délimitation de terrain', cat: 'clotures', img: '593997222_1299146238894256_7111244287217579699_n.jpg', summary: 'Aménagement de la limite extérieure d’une propriété.' },
-    { title: 'Clôture rigide — ligne de propriété', cat: 'clotures', img: '595923527_1300166818792198_3149958148292069886_n.jpg', summary: 'Ligne de clôture rigide installée en périphérie d’un terrain.' },
-    { title: 'Occultation sur mesure', cat: 'clotures', img: '605111144_1313335420808671_4322054820875846881_n.jpg', summary: 'Panneau d’occultation adapté à une clôture existante.' },
-    { title: 'Portillon et clôture', cat: 'portails', img: '623332063_1342261117916101_1956875220114118373_n.jpg', summary: 'Portillon associé à un ensemble de clôture.' },
+    { title: 'Clôture rigide — chantier résidentiel', cat: 'clotures', img: '526667199_1193094866166061_2591278162826548176_n.jpg', summary: 'Pose d’un ensemble de panneaux rigides pour clôturer un jardin.', tags: ['rigide'] },
+    { title: 'Palissade d’occultation', cat: 'clotures-alu-palissades', img: '526747947_1193094626166085_5444967661889720550_n.jpg', summary: 'Palissade en lames pour préserver l’intimité d’une terrasse.', tags: ['occultant', 'palissade'] },
+    { title: 'Portillon d’accès', cat: 'portails', img: '548881804_1230845459057668_4375543893482562231_n.jpg', summary: 'Portillon intégré à une clôture pour un accès piéton.', tags: ['portillon'] },
+    { title: 'Délimitation de terrain', cat: 'terrassements', img: '593997222_1299146238894256_7111244287217579699_n.jpg', summary: 'Aménagement de la limite extérieure d’une propriété.' },
+    { title: 'Clôture rigide — ligne de propriété', cat: 'clotures', img: '595923527_1300166818792198_3149958148292069886_n.jpg', summary: 'Ligne de clôture rigide installée en périphérie d’un terrain.', tags: ['rigide'] },
+    { title: 'Occultation sur mesure', cat: 'clotures-alu-palissades', img: '605111144_1313335420808671_4322054820875846881_n.jpg', summary: 'Panneau d’occultation adapté à une clôture existante.', tags: ['occultant', 'palissade'] },
+    { title: 'Portillon et clôture', cat: 'clotures', img: '623332063_1342261117916101_1956875220114118373_n.jpg', summary: 'Portillon associé à un ensemble de clôture.', tags: ['portillon'] },
     { title: 'Bordure et délimitation', cat: 'terrassements', img: '632342391_1354493173359562_2227672343321464994_n.jpg', summary: 'Pose de bordures pour structurer l’espace extérieur.' },
-    { title: 'Clôture rigide avec soubassement', cat: 'clotures', img: '637782513_1360817009393845_2058624423555773206_n.jpg', summary: 'Clôture rigide complétée d’un soubassement.' },
-    { title: 'Palissade décorative', cat: 'clotures', img: '638047643_1359968719478674_538155947428496695_n.jpg', summary: 'Palissade alliant occultation et esthétique.' },
+    { title: 'Clôture rigide avec soubassement', cat: 'clotures', img: '637782513_1360817009393845_2058624423555773206_n.jpg', summary: 'Clôture rigide complétée d’un soubassement.', tags: ['rigide', 'sous-bassement'] },
+    { title: 'Palissade décorative', cat: 'clotures-alu-palissades', img: '638047643_1359968719478674_538155947428496695_n.jpg', summary: 'Palissade alliant occultation et esthétique.', tags: ['palissade'] },
   ];
   const [count] = await db.select({ n: sql`count(*)` }).from(projects);
   if (Number(count.n) === 0) {
@@ -274,7 +276,7 @@ async function main() {
         summary: p.summary,
         description: 'Description provisoire — à compléter et valider avec l’entreprise.',
         imageUrl: `/uploads/${p.img}`,
-        tags: ['À valider'],
+        tags: ['À valider', ...(p.tags || [])],
         published: true,
         sortOrder: order++,
       });

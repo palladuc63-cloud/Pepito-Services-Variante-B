@@ -26,7 +26,12 @@ const gallery = project.images?.length
   : (project.imageUrl ? [project.imageUrl] : []);
 ---
 
-<article class="card project-card" data-category={project.category?.slug ?? ''} id={project.slug}>
+<article
+  class="card project-card"
+  data-category={project.category?.slug ?? ''}
+  data-tags={(project.tags ?? []).join('|')}
+  id={project.slug}
+>
   <div class="card-media" data-gallery={gallery.length > 1 ? '' : undefined}>
     {gallery.map((url, i) => (
       <img

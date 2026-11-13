@@ -17,6 +17,11 @@ const navLinks = settings.nav.map((link) => ({
   isActive: link.href === '/'
     ? currentPath === base || currentPath === `${base}`
     : currentPath.startsWith(`${base}${link.href.replace(/^\//, '')}`),
+  children: link.children?.map((c) => ({
+    ...c,
+    href: `${base}${c.href.replace(/^\//, '')}`,
+    subs: c.subs?.map((s) => ({ ...s, href: `${base}${s.href.replace(/^\//, '')}` })),
+  })),
 }));
 ---
 
@@ -37,8 +42,8 @@ const navLinks = settings.nav.map((link) => ({
 
       <ul class="desktop-nav hidden md:flex items-center gap-2 list-none m-0 p-0" role="menubar">
         {
-          navLinks.map((link) => (
-            <li role="none">
+          navLinks.map((link, i) => (
+            <li role="none" class:list={['nav-item', { 'nav-item--has-dd': link.children?.length }]}>
               <a
                 href={link.href}
                 class:list={[
@@ -53,6 +58,47 @@ const navLinks = settings.nav.map((link) => ({
                 {link.icon && <Icon name={link.icon} size={15} class="nav-icon" />}
                 {link.label}
               </a>
+              {link.children?.length && (
+                <>
+                  <button
+                    type="button"
+                    class="nav-dd-toggle"
+                    aria-expanded="false"
+                    aria-controls={`nav-dd-${i}`}
+                    aria-label={`Ouvrir le sous-menu ${link.label}`}
+                  >
+                    <Icon name="chevron-down" size={13} class="nav-dd-caret" />
+                  </button>
+                  <div class="nav-dd" id={`nav-dd-${i}`} role="menu" aria-label={`Sous-menu ${link.label}`}>
+                    <div class="nav-dd__grid">
+                      {link.children.map((child) => (
+                        <div class="nav-dd__item" role="none">
+                          <a href={child.href} class="nav-dd__link" role="menuitem">
+                            <span class:list={['nav-dd__media', { 'nav-dd__media--img': child.image }]}>
+                              {child.image && (
+                                <img src={child.image} alt="" loading="lazy" class="nav-dd__thumb" />
+                              )}
+                              <Icon name={child.icon ?? 'grid'} size={18} class="nav-dd__icon" />
+                            </span>
+                            <span class="nav-dd__label">{child.label}</span>
+                          </a>
+                          {child.subs?.length ? (
+                            <ul class="nav-dd__subs">
+                              {child.subs.map((sub) => (
+                                <li>
+                                  <a href={sub.href} class="nav-dd__sub" role="menuitem">
+                                    {sub.label}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </li>
           ))
         }
@@ -88,17 +134,66 @@ const navLinks = settings.nav.map((link) => ({
 
   <ul class="mobile-menu__list" role="menubar">
     {
-      navLinks.map((link) => (
-        <li class="mobile-menu__item" role="none">
-          <a
-            href={link.href}
-            class="mobile-menu__link"
-            aria-current={link.isActive ? 'page' : undefined}
-            role="menuitem"
-          >
-            {link.icon && <Icon name={link.icon} size={20} class="mobile-nav-icon" />}
-            {link.label}
-          </a>
+      navLinks.map((link, i) => (
+        <li
+          class:list={['mobile-menu__item', { 'mobile-menu__item--has-sub': link.children?.length }]}
+          role="none"
+        >
+          {link.children?.length ? (
+            <>
+              <div class="mobile-menu__row">
+                <a
+                  href={link.href}
+                  class="mobile-menu__link"
+                  aria-current={link.isActive ? 'page' : undefined}
+                  role="menuitem"
+                >
+                  {link.icon && <Icon name={link.icon} size={20} class="mobile-nav-icon" />}
+                  {link.label}
+                </a>
+                <button
+                  type="button"
+                  class="mobile-sub-toggle"
+                  aria-expanded="false"
+                  aria-controls={`mobile-sub-${i}`}
+                  aria-label={`Ouvrir le sous-menu ${link.label}`}
+                >
+                  <Icon name="chevron-down" size={18} />
+                </button>
+              </div>
+              <ul class="mobile-sub-list" id={`mobile-sub-${i}`} role="menu">
+                {link.children.map((child) => (
+                  <li class="mobile-sub-item" role="none">
+                    <a href={child.href} class="mobile-sub-link" role="menuitem">
+                      <Icon name={child.icon ?? 'grid'} size={16} class="mobile-nav-icon" />
+                      {child.label}
+                    </a>
+                    {child.subs?.length ? (
+                      <ul class="mobile-sub-sub" role="menu">
+                        {child.subs.map((sub) => (
+                          <li role="none">
+                            <a href={sub.href} class="mobile-sub-link mobile-sub-link--mini" role="menuitem">
+                              {sub.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <a
+              href={link.href}
+              class="mobile-menu__link"
+              aria-current={link.isActive ? 'page' : undefined}
+              role="menuitem"
+            >
+              {link.icon && <Icon name={link.icon} size={20} class="mobile-nav-icon" />}
+              {link.label}
+            </a>
+          )}
         </li>
       ))
     }
@@ -138,8 +233,43 @@ const navLinks = settings.nav.map((link) => ({
       toggle.focus();
     }
 
+    function closeDropdowns() {
+      document.querySelectorAll('.nav-item--has-dd.is-open').forEach((item) => {
+        item.classList.remove('is-open');
+        item
+          .querySelector('.nav-dd-toggle')
+          ?.setAttribute('aria-expanded', 'false');
+      });
+    }
+
     document.addEventListener('click', (e) => {
       const el = e.target as HTMLElement;
+
+      const ddToggle = el.closest('.nav-dd-toggle');
+      if (ddToggle) {
+        const item = ddToggle.closest('.nav-item--has-dd');
+        if (item) {
+          const willOpen = !item.classList.contains('is-open');
+          closeDropdowns();
+          item.classList.toggle('is-open', willOpen);
+          ddToggle.setAttribute('aria-expanded', String(willOpen));
+        }
+        return;
+      }
+
+      const subToggle = el.closest('.mobile-sub-toggle');
+      if (subToggle) {
+        const item = subToggle.closest('.mobile-menu__item--has-sub');
+        item?.classList.toggle('is-open');
+        subToggle.setAttribute(
+          'aria-expanded',
+          String(item?.classList.contains('is-open') ?? false)
+        );
+        return;
+      }
+
+      if (!el.closest('.nav-item--has-dd')) closeDropdowns();
+
       if (el.closest('.mobile-menu-toggle')) {
         const { menu } = getMenu();
         menu?.hidden ? openMenu() : closeMenu();
@@ -149,7 +279,10 @@ const navLinks = settings.nav.map((link) => ({
     });
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeMenu();
+      if (event.key === 'Escape') {
+        closeDropdowns();
+        closeMenu();
+      }
     });
 
     // Logo rétractable : classe sur le header passé un seuil de scroll
@@ -360,5 +493,340 @@ const navLinks = settings.nav.map((link) => ({
 
   .mobile-menu__link[aria-current='page'] {
     color: var(--color-primary-light);
+  }
+
+  /* ─── Dropdown « Réalisations » ───
+     Markup unique ; chaque thème choisit sa présentation via
+     [data-theme] — nature = icônes, immersif = mega-menu photo,
+     bento = vignettes, editorial = typographique. */
+  .nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-item--has-dd {
+    padding-bottom: 0.7rem;
+    margin-bottom: -0.7rem;
+  }
+
+  .nav-dd-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-left: -0.45rem;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--stone);
+    cursor: pointer;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  .nav-dd-toggle:hover,
+  .nav-dd-toggle:focus-visible {
+    background: var(--forest-soft);
+    color: var(--forest-dark);
+  }
+
+  :global(.nav-dd-caret) {
+    transition: transform 0.18s ease;
+  }
+
+  .nav-item--has-dd:is(:hover, :focus-within, .is-open) :global(.nav-dd-caret) {
+    transform: rotate(180deg);
+  }
+
+  .nav-dd {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 18rem;
+    padding: var(--space-3);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    z-index: 60;
+  }
+
+  .nav-item--has-dd:is(:hover, :focus-within, .is-open) .nav-dd {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .nav-dd__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .nav-dd__link {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: var(--radius-md);
+    color: var(--ink);
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  .nav-dd__link:hover,
+  .nav-dd__link:focus-visible {
+    background: var(--forest-soft);
+    color: var(--forest-dark);
+  }
+
+  .nav-dd__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    color: var(--forest);
+  }
+
+  .nav-dd__thumb {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .nav-dd__subs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem 0.85rem;
+    margin: 0 0 0.35rem;
+    padding: 0 0 0 3.35rem;
+    list-style: none;
+  }
+
+  .nav-dd__sub {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--stone);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .nav-dd__sub:hover,
+  .nav-dd__sub:focus-visible {
+    color: var(--forest-dark);
+  }
+
+  /* Immersif — mega-menu pleine largeur, cards photo */
+  :global([data-theme='immersif']) .nav-item--has-dd {
+    position: static;
+  }
+
+  :global([data-theme='immersif']) .nav-dd {
+    left: 0;
+    right: 0;
+    padding: 0;
+    background: var(--paper);
+    border-right: none;
+    border-left: none;
+    border-radius: 0;
+  }
+
+  :global([data-theme='immersif']) .nav-dd__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+    gap: var(--space-6);
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  :global([data-theme='immersif']) .nav-dd__link {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+    padding: 0;
+  }
+
+  :global([data-theme='immersif']) .nav-dd__link:hover,
+  :global([data-theme='immersif']) .nav-dd__link:focus-visible {
+    background: transparent;
+    color: var(--forest);
+  }
+
+  :global([data-theme='immersif']) .nav-dd__media {
+    width: 100%;
+    height: 6.25rem;
+    overflow: hidden;
+    background: var(--paper-deep);
+  }
+
+  :global([data-theme='immersif']) .nav-dd__media :global(.nav-dd__icon) {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  :global([data-theme='immersif']) .nav-dd__media--img :global(.nav-dd__icon) {
+    display: none;
+  }
+
+  :global([data-theme='immersif']) .nav-dd__thumb {
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  :global([data-theme='immersif']) .nav-dd__link:hover .nav-dd__thumb,
+  :global([data-theme='immersif']) .nav-dd__link:focus-visible .nav-dd__thumb {
+    transform: scale(1.05);
+  }
+
+  :global([data-theme='immersif']) .nav-dd__label {
+    font-family: var(--font-display, var(--font-heading));
+    font-size: 1.05rem;
+  }
+
+  :global([data-theme='immersif']) .nav-dd__subs {
+    flex-direction: column;
+    gap: 0.15rem;
+    padding-left: 0;
+  }
+
+  /* Bento — hybride compact avec vignettes */
+  :global([data-theme='bento']) .nav-dd {
+    min-width: 21rem;
+  }
+
+  :global([data-theme='bento']) .nav-dd__media {
+    width: 3rem;
+    height: 3rem;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--paper-deep);
+  }
+
+  :global([data-theme='bento']) .nav-dd__media--img :global(.nav-dd__icon) {
+    display: none;
+  }
+
+  :global([data-theme='bento']) .nav-dd__thumb {
+    display: block;
+  }
+
+  :global([data-theme='bento']) .nav-dd__subs {
+    padding-left: 4.35rem;
+  }
+
+  /* Editorial — liste typographique, pas de visuel */
+  :global([data-theme='editorial']) .nav-dd {
+    min-width: 19rem;
+  }
+
+  :global([data-theme='editorial']) .nav-dd__media {
+    display: none;
+  }
+
+  :global([data-theme='editorial']) .nav-dd__link {
+    padding: 0.4rem 0.65rem;
+    font-family: var(--font-display, var(--font-heading));
+    font-size: 1.05rem;
+  }
+
+  :global([data-theme='editorial']) .nav-dd__subs {
+    padding-left: 1.35rem;
+  }
+
+  /* ─── Sous-menu mobile (accordéon) ─── */
+  .mobile-menu__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .mobile-menu__row .mobile-menu__link {
+    flex: 1;
+  }
+
+  .mobile-sub-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-warm-white);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.25s ease;
+  }
+
+  .mobile-sub-toggle:hover,
+  .mobile-sub-toggle:focus-visible {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .mobile-menu__item--has-sub.is-open .mobile-sub-toggle {
+    transform: rotate(180deg);
+  }
+
+  .mobile-sub-list {
+    margin: 0;
+    padding: 0 0 0.5rem;
+    list-style: none;
+    max-height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition: max-height 0.28s ease, visibility 0.28s ease;
+  }
+
+  .mobile-menu__item--has-sub.is-open .mobile-sub-list {
+    max-height: 38rem;
+    visibility: visible;
+  }
+
+  .mobile-sub-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0 0.5rem 1.75rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-warm-white);
+    text-decoration: none;
+    opacity: 0.92;
+    transition: color 200ms ease, opacity 200ms ease;
+  }
+
+  .mobile-sub-sub {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mobile-sub-link--mini {
+    padding-left: 3.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.7;
+  }
+
+  .mobile-sub-link:hover,
+  .mobile-sub-link:focus-visible {
+    color: var(--color-sand);
+    opacity: 1;
   }
 </style>

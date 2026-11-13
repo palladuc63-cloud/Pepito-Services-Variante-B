@@ -37,6 +37,10 @@ const { projects, categories, preview = false } = Astro.props;
         </button>
       ))
     }
+    <span class="filter-chip" id="filter-chip" hidden>
+      Type : <strong id="filter-chip-label"></strong>
+      <button type="button" id="filter-chip-clear" aria-label="Retirer le filtre de type">×</button>
+    </span>
   </div>
 
   <div class="project-grid">
@@ -44,7 +48,7 @@ const { projects, categories, preview = false } = Astro.props;
   </div>
 
   <p class="filter-empty" id="filter-empty" role="status" hidden>
-    Aucune réalisation dans cette catégorie pour le moment.
+    Aucune réalisation ne correspond à ce filtre.
   </p>
 </div>
 
@@ -75,33 +79,66 @@ const { projects, categories, preview = false } = Astro.props;
       emptyMessage.hidden = visibleCards.length > 0;
     };
 
+    const tagChip = document.getElementById('filter-chip') as HTMLSpanElement | null;
+    const tagChipLabel = document.getElementById('filter-chip-label');
+    const tagChipClear = document.getElementById('filter-chip-clear');
+
+    const params = new URLSearchParams(window.location.search);
+    let activeCat = params.get('categorie') ?? 'all';
+    let activeTag = params.get('tag');
+    if (activeCat !== 'all' && !document.querySelector(`.filter-btn[data-filter="${activeCat}"]`)) {
+      activeCat = 'all';
+    }
+
+    const applyFilters = () => {
+      filterButtons.forEach((btn) => {
+        const match = (btn.dataset.filter ?? 'all') === activeCat;
+        btn.classList.toggle('is-active', match);
+        btn.setAttribute('aria-pressed', String(match));
+      });
+      if (tagChip) {
+        tagChip.hidden = !activeTag;
+        if (activeTag && tagChipLabel) tagChipLabel.textContent = activeTag;
+      }
+      projectCards.forEach((card) => {
+        const cat = card.dataset.category;
+        const tags = (card.dataset.tags ?? '').split('|');
+        const show =
+          (activeCat === 'all' || cat === activeCat) &&
+          (!activeTag || tags.includes(activeTag));
+        card.hidden = !show;
+      });
+      renumber();
+      updateEmptyState();
+    };
+
+    const syncUrl = () => {
+      const url = new URL(window.location.href);
+      if (activeCat === 'all') url.searchParams.delete('categorie');
+      else url.searchParams.set('categorie', activeCat);
+      if (activeTag) url.searchParams.set('tag', activeTag);
+      else url.searchParams.delete('tag');
+      history.replaceState(null, '', url);
+    };
+
+    // Changer de catégorie efface le sous-type : il peut ne pas exister
+    // dans la nouvelle catégorie.
     filterButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        const filter = button.dataset.filter ?? 'all';
-
-        filterButtons.forEach((btn) => {
-          btn.classList.toggle('is-active', btn === button);
-          btn.setAttribute('aria-pressed', String(btn === button));
-        });
-
-        projectCards.forEach((card) => {
-          const category = card.dataset.category;
-          const shouldShow = filter === 'all' || category === filter;
-          card.hidden = !shouldShow;
-        });
-
-        renumber();
-        updateEmptyState();
+        activeCat = button.dataset.filter ?? 'all';
+        activeTag = null;
+        applyFilters();
+        syncUrl();
       });
     });
 
-    const initialCategory = new URLSearchParams(window.location.search).get('categorie');
-    if (initialCategory) {
-      const initialButton = document.querySelector<HTMLButtonElement>(
-        `.filter-btn[data-filter="${initialCategory}"]`
-      );
-      if (initialButton) initialButton.click();
-    }
+    tagChipClear?.addEventListener('click', () => {
+      activeTag = null;
+      applyFilters();
+      syncUrl();
+    });
+
+    applyFilters();
   });
 </script>
 
@@ -142,6 +179,42 @@ const { projects, categories, preview = false } = Astro.props;
   .filter-btn.is-active {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
+    color: var(--cta-text);
+  }
+
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--tag-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--tag-color);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  .filter-chip button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .filter-chip button:hover,
+  .filter-chip button:focus-visible {
+    background-color: var(--color-primary);
     color: var(--cta-text);
   }
 
