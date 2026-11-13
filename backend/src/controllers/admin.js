@@ -1,4 +1,4 @@
-import { eq, asc, desc, and } from 'drizzle-orm';
+import { eq, asc, desc, and, sql } from 'drizzle-orm';
 import { db } from '../db.js';
 import {
   categories, services, projects, articles, messages, settings,
@@ -25,8 +25,15 @@ async function uniqueSlug(table, base, excludeId) {
 }
 
 // ─── Categories ─────────────────────────────────────────────
-export const listCategories = async (_req, res) =>
-  res.json(await db.select().from(categories).orderBy(asc(categories.sortOrder)));
+export const listCategories = async (_req, res) => {
+  const rows = await db.select().from(categories).orderBy(asc(categories.sortOrder));
+  const counts = await db
+    .select({ categoryId: projects.categoryId, n: sql`count(*)` })
+    .from(projects)
+    .groupBy(projects.categoryId);
+  const map = new Map(counts.map((c) => [c.categoryId, Number(c.n)]));
+  res.json(rows.map((c) => ({ ...c, projectCount: map.get(c.id) ?? 0 })));
+};
 
 export async function createCategory(req, res) {
   const { label, sortOrder = 0, active = true } = req.body ?? {};
@@ -48,8 +55,74 @@ export async function updateCategory(req, res) {
 }
 
 export async function deleteCategory(req, res) {
-  await db.delete(categories).where(eq(categories.id, Number(req.params.id)));
+  const id = Number(req.params.id);
+  const [{ n }] = await db
+    .select({ n: sql`count(*)` })
+    .from(projects)
+    .where(eq(projects.categoryId, id));
+  const count = Number(n);
+  // Garde-fou : par défaut on refuse de laisser des réas orphelines ;
+  // ?detach=1 les détache explicitement avant suppression.
+  if (count > 0 && req.query.detach !== '1') {
+    return res.status(409).json({
+      error: `${count} réalisation(s) encore rattachée(s) à cette catégorie`,
+      count,
+    });
+  }
+  if (count > 0)
+    await db.update(projects).set({ categoryId: null }).where(eq(projects.categoryId, id));
+  await db.delete(categories).where(eq(categories.id, id));
   res.json({ status: 'ok' });
+}
+
+// ─── Tags de réalisations ────────────────────────────────────
+// Les tags vivent dans le JSON projects.tags — la gestion se fait
+// par réécriture en masse des projets concernés.
+export const listTags = async (_req, res) => {
+  const rows = await db.select({ tags: projects.tags }).from(projects);
+  const counts = new Map();
+  for (const r of rows)
+    for (const t of r.tags || []) counts.set(t, (counts.get(t) || 0) + 1);
+  res.json(
+    [...counts.entries()]
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
+  );
+};
+
+export async function renameTag(req, res) {
+  const { from, to } = req.body ?? {};
+  if (!from?.trim() || !to?.trim())
+    return res.status(400).json({ error: 'from et to requis' });
+  const target = to.trim();
+  const rows = await db.select().from(projects);
+  let updated = 0;
+  for (const p of rows) {
+    const tags = p.tags || [];
+    if (!tags.includes(from)) continue;
+    // Set → évite les doublons si `to` existe déjà sur la même réa
+    const next = [...new Set(tags.map((t) => (t === from ? target : t)))];
+    await db.update(projects).set({ tags: next }).where(eq(projects.id, p.id));
+    updated++;
+  }
+  res.json({ status: 'ok', updated });
+}
+
+export async function deleteTag(req, res) {
+  const { tag } = req.body ?? {};
+  if (!tag?.trim()) return res.status(400).json({ error: 'tag requis' });
+  const rows = await db.select().from(projects);
+  let updated = 0;
+  for (const p of rows) {
+    const tags = p.tags || [];
+    if (!tags.includes(tag)) continue;
+    await db
+      .update(projects)
+      .set({ tags: tags.filter((t) => t !== tag) })
+      .where(eq(projects.id, p.id));
+    updated++;
+  }
+  res.json({ status: 'ok', updated });
 }
 
 // ─── Slides (hero accueil) ───────────────────────────────────

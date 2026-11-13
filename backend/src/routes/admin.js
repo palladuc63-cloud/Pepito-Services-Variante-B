@@ -16,6 +16,9 @@ router.get('/categories', ctrl.listCategories);
 router.post('/categories', ctrl.createCategory);
 router.put('/categories/:id', ctrl.updateCategory);
 router.delete('/categories/:id', ctrl.deleteCategory);
+router.get('/tags', ctrl.listTags);
+router.post('/tags/rename', ctrl.renameTag);
+router.post('/tags/delete', ctrl.deleteTag);
 
 router.get('/services', ctrl.listServices);
 router.post('/services', ctrl.createService);

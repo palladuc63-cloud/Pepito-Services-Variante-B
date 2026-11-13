@@ -25,6 +25,7 @@ const base = import.meta.env.BASE_URL;
         <button class="admin-nav-link" data-tab="messages">📩 Messages</button>
         <button class="admin-nav-link" data-tab="prospects">📇 Prospects</button>
         <button class="admin-nav-link" data-tab="projects">🚧 Réalisations</button>
+        <button class="admin-nav-link" data-tab="categories">🏷️ Catégories &amp; tags</button>
         <button class="admin-nav-link" data-tab="citypages">📍 Pages villes</button>
         <button class="admin-nav-link" data-tab="articles">📰 Articles</button>
         <button class="admin-nav-link" data-tab="social">📣 Réseaux</button>
@@ -133,10 +134,14 @@ const base = import.meta.env.BASE_URL;
             </div>
             <div id="projects-cards" class="item-cards" hidden></div>
           </div>
-          <div class="card" style="margin-top:16px">
-            <h2>🗂️ Catégories de réalisations</h2>
+        </section>
+
+        <!-- CATÉGORIES & TAGS -->
+        <section id="tab-categories" hidden>
+          <div class="card">
+            <h2>Catégories de réalisations</h2>
             <table class="admin-table">
-              <thead><tr><th>Slug</th><th>Label</th><th>Ordre</th><th>Active</th><th></th></tr></thead>
+              <thead><tr><th>Slug</th><th>Label</th><th>Ordre</th><th>Réas</th><th>Active</th><th></th></tr></thead>
               <tbody id="categories-body"></tbody>
             </table>
             <form id="category-form" class="form-row cols-3" style="margin-top:16px;align-items:end">
@@ -144,6 +149,19 @@ const base = import.meta.env.BASE_URL;
               <div><label class="form-label">Ordre</label><input class="form-input" id="cat-order" type="number" value="0" /></div>
               <button class="btn btn-primary" type="submit">+ Ajouter</button>
             </form>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <h2>Tags des réalisations</h2>
+            <p style="color:var(--muted);font-size:13px;margin:0 0 12px">
+              Les tags servent de sous-types dans le menu et les filtres du site
+              (ex. souple, rigide, occultant…). Le badge « menu » marque ceux
+              affichés en sous-liens. Renommer ou supprimer un tag l'applique
+              à toutes les réalisations concernées.
+            </p>
+            <table class="admin-table">
+              <thead><tr><th>Tag</th><th>Réas</th><th></th></tr></thead>
+              <tbody id="tags-body"></tbody>
+            </table>
           </div>
         </section>
 
@@ -367,7 +385,7 @@ const base = import.meta.env.BASE_URL;
     projects: ['Réalisations', 'Chantiers publiés sur le site'],
     articles: ['Articles', 'Actualités du blog'],
     services: ['Services', 'Services affichés sur la homepage'],
-    categories: ['Catégories', 'Catégories de réalisations'],
+    categories: ['Catégories & tags', 'Catégories et sous-types des réalisations'],
     citypages: ['Pages villes', 'Pages SEO local « service + ville »'],
     messages: ['Messages', 'Demandes reçues via le formulaire et Janus'],
     prospects: ['Prospects', 'Contacts à relancer (formulaire, chatbot, téléphone)'],
@@ -868,21 +886,88 @@ const base = import.meta.env.BASE_URL;
     categories = await api.get('/api/admin/categories');
     $('#categories-body').innerHTML = categories.map((c) => `
       <tr>
-        <td><code>${esc(c.slug)}</code></td><td>${esc(c.label)}</td><td>${c.sortOrder}</td>
+        <td><code>${esc(c.slug)}</code></td><td>${esc(c.label)}</td><td>${c.sortOrder}</td><td>${c.projectCount ?? 0}</td>
         <td><span class="status-dot ${c.active ? 'on' : 'off'}"></span>${c.active ? 'Oui' : 'Non'}</td>
         <td style="text-align:right;white-space:nowrap">
+          <button class="btn btn-sm" data-cat-edit="${c.id}">Renommer</button>
           <button class="btn btn-sm" data-cat-toggle="${c.id}" data-active="${c.active ? 0 : 1}">${c.active ? 'Désactiver' : 'Activer'}</button>
           <button class="btn btn-sm btn-danger" data-cat-del="${c.id}">✕</button>
         </td>
       </tr>`).join('');
+    document.querySelectorAll('[data-cat-edit]').forEach((b) => b.addEventListener('click', () => {
+      const c = categories.find((x) => x.id === Number(b.dataset.catEdit));
+      if (!c) return;
+      openModal('Renommer la catégorie', `
+        <div class="form-row"><label class="form-label">Label</label><input class="form-input" id="c-edit-label" value="${esc(c.label)}" /></div>
+        <div class="form-row"><label class="form-label">Ordre</label><input class="form-input" id="c-edit-order" type="number" value="${c.sortOrder}" /></div>
+        <p style="color:var(--muted);font-size:13px;margin:4px 0 0">Le slug <code>${esc(c.slug)}</code> ne change pas : les liens du site restent stables.</p>`,
+        async () => {
+          await api.put(`/api/admin/categories/${c.id}`, {
+            label: $('#c-edit-label').value.trim(),
+            sortOrder: Number($('#c-edit-order').value),
+          });
+          loaders.categories();
+          showAlert('Catégorie mise à jour.');
+        });
+    }));
     document.querySelectorAll('[data-cat-toggle]').forEach((b) => b.addEventListener('click', async () => {
       await api.put(`/api/admin/categories/${b.dataset.catToggle}`, { active: b.dataset.active === '1' });
       loaders.categories();
     }));
     document.querySelectorAll('[data-cat-del]').forEach((b) => b.addEventListener('click', async () => {
       if (!confirm('Supprimer cette catégorie ?')) return;
-      await api.del(`/api/admin/categories/${b.dataset.catDel}`);
+      try {
+        await api.del(`/api/admin/categories/${b.dataset.catDel}`);
+      } catch (err) {
+        if (err.status === 409 && confirm(`${err.message}.\nDétacher les réalisations et supprimer quand même ?`)) {
+          await api.del(`/api/admin/categories/${b.dataset.catDel}?detach=1`);
+        } else if (err.status !== 409) {
+          showAlert(err.message, false);
+        }
+      }
       loaders.categories();
+    }));
+    loaders.tags();
+  };
+
+  // ── Tags de réalisations — réécriture en masse côté API ──
+  const MENU_TAGS = new Set([
+    'souple', 'rigide', 'sous-bassement', 'occultant',
+    'battant', 'coulissant', 'portillon',
+  ]);
+  loaders.tags = async () => {
+    const tags = await api.get('/api/admin/tags');
+    $('#tags-body').innerHTML = tags.length ? tags.map((t) => `
+      <tr>
+        <td>${esc(t.tag)}${MENU_TAGS.has(t.tag) ? ' <span class="tag-pill pub">menu</span>' : ''}</td>
+        <td>${t.count}</td>
+        <td style="text-align:right;white-space:nowrap">
+          <button class="btn btn-sm" data-tag-rename="${esc(t.tag)}">Renommer</button>
+          <button class="btn btn-sm btn-danger" data-tag-del="${esc(t.tag)}">✕</button>
+        </td>
+      </tr>`).join('')
+      : '<tr><td colspan="3" style="color:var(--muted)">Aucun tag pour le moment.</td></tr>';
+    document.querySelectorAll('[data-tag-rename]').forEach((b) => b.addEventListener('click', () => {
+      const from = b.dataset.tagRename;
+      const count = tags.find((t) => t.tag === from)?.count ?? 0;
+      openModal(`Renommer le tag « ${from} »`, `
+        <div class="form-row"><label class="form-label">Nouveau nom</label><input class="form-input" id="t-new" value="${esc(from)}" /></div>
+        <p style="color:var(--muted);font-size:13px;margin:4px 0 0">Appliqué aux ${count} réalisation(s) concernée(s).</p>`,
+        async () => {
+          const to = $('#t-new').value.trim();
+          if (!to || to === from) return;
+          const r = await api.post('/api/admin/tags/rename', { from, to });
+          loaders.tags();
+          showAlert(`Tag renommé sur ${r.updated} réalisation(s).`);
+        });
+    }));
+    document.querySelectorAll('[data-tag-del]').forEach((b) => b.addEventListener('click', async () => {
+      const tag = b.dataset.tagDel;
+      const count = tags.find((t) => t.tag === tag)?.count ?? 0;
+      if (!confirm(`Supprimer le tag « ${tag} » des ${count} réalisation(s) ?`)) return;
+      const r = await api.post('/api/admin/tags/delete', { tag });
+      loaders.tags();
+      showAlert(`Tag supprimé de ${r.updated} réalisation(s).`);
     }));
   };
   $('#category-form').addEventListener('submit', async (e) => {
