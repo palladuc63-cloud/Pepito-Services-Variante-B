@@ -18,6 +18,7 @@ import gateWood from '../assets/gate-metal.webp';
     </div>
   </div>
   <div class="gate-seam"></div>
+  <div class="gate-halo"></div>
   <p class="gate-skip">Cliquer pour entrer</p>
 </div>
 
@@ -205,6 +206,19 @@ import gateWood from '../assets/gate-metal.webp';
     pointer-events: none;
   }
 
+  /* Lumière plein écran une fois le portail ouvert — on marche dedans */
+  .gate-halo {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background: radial-gradient(
+      ellipse 78% 68% at center,
+      rgb(255 248 230 / 0.95),
+      rgb(255 248 230 / 0) 72%
+    );
+    pointer-events: none;
+  }
+
   .gate-skip {
     position: absolute;
     left: 50%;
@@ -266,10 +280,8 @@ import gateWood from '../assets/gate-metal.webp';
     // stabilise (décalage droite plus tardif = vantaux pas synchrones).
     const swingKeys = (dir: number) => [
       { transform: 'rotateY(0deg)', easing: 'cubic-bezier(0.55, 0, 0.85, 0.4)', offset: 0 },
-      { transform: `rotateY(${5 * dir}deg)`, easing: 'cubic-bezier(0.3, 0.4, 0.5, 1)', offset: 0.24 },
-      { transform: `rotateY(${96 * dir}deg)`, easing: 'cubic-bezier(0.3, 0.6, 0.4, 1)', offset: 0.78 },
-      { transform: `rotateY(${114 * dir}deg)`, easing: 'ease-out', offset: 0.93 },
-      { transform: `rotateY(${106 * dir}deg)`, offset: 1 },
+      { transform: `rotateY(${5 * dir}deg)`, easing: 'cubic-bezier(0.25, 0.5, 0.3, 1)', offset: 0.24 },
+      { transform: `rotateY(${108 * dir}deg)`, offset: 1 },
     ];
     anims.push(
       left.animate(swingKeys(1), { duration: 1450, delay: 460, fill: 'forwards' }),
@@ -299,6 +311,22 @@ import gateWood from '../assets/gate-metal.webp';
         { duration: 1500, delay: 460, easing: 'ease-out', fill: 'forwards' }
       )
     );
+
+    // Halo plein écran : la lumière envahit tout quand le portail est
+    // ouvert — maintenue jusqu'au fondu final (traversée dans le jour).
+    const halo = root.querySelector<HTMLElement>('.gate-halo');
+    if (halo) {
+      anims.push(
+        halo.animate(
+          [
+            { opacity: 0 },
+            { opacity: 0.85, offset: 0.55 },
+            { opacity: 0.9 },
+          ],
+          { duration: 1500, delay: 950, easing: 'ease-out', fill: 'forwards' }
+        )
+      );
+    }
 
     // Ombre portée suivant le rythme du battement
     if (shadeL) {
