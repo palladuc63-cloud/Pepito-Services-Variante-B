@@ -26,17 +26,18 @@ import wallImg from '../assets/gate-wall.webp';
 
   :global([data-theme='nature']) .gs {
     display: block; height: 240vh; position: relative;
+    margin-top: -14vh; z-index: 4;
   }
 
   :global([data-theme='nature']) .gs__sticky {
     --glh: min(50vh, 38vw);
-    --gwh: calc(var(--glh) * 1.22);
+    --gwh: calc(50% + var(--glh) / 2);
     position: sticky; top: 0; height: 100vh; overflow: hidden;
-    background: var(--color-surface, #f3efe5);
   }
 
   :global([data-theme='nature']) .gs__back {
-    position: absolute; inset: 0; overflow: hidden;
+    position: absolute; left: 0; right: 0; top: 14vh; bottom: 0;
+    overflow: hidden; background: var(--color-surface, #f3efe5);
   }
   .gs__reveal {
     min-height: 100%; display: flex; flex-direction: column;
@@ -55,7 +56,7 @@ import wallImg from '../assets/gate-wall.webp';
   }
   :global([data-theme='nature']) .gs__wall {
     display: block; position: absolute;
-    top: calc(50% + var(--glh) / 2 - var(--gwh));
+    top: 0;
     height: var(--gwh);
     width: max(0px, calc(50% - (var(--glh) * 1.1058) + 4vw + 30px));
     overflow: hidden;
@@ -109,7 +110,6 @@ import wallImg from '../assets/gate-wall.webp';
   if (sections.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const ease = (t: number) => t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     const updaters = [...sections].map((sec) => {
-      const scene = sec.querySelector<HTMLElement>('.gs__scene')!;
       const l = sec.querySelector<HTMLElement>('.gs__leaf--l')!;
       const r = sec.querySelector<HTMLElement>('.gs__leaf--r')!;
       const hint = sec.querySelector<HTMLElement>('.gs__hint')!;
@@ -132,10 +132,9 @@ import wallImg from '../assets/gate-wall.webp';
         if (fixed === null && (rect.bottom < -100 || rect.top > innerHeight + 100)) return;
 
         const op = ease(Math.min(1, Math.max(0, (p - .08) / .52)));   // ouverture 8%→60%
-        const a = op * 104;
+        const a = op * 80;
         l.style.transform = `rotateY(${a}deg) scaleX(1.02)`;
         r.style.transform = `rotateY(${-a}deg) scaleX(1.02)`;
-        scene.style.opacity = a >= 103 ? '0' : '1';
 
         hint.style.opacity = String(Math.max(0, 1 - p * 5));
 
