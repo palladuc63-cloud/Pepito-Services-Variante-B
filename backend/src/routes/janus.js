@@ -8,9 +8,10 @@ import { authenticateJWT } from '../utils/auth.js';
 const router = express.Router();
 
 const JANUS_API = process.env.JANUS_API_URL || 'https://app.agencepoint.fr/api/tenant-knowledge';
+const JANUS_FEATURES_API = process.env.JANUS_FEATURES_API_URL || 'https://app.agencepoint.fr/api/tenant-features';
 const TENANT = process.env.JANUS_TENANT_SLUG || 'pepito-services';
 
-async function relay(req, res) {
+async function relay(req, res, endpoint = JANUS_API) {
   const key = process.env.JANUS_TENANT_KEY || '';
   if (!key) {
     return res.status(503).json({ error: 'Assistant non configuré côté serveur.' });
@@ -20,7 +21,7 @@ async function relay(req, res) {
     if (req.method === 'DELETE' && req.query.source) {
       qs.set('source', String(req.query.source));
     }
-    const upstream = await fetch(`${JANUS_API}?${qs.toString()}`, {
+    const upstream = await fetch(`${endpoint}?${qs.toString()}`, {
       method: req.method,
       headers: { 'Content-Type': 'application/json', 'X-Tenant-Key': key },
       body: req.method === 'POST' ? JSON.stringify(req.body) : undefined,
@@ -36,5 +37,8 @@ async function relay(req, res) {
 router.get('/knowledge', authenticateJWT, relay);
 router.post('/knowledge', authenticateJWT, relay);
 router.delete('/knowledge', authenticateJWT, relay);
+// Réglages du widget (affichage chatbot / bouton rappel IA)
+router.get('/features', authenticateJWT, (req, res) => relay(req, res, JANUS_FEATURES_API));
+router.post('/features', authenticateJWT, (req, res) => relay(req, res, JANUS_FEATURES_API));
 
 export default router;

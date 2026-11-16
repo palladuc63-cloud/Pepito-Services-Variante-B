@@ -239,6 +239,25 @@ const base = import.meta.env.BASE_URL;
         <!-- ASSISTANT : base de connaissances (vocal + chatbot) -->
         <section id="tab-assistant" hidden>
           <div class="card">
+            <h2>Fonctionnalités de l'assistant</h2>
+            <p class="form-hint" style="margin-bottom:14px">Choisissez ce que les visiteurs voient sur le site.</p>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:10px">
+              <input id="feat-chat" type="checkbox" style="margin-top:3px" />
+              <span>
+                <span style="display:block;font-weight:600">Chatbot sur le site</span>
+                <span class="form-hint" style="display:block">La bulle de chat en bas à droite des pages publiques.</span>
+              </span>
+            </label>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+              <input id="feat-callback" type="checkbox" style="margin-top:3px" />
+              <span>
+                <span style="display:block;font-weight:600">Rappel par l'assistant</span>
+                <span class="form-hint" style="display:block">Le bouton 📞 du chat : l'assistant téléphone au visiteur dans la minute.</span>
+              </span>
+            </label>
+            <p id="feat-msg" class="alert" style="display:none;margin-top:10px"></p>
+          </div>
+          <div class="card">
             <h2>Enrichir les connaissances de l'assistant</h2>
             <p class="form-hint" style="margin-bottom:14px">
               Ces informations alimentent l'assistant téléphonique et le chatbot du site :
@@ -1784,7 +1803,35 @@ const base = import.meta.env.BASE_URL;
       host.innerHTML = `<p style="font-size:13px;color:#e74c3c">${esc(err.message)}</p>`;
     }
   }
-  loaders.assistant = loadKnowledge;
+  // ── Fonctionnalités du widget (chatbot / rappel IA) ──
+  const featMsg = $('#feat-msg');
+  function featNote(msg, ok = true) {
+    featMsg.textContent = msg;
+    featMsg.className = `alert ${ok ? 'alert-ok' : 'alert-err'}`;
+    featMsg.style.display = 'block';
+  }
+  async function loadFeatures() {
+    try {
+      const { features } = await api.get('/api/janus/features');
+      $('#feat-chat').checked = features.chat;
+      $('#feat-callback').checked = features.callback;
+    } catch { /* service indisponible — cases inchangées */ }
+  }
+  async function saveFeature(key, input) {
+    input.disabled = true;
+    try {
+      await api.post('/api/janus/features', { [key]: input.checked });
+      featNote('✅ Réglage enregistré — effet immédiat sur le site.');
+    } catch (err) {
+      input.checked = !input.checked;
+      featNote(err.message, false);
+    } finally {
+      input.disabled = false;
+    }
+  }
+  $('#feat-chat').addEventListener('change', (e) => saveFeature('chat', e.target));
+  $('#feat-callback').addEventListener('change', (e) => saveFeature('callback', e.target));
+  loaders.assistant = () => { loadKnowledge(); loadFeatures(); };
 
   $('#kb-text-form').addEventListener('submit', async (e) => {
     e.preventDefault();
