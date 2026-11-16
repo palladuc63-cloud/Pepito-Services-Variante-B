@@ -9,6 +9,7 @@ import authRouter from './routes/auth.js';
 import publicRouter from './routes/public.js';
 import adminRouter from './routes/admin.js';
 import uploadRouter from './routes/upload.js';
+import janusRouter from './routes/janus.js';
 import { sweepDueSocialPosts } from './utils/social.js';
 import { rateLimit } from './utils/rateLimit.js';
 import { createMessage } from './controllers/public.js';
@@ -45,6 +46,10 @@ app.use(cors({
   credentials: true,
 }));
 
+// Uploads de fichiers pour la base de connaissance de l'assistant : le
+// JSON porte le fichier en base64 (~27 Mo pour 20 Mo). Parser scopé AVANT
+// la limite globale de 100 ko — body-parser saute les corps déjà lus.
+app.use('/api/janus', express.json({ limit: '30mb' }));
 app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
 
@@ -59,6 +64,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/public', publicRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/janus', janusRouter);
 
 // Alias pour les intégrations externes (chatbot Janus, assistant vocal)
 // qui POSTent sur {apiBaseUrl}/api/messages : mêmes règles que le

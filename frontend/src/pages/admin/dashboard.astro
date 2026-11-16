@@ -29,6 +29,7 @@ const base = import.meta.env.BASE_URL;
         <button class="admin-nav-link" data-tab="citypages">📍 Pages villes</button>
         <button class="admin-nav-link" data-tab="articles">📰 Articles</button>
         <button class="admin-nav-link" data-tab="social">📣 Réseaux</button>
+        <button class="admin-nav-link" data-tab="assistant">🤖 Assistant</button>
         <button class="admin-nav-link" data-tab="settings">⚙️ Paramètres</button>
         <button class="admin-nav-link" id="btn-logout">🚪 Déconnexion</button>
         <button id="nav-burger" aria-label="Ouvrir le menu" aria-expanded="false">
@@ -235,6 +236,37 @@ const base = import.meta.env.BASE_URL;
           </div>
         </section>
 
+        <!-- ASSISTANT : base de connaissances (vocal + chatbot) -->
+        <section id="tab-assistant" hidden>
+          <div class="card">
+            <h2>Enrichir les connaissances de l'assistant</h2>
+            <p class="form-hint" style="margin-bottom:14px">
+              Ces informations alimentent l'assistant téléphonique et le chatbot du site :
+              normes, DTU, fiches techniques, tarifs internes, FAQ métier… Ajoutez ce qui
+              vous semble utile — le contenu que vous déposez relève de votre responsabilité.
+            </p>
+            <form id="kb-text-form">
+              <div class="form-row"><input id="kb-title" class="form-input" placeholder="Titre (ex : Garantie décennale — ce qu'elle couvre)" required /></div>
+              <div class="form-row"><textarea id="kb-content" class="form-textarea" placeholder="Contenu — texte libre, consignes, tarifs…" required></textarea></div>
+              <button type="submit" class="btn btn-primary">Ajouter</button>
+            </form>
+            <form id="kb-file-form" style="margin-top:14px">
+              <div class="form-row"><input id="kb-file" class="form-input" type="file" accept=".pdf,.docx,.txt,.md,.csv,.json" required /></div>
+              <p class="form-hint">Document (PDF, Word, texte — 20 Mo max) : le texte est extrait et indexé. Les PDF scannés (images) ne sont pas lisibles.</p>
+              <button type="submit" class="btn">Indexer ce document</button>
+            </form>
+            <form id="kb-url-form" style="margin-top:14px;display:flex;gap:10px">
+              <input id="kb-url" class="form-input" type="url" placeholder="Ou indexer un lien — https://…" style="flex:1" required />
+              <button type="submit" class="btn">Indexer</button>
+            </form>
+            <p id="kb-msg" class="alert" style="display:none;margin-top:10px"></p>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <h2>Connaissances ajoutées</h2>
+            <div id="kb-list"><p style="font-size:13px;color:var(--muted)">Chargement…</p></div>
+          </div>
+        </section>
+
         <!-- PARAMÈTRES -->
         <section id="tab-settings" hidden>
           <div class="card">
@@ -390,6 +422,7 @@ const base = import.meta.env.BASE_URL;
     messages: ['Messages', 'Demandes reçues via le formulaire et Janus'],
     prospects: ['Prospects', 'Contacts à relancer (formulaire, chatbot, téléphone)'],
     social: ['Réseaux sociaux', 'Posts Facebook & fiche Google générés automatiquement'],
+    assistant: ['Assistant', 'Connaissances de l\u2019assistant vocal et du chatbot'],
     overview: ["Vue d'ensemble", "L'essentiel du site en un coup d'œil"],
     home: ['Accueil', 'Slides du diaporama de la page d\u2019accueil'],
     seo: ['SEO / Redirections', 'Overrides meta et redirections 301/302'],
@@ -1720,6 +1753,91 @@ const base = import.meta.env.BASE_URL;
         </div>`;
     }).join('');
   }
+
+  // ── Assistant : base de connaissances (vocal + chatbot) ──
+  const kbMsg = $('#kb-msg');
+  function kbNote(msg, ok = true) {
+    kbMsg.textContent = msg;
+    kbMsg.className = `alert ${ok ? 'alert-ok' : 'alert-err'}`;
+    kbMsg.style.display = 'block';
+  }
+
+  async function loadKnowledge() {
+    const host = $('#kb-list');
+    try {
+      const { entries } = await api.get('/api/janus/knowledge');
+      if (!entries.length) {
+        host.innerHTML = '<p style="font-size:13px;color:var(--muted)">Aucune connaissance ajoutée pour l\'instant — l\'assistant se base sur le contenu du site.</p>';
+        return;
+      }
+      host.innerHTML = entries.map((e) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border,#e5e7eb)">
+          <div style="min-width:0">
+            <strong style="font-size:14px">${e.kind === 'link' ? '🔗' : e.kind === 'file' ? '📄' : '📝'} ${esc(e.title || e.source)}</strong>
+            <span class="tag-pill">${e.kind}</span>
+            <p style="font-size:12px;color:var(--muted);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:520px">${esc(e.preview || '')}</p>
+            <p style="font-size:12px;color:var(--muted);margin-top:2px">${e.chunks} fragment${e.chunks > 1 ? 's' : ''} indexé${e.chunks > 1 ? 's' : ''}</p>
+          </div>
+          <button class="btn btn-sm btn-danger" data-kb-del="${esc(e.source)}">Retirer</button>
+        </div>`).join('');
+    } catch (err) {
+      host.innerHTML = `<p style="font-size:13px;color:#e74c3c">${esc(err.message)}</p>`;
+    }
+  }
+  loaders.assistant = loadKnowledge;
+
+  $('#kb-text-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    kbNote('Indexation en cours…');
+    try {
+      const r = await api.post('/api/janus/knowledge', { type: 'text', title: $('#kb-title').value, content: $('#kb-content').value });
+      kbNote(`✅ Ajouté — ${r.chunks} fragment(s) indexé(s).`);
+      $('#kb-title').value = ''; $('#kb-content').value = '';
+      loadKnowledge();
+    } catch (err) { kbNote(err.message, false); }
+  });
+
+  $('#kb-file-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const file = $('#kb-file').files?.[0];
+    if (!file) return;
+    if (file.size > 20 * 1024 * 1024) { kbNote('Fichier trop volumineux (20 Mo max).', false); return; }
+    kbNote('Extraction et indexation du document… (peut prendre une minute)');
+    try {
+      const b64 = await new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result).split(',')[1]);
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+      const r = await api.post('/api/janus/knowledge', { type: 'file', name: file.name, content_base64: b64 });
+      kbNote(`✅ Document indexé — ${r.chunks} fragment(s).`);
+      $('#kb-file').value = '';
+      loadKnowledge();
+    } catch (err) { kbNote(err.message, false); }
+  });
+
+  $('#kb-url-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    kbNote('Lecture et indexation de la page…');
+    try {
+      const r = await api.post('/api/janus/knowledge', { type: 'url', url: $('#kb-url').value });
+      kbNote(`✅ Page indexée — ${r.chunks} fragment(s).`);
+      $('#kb-url').value = '';
+      loadKnowledge();
+    } catch (err) { kbNote(err.message, false); }
+  });
+
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-kb-del]');
+    if (!btn) return;
+    if (!confirm('Retirer cette connaissance de l\'assistant ?')) return;
+    try {
+      await api.del(`/api/janus/knowledge?source=${encodeURIComponent(btn.dataset.kbDel)}`);
+      kbNote('✅ Connaissance retirée.');
+      loadKnowledge();
+    } catch (err) { kbNote(err.message, false); }
+  });
 
   loaders.settings = async () => {
     const s = await api.get('/api/admin/settings');
