@@ -72,8 +72,12 @@ const signature = {
   installsTitle: 'Nos dernières installations',
 };
 
-// Photo du hero Signature : première réalisation avec image.
-const sigHeroProject = projects.find((p: Project) => p.images?.length || p.imageUrl);
+// Photo du hero Signature : de préférence une réalisation « clôture rigide »,
+// sinon la première avec image.
+const hasImg = (p: Project) => p.images?.length || p.imageUrl;
+const sigHeroProject =
+  projects.find((p: Project) => hasImg(p) && /rigide/i.test(`${p.title} ${(p.tags || []).join(' ')}`)) ||
+  projects.find((p: Project) => hasImg(p));
 const sigHeroImg = sigHeroProject?.images?.[0]?.imageUrl || sigHeroProject?.imageUrl || '';
 
 // Entité locale canonique (@id #business, référencée par les pages villes
