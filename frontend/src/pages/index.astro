@@ -6,6 +6,13 @@ import Section from '../components/Section.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import logo from '../assets/pepito-logo.svg';
+import isoCloture from '../assets/iso/cloture-rigide.webp';
+import isoGrillage from '../assets/iso/grillage.webp';
+import isoPalissade from '../assets/iso/palissade.webp';
+import isoPortail from '../assets/iso/portail.webp';
+import isoMotorisation from '../assets/iso/motorisation.webp';
+import isoMinipelle from '../assets/iso/minipelle.webp';
+import isoMaconnerie from '../assets/iso/maconnerie.webp';
 import { getSite } from '../lib/site.js';
 import { getProjects } from '../lib/api.js';
 import type { Project, Service } from '../data/types';
@@ -14,6 +21,60 @@ const { settings, services, slides } = await getSite();
 const projects = await getProjects();
 const previewProjects = projects.slice(0, 3);
 const base = import.meta.env.BASE_URL;
+
+// ── Thème « Signature » : contenu de la landing produit ──
+// Tout le texte de la page est regroupé ici pour être facile à modifier.
+const signature = {
+  heroTitle: 'La Clôture Rigide avec Sous-bassement Béton',
+  heroSubtitle:
+    'Sécurisez et valorisez votre propriété avec notre solution de clôture grillagée robuste, surélevée sur des plaques de béton de protection contre l’humidité et le passage d’animaux.',
+  ctaPrimary: { label: 'Découvrir nos réalisations', href: `${base}realisations/` },
+  ctaSecondary: { label: 'Nous contacter', href: `${base}contact/` },
+  activitiesTitle: 'Nos activités',
+  activities: [
+    { img: isoGrillage, label: 'Grillage souple' },
+    { img: isoCloture, label: 'Clôture rigide' },
+    { img: isoPalissade, label: 'Palissade occultante' },
+    { img: isoPortail, label: 'Portails & portillons' },
+    { img: isoMotorisation, label: 'Motorisation' },
+    { img: isoMinipelle, label: 'Terrassement mini-pelle' },
+    { img: isoMaconnerie, label: 'Petite maçonnerie' },
+  ],
+  benefitsTitle: 'Pourquoi choisir notre clôture avec sous-bassement béton ?',
+  benefits: [
+    {
+      icon: 'shield',
+      title: 'Robustesse maximale',
+      text: 'Sécurité, rigidité — les plaques béton stabilisent la clôture et retiennent la terre.',
+    },
+    {
+      icon: 'finish',
+      title: 'Finition parfaite et propre',
+      text: 'Pas d’entretien de coupe en lisière de grillage — propreté et délimitation claire.',
+    },
+    {
+      icon: 'clock',
+      title: 'Longévité exceptionnelle',
+      text: 'Anti-humidité : pas de contact du métal avec le sol humide, résistant aux intempéries.',
+    },
+  ],
+  processTitle: 'Notre processus de pose en 5 étapes',
+  steps: [
+    { title: 'Étude & traçage', text: 'Analyse du terrain, alignement, repères.' },
+    { title: 'Terrassement', text: 'Petites excavations pour les poteaux à la mini-pelle.' },
+    {
+      title: 'Scellement & sous-bassement',
+      text: 'Mise en place des poteaux et glissement des plaques de sous-bassement béton.',
+    },
+    { title: 'Pose des panneaux', text: 'Installation et fixation des grilles en acier rigide.' },
+    { title: 'Réception', text: 'Ajustements finaux — chantier livré clé en main.' },
+  ],
+  installsTitle: 'Nos dernières installations',
+};
+
+// Photo du hero Signature : première réalisation avec image.
+const sigHeroProject = projects.find((p: Project) => p.images?.length || p.imageUrl);
+const sigHeroImg = sigHeroProject?.images?.[0]?.imageUrl || sigHeroProject?.imageUrl || '';
 
 // Entité locale canonique (@id #business, référencée par les pages villes
 // et réalisations). sameAs relie la fiche Google et les réseaux au site —
@@ -128,6 +189,109 @@ const jsonLd = [{
       <a href={`${base}contact/`} class="btn btn-primary">Demander un chiffrage</a>
     </div>
   </Section>
+
+  {/* ── Thème « Signature » : landing produit (visible uniquement sous
+      data-theme='signature', masquée via theme-signature.css) ── */}
+  <div class="signature-home">
+    <section class="sig-hero">
+      <div class="container sig-hero__grid">
+        <div class="sig-hero__content">
+          <h1>{signature.heroTitle}</h1>
+          <p class="sig-hero__sub">{signature.heroSubtitle}</p>
+          <div class="sig-hero__actions">
+            <a href={signature.ctaPrimary.href} class="sig-btn sig-btn--primary">
+              {signature.ctaPrimary.label}
+            </a>
+            <a href={signature.ctaSecondary.href} class="sig-btn sig-btn--ghost">
+              {signature.ctaSecondary.label}
+            </a>
+          </div>
+        </div>
+        <div class="sig-hero__visual">
+          {sigHeroImg && (
+            <div class="sig-hero__photo">
+              <img src={sigHeroImg} alt={sigHeroProject?.title || 'Clôture rigide posée par Pépito Services'} loading="eager" />
+            </div>
+          )}
+          <img class="sig-hero__iso" src={isoCloture.src} alt="" aria-hidden="true" />
+        </div>
+      </div>
+    </section>
+
+    <section class="sig-activities container">
+      <h2 class="sig-title">{signature.activitiesTitle}</h2>
+      <ul class="sig-activities__row">
+        {signature.activities.map((a) => (
+          <li class="sig-activity">
+            <img src={a.img.src} alt="" aria-hidden="true" loading="lazy" />
+            <span>{a.label}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="sig-benefits">
+      <div class="container">
+        <h2 class="sig-title">{signature.benefitsTitle}</h2>
+        <div class="sig-benefits__grid">
+          {signature.benefits.map((b) => (
+            <div class="sig-benefit">
+              <span class="sig-benefit__icon" aria-hidden="true">
+                {b.icon === 'shield' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z" />
+                    <path d="M9 12l2 2 4-4" />
+                  </svg>
+                )}
+                {b.icon === 'finish' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 20l4-1 11-11a2.1 2.1 0 0 0-3-3L5 16l-1 4z" />
+                    <path d="M13.5 6.5l3 3" />
+                  </svg>
+                )}
+                {b.icon === 'clock' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="13" r="8" />
+                    <path d="M12 9v4l2.5 2.5" />
+                    <path d="M9 2h6" />
+                  </svg>
+                )}
+              </span>
+              <h3>{b.title}</h3>
+              <p>{b.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="sig-process">
+      <div class="container">
+        <h2 class="sig-title">{signature.processTitle}</h2>
+        <ol class="sig-steps">
+          {signature.steps.map((s, i) => (
+            <li class="sig-step">
+              <span class="sig-step__chev" aria-hidden="true">{i + 1}.</span>
+              <div class="sig-step__body">
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="sig-installs container">
+      <h2 class="sig-title">{signature.installsTitle}</h2>
+      <div class="projects-grid-preview">
+        {previewProjects.map((project: Project) => <ProjectCard project={project} />)}
+      </div>
+      <div class="sig-installs__more">
+        <a href={`${base}realisations/`} class="sig-btn sig-btn--primary">Voir toutes les réalisations</a>
+      </div>
+    </section>
+  </div>
 </MainLayout>
 
 <style>

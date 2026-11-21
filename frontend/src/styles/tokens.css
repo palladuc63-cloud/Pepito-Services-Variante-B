@@ -248,3 +248,75 @@
 :root {
   --picket-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='16'%3E%3Cpath d='M1 16V5L3 1L5 5V16Z'/%3E%3C/svg%3E");
 }
+
+/* ── Thème « Signature » : landing produit, pictos isométriques ──
+   Mise en page dans theme-signature.css. */
+[data-theme='signature'] {
+  --paper: #f7f9f7;
+  --paper-deep: #e9eee9;
+  --basalt: #1d3a21;
+  --basalt-dark: #122a16;
+
+  --ink: #161a17;
+  --stone: #4f5a52;
+  --stone-light: #6b756e;
+  --line: #dde3dd;
+
+  --forest: #1e4a26;
+  --forest-dark: #122a16;
+  --forest-soft: #e3ecdf;
+
+  --copper: #3f7a44;
+  --copper-dark: #2c5a31;
+  --copper-light: #9dc3a2;
+  --copper-soft: #e8f0e4;
+
+  --steel: #161a17;
+  --steel-light: #e9eee9;
+
+  --cta: #1e4a26;
+  --cta-dark: #143319;
+  --cta-text: #ffffff;
+  --panel: #ffffff;
+  --on-dark: #f2f6f0;
+  --ring: rgb(30 74 38 / 0.35);
+
+  --radius: 0.75rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --r-btn: 999px;
+  --r-card: 1rem;
+  --card-border-bottom: 1px solid var(--line);
+  --card-hover-border: var(--line);
+  --hero-radius: 0;
+  --btn-ls: 0;
+
+  --shadow-sm: 0 1px 2px 0 rgb(20 40 22 / 0.06);
+  --shadow-md: 0 8px 20px -8px rgb(20 40 22 / 0.14);
+  --shadow-lg: 0 24px 40px -16px rgb(20 40 22 / 0.25);
+
+  --deco: none;
+  --grain-img: none;
+  --cta-img: none;
+
+  --tag-bg: var(--forest-soft);
+  --tag-color: var(--forest-dark);
+  --tag-border: transparent;
+  --tag-radius: 999px;
+  --tag-ls: 0.04em;
+  --tag-pad: 0.25rem 0.85rem;
+  --tag-shadow: none;
+  --tag-rivet: none;
+
+  --nav-active-shadow: none;
+  --nav-active-bg: var(--forest-soft);
+  --header-top-border: 0;
+  --hero-rgb: 18 42 22;
+
+  --signal: var(--forest);
+  --signal-dark: var(--forest-dark);
+  --signal-light: #5e9064;
+  --signal-soft: var(--forest-soft);
+}
