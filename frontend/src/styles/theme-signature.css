@@ -149,15 +149,11 @@
   color: var(--forest);
 }
 
-/* Visuel : photo réelle découpée en diagonale + picto iso qui déborde */
-.sig-hero__visual {
-  position: relative;
-}
-
+/* Visuel : la photo remplit tout le pan diagonal, bord d'écran à diagonale */
 .sig-hero__photo {
   position: relative;
   aspect-ratio: 4 / 3;
-  clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
+  clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
   background: var(--paper-deep);
 }
 
@@ -168,14 +164,22 @@
   display: block;
 }
 
-.sig-hero__iso {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: clamp(9rem, 30%, 15rem);
-  height: auto;
-  transform: translateY(22%);
-  filter: drop-shadow(0 18px 22px rgb(18 42 22 / 0.28));
+@media (min-width: 900px) {
+  /* Le visuel sort du flux : il couvre toute la zone du hero à droite.
+     Même clip-path que le pan ::before → la photo le remplit exactement,
+     jusqu'au bord droit de l'écran et sur toute la hauteur. */
+  .sig-hero__visual {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .sig-hero__photo {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+    clip-path: polygon(58% 0, 100% 0, 100% 100%, 38% 100%);
+  }
 }
 
 /* ═══ Rangée « Nos activités » — pictos isométriques ═══ */

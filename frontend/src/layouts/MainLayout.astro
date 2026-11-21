@@ -28,11 +28,11 @@ const umamiHost = umamiSrc ? umamiSrc.replace(/\/[^/]*$/, '') : '';
 ---
 
 <!doctype html>
-<html lang="fr" data-theme="nature">
+<html lang="fr" data-theme="signature">
   <head>
     <script is:inline>
       try {
-        var themes = ['nature', 'immersif', 'bento', 'editorial'];
+        var themes = ['nature', 'immersif', 'bento', 'editorial', 'signature'];
         var fromUrl = new URLSearchParams(location.search).get('theme');
         if (themes.indexOf(fromUrl) !== -1) localStorage.setItem('pepito-theme', fromUrl);
         var t = localStorage.getItem('pepito-theme');
