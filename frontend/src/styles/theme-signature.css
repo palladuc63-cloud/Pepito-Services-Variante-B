@@ -69,14 +69,16 @@
   isolation: isolate;
 }
 
-/* Grand pan diagonal gris clair derrière le visuel (signature de la maquette) */
+/* Large bande diagonale gris clair derrière le visuel (signature de la
+   maquette) : bords parallèles à ceux de la photo (même pente −20 %),
+   décalés à gauche → une bande grise reste visible le long de l'image. */
 .sig-hero::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
   background: var(--paper-deep);
-  clip-path: polygon(58% 0, 100% 0, 100% 100%, 38% 100%);
+  clip-path: polygon(46% 0, 100% 0, 100% 100%, 26% 100%);
 }
 
 .sig-hero__grid {
