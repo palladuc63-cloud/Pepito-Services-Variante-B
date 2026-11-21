@@ -26,6 +26,8 @@ const base = import.meta.env.BASE_URL;
 // Tout le texte de la page est regroupé ici pour être facile à modifier.
 const signature = {
   heroTitle: 'La Clôture Rigide avec Sous-bassement Béton',
+  // Photo du hero : chemin /uploads ou null = auto (réalisation « sous-bassement »)
+  heroImage: '/uploads/fb-import/lot-086/lot-086-01.webp',
   heroSubtitle:
     'Sécurisez et valorisez votre propriété avec notre solution de clôture grillagée robuste, surélevée sur des plaques de béton de protection contre l’humidité et le passage d’animaux.',
   ctaPrimary: { label: 'Découvrir nos réalisations', href: `${base}realisations/` },
@@ -86,7 +88,7 @@ const sigHeroProject =
   bestMatch(/sous?-?bassement/i) ||
   bestMatch(/rigide/i) ||
   projects.find((p: Project) => hasImg(p));
-const sigHeroImg = sigHeroProject?.images?.[0]?.imageUrl || sigHeroProject?.imageUrl || '';
+const sigHeroImg = signature.heroImage || sigHeroProject?.images?.[0]?.imageUrl || sigHeroProject?.imageUrl || '';
 
 // Entité locale canonique (@id #business, référencée par les pages villes
 // et réalisations). sameAs relie la fiche Google et les réseaux au site —
