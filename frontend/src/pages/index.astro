@@ -26,8 +26,16 @@ const base = import.meta.env.BASE_URL;
 // Tout le texte de la page est regroupé ici pour être facile à modifier.
 const signature = {
   heroTitle: 'La Clôture Rigide avec Sous-bassement Béton',
-  // Photo du hero : chemin /uploads ou null = auto (réalisation « sous-bassement »)
-  heroImage: '/uploads/fb-import/lot-086/lot-086-01.webp',
+  // Photos du hero : diaporama en fondu (~5 s/image, cycle 30 s pour 6).
+  // Liste vide = repli auto sur la réalisation « sous-bassement ».
+  heroImages: [
+    '/uploads/fb-import/lot-086/lot-086-01.webp',
+    '/uploads/fb-import/lot-085/lot-085-01.webp',
+    '/uploads/fb-import/lot-065/lot-065-01.webp',
+    '/uploads/fb-import/lot-021/lot-021-01.webp',
+    '/uploads/fb-import/lot-018/lot-018-01.webp',
+    '/uploads/fb-import/lot-047/lot-047-01.webp',
+  ],
   heroSubtitle:
     'Sécurisez et valorisez votre propriété avec notre solution de clôture grillagée robuste, surélevée sur des plaques de béton de protection contre l’humidité et le passage d’animaux.',
   ctaPrimary: { label: 'Découvrir nos réalisations', href: `${base}realisations/` },
@@ -88,7 +96,9 @@ const sigHeroProject =
   bestMatch(/sous?-?bassement/i) ||
   bestMatch(/rigide/i) ||
   projects.find((p: Project) => hasImg(p));
-const sigHeroImg = signature.heroImage || sigHeroProject?.images?.[0]?.imageUrl || sigHeroProject?.imageUrl || '';
+const sigHeroImgs = signature.heroImages.length
+  ? signature.heroImages
+  : [sigHeroProject?.images?.[0]?.imageUrl || sigHeroProject?.imageUrl].filter(Boolean);
 
 // Entité locale canonique (@id #business, référencée par les pages villes
 // et réalisations). sameAs relie la fiche Google et les réseaux au site —
@@ -222,9 +232,17 @@ const jsonLd = [{
           </div>
         </div>
         <div class="sig-hero__visual">
-          {sigHeroImg && (
+          {sigHeroImgs.length > 0 && (
             <div class="sig-hero__photo">
-              <img src={sigHeroImg} alt={sigHeroProject?.title || 'Clôture rigide posée par Pépito Services'} loading="eager" />
+              {sigHeroImgs.map((src, i) => (
+                <img
+                  src={src}
+                  alt={i === 0 ? 'Clôture rigide posée par Pépito Services' : ''}
+                  aria-hidden={i === 0 ? undefined : 'true'}
+                  style={`--d:${i * 5}s`}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                />
+              ))}
             </div>
           )}
         </div>

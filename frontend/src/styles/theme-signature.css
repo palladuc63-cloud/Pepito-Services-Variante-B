@@ -157,11 +157,44 @@
   background: var(--paper-deep);
 }
 
+/* Diaporama en fondu (6 images, cycle 30 s : ~5 s chacune).
+   Chaque slide occupe une fenêtre de 100/6 ≈ 16,7 % du cycle ;
+   --d (inline) décale chaque image de 5 s. */
 .sig-hero__photo img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
+  opacity: 0;
+  animation: sig-hero-fade 30s linear infinite;
+  animation-delay: var(--d, 0s);
+}
+
+@keyframes sig-hero-fade {
+  0% { opacity: 0; }
+  3.5% { opacity: 1; }
+  16.7% { opacity: 1; }
+  20.2% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+.sig-hero__photo img:only-child {
+  animation: none;
+  opacity: 1;
+}
+
+.sig-hero__photo:hover img {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sig-hero__photo img {
+    animation: none;
+  }
+  .sig-hero__photo img:first-child {
+    opacity: 1;
+  }
 }
 
 @media (min-width: 900px) {
