@@ -532,7 +532,7 @@ const base = import.meta.env.BASE_URL;
     const pagesEl = $('#analytics-pages');
     const refsEl = $('#analytics-refs');
     statsEl.innerHTML = '<p style="color:var(--muted);margin:0">Chargement…</p>';
-    pagesEl.innerHTML = ''; refsEl.innerHTML = '';
+    pagesEl.replaceChildren(); refsEl.replaceChildren();
     let a;
     try { a = await api.get(`/api/admin/analytics?days=${$('#analytics-days').value}`); }
     catch { statsEl.innerHTML = '<p style="color:var(--muted);margin:0">Statistiques indisponibles — Umami ne répond pas.</p>'; return; }
@@ -592,8 +592,7 @@ const base = import.meta.env.BASE_URL;
     const y = calCursor.getFullYear(), m = calCursor.getMonth();
     $('#cal-title').textContent = calCursor.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
     const key = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    const byDay = {};
-    items.forEach((it) => { const k = key(new Date(it.at)); (byDay[k] ??= []).push(it); });
+    const byDay = Object.groupBy(items, (it) => key(new Date(it.at)));
     const offset = (new Date(y, m, 1).getDay() + 6) % 7; // lundi = 0
     const first = new Date(y, m, 1 - offset);
     let html = ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.']
