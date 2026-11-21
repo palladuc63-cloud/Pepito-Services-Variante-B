@@ -444,12 +444,21 @@ const navLinks = settings.nav.map((link) => ({
     animation: menu-item-in 0.28s ease-out backwards;
   }
 
-  .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(1) { animation-delay: 60ms; }
-  .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(2) { animation-delay: 100ms; }
-  .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(3) { animation-delay: 140ms; }
-  .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(4) { animation-delay: 180ms; }
-  .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(5) { animation-delay: 220ms; }
-  .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(6) { animation-delay: 260ms; }
+  /* Stagger : sibling-index() quand disponible, :nth-child en fallback */
+  @supports (animation-delay: calc(sibling-index() * 0.1s)) {
+    .mobile-menu:not([hidden]) .mobile-menu__item {
+      animation-delay: calc(sibling-index() * 40ms + 20ms);
+    }
+  }
+
+  @supports not (animation-delay: calc(sibling-index() * 0.1s)) {
+    .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(1) { animation-delay: 60ms; }
+    .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(2) { animation-delay: 100ms; }
+    .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(3) { animation-delay: 140ms; }
+    .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(4) { animation-delay: 180ms; }
+    .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(5) { animation-delay: 220ms; }
+    .mobile-menu:not([hidden]) .mobile-menu__item:nth-child(6) { animation-delay: 260ms; }
+  }
 
   .mobile-menu__header {
     display: flex;
@@ -838,6 +847,26 @@ const navLinks = settings.nav.map((link) => ({
   .mobile-menu__item--has-sub.is-open .mobile-sub-list {
     max-height: 38rem;
     visibility: visible;
+  }
+
+  /* Hauteur intrinsèque quand le navigateur supporte interpolate-size
+     (Chrome/Edge 129+) ; le max-height ci-dessus reste le fallback. */
+  @supports (interpolate-size: allow-keywords) {
+    .mobile-menu {
+      interpolate-size: allow-keywords;
+    }
+
+    .mobile-sub-list {
+      max-height: none;
+      block-size: 0;
+      transition: block-size 0.28s ease, visibility 0.28s ease;
+    }
+
+    .mobile-menu__item--has-sub.is-open .mobile-sub-list {
+      max-height: none;
+      block-size: auto;
+      visibility: visible;
+    }
   }
 
   .mobile-sub-link {

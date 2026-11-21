@@ -33,7 +33,7 @@ export async function getSite() {
   // catégorie ; sous-liens = tags réellement présents sur ses projets.
   const catImage = new Map();
   const catTags = new Map();
-  const sorted = [...projects].sort(
+  const sorted = projects.toSorted(
     (a, b) => new Date(b.publishedAt || b.createdAt || 0) - new Date(a.publishedAt || a.createdAt || 0)
   );
   for (const p of sorted) {

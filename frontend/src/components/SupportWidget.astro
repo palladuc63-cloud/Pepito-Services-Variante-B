@@ -138,7 +138,7 @@ const enabled = import.meta.env.PUBLIC_SAV_WIDGET !== '0';
 
   function clearActions() {
     actions.hidden = true;
-    while (actions.firstChild) actions.removeChild(actions.firstChild);
+    actions.replaceChildren();
   }
 
   function chip(label: string, onClick: () => void, primary = false) {
