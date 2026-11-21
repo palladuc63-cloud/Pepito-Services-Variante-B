@@ -74,13 +74,17 @@ const signature = {
 
 // Photo du hero Signature : de préférence la réalisation « sous-bassement »
 // la plus récente (le produit de la landing), sinon « rigide », sinon la
-// première avec image.
+// première avec image. « Récent » = sortOrder maximal (tri de l'API :
+// sortOrder ASC puis createdAt DESC).
 const hasImg = (p: Project) => p.images?.length || p.imageUrl;
 const haystack = (p: Project) => `${p.title} ${(p.tags || []).join(' ')}`;
-const lastMatch = (re: RegExp) => [...projects].reverse().find((p: Project) => hasImg(p) && re.test(haystack(p)));
+const bestMatch = (re: RegExp) =>
+  projects
+    .filter((p: Project) => hasImg(p) && re.test(haystack(p)))
+    .sort((a: Project, b: Project) => b.sortOrder - a.sortOrder)[0];
 const sigHeroProject =
-  lastMatch(/sous?-?bassement/i) ||
-  lastMatch(/rigide/i) ||
+  bestMatch(/sous?-?bassement/i) ||
+  bestMatch(/rigide/i) ||
   projects.find((p: Project) => hasImg(p));
 const sigHeroImg = sigHeroProject?.images?.[0]?.imageUrl || sigHeroProject?.imageUrl || '';
 
