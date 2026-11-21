@@ -72,11 +72,15 @@ const signature = {
   installsTitle: 'Nos dernières installations',
 };
 
-// Photo du hero Signature : de préférence une réalisation « clôture rigide »,
-// sinon la première avec image.
+// Photo du hero Signature : de préférence la réalisation « sous-bassement »
+// la plus récente (le produit de la landing), sinon « rigide », sinon la
+// première avec image.
 const hasImg = (p: Project) => p.images?.length || p.imageUrl;
+const haystack = (p: Project) => `${p.title} ${(p.tags || []).join(' ')}`;
+const lastMatch = (re: RegExp) => [...projects].reverse().find((p: Project) => hasImg(p) && re.test(haystack(p)));
 const sigHeroProject =
-  projects.find((p: Project) => hasImg(p) && /rigide/i.test(`${p.title} ${(p.tags || []).join(' ')}`)) ||
+  lastMatch(/sous?-?bassement/i) ||
+  lastMatch(/rigide/i) ||
   projects.find((p: Project) => hasImg(p));
 const sigHeroImg = sigHeroProject?.images?.[0]?.imageUrl || sigHeroProject?.imageUrl || '';
 
