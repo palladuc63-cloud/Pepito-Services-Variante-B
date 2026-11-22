@@ -1,11 +1,11 @@
 ---
-import gateBackdrop from '../assets/gate/backdrop-blur.webp';
+import gatePlate from '../assets/gate/gate-plate.webp';
 import gatePhoto from '../assets/gate/portail-reference.webp';
 ---
 
 <section class="gate-scene" aria-label="Portail battant aluminium sur mesure">
   <div class="gate-scene__sticky">
-    <div class="gate-scene__canvas" data-backdrop={gateBackdrop.src}></div>
+    <div class="gate-scene__canvas" data-plate={gatePlate.src}></div>
     <img
       class="gate-scene__fallback"
       src={gatePhoto.src}
@@ -122,95 +122,70 @@ import gatePhoto from '../assets/gate/portail-reference.webp';
         return;
       }
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFShadowMap;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.05;
       canvasHost.appendChild(renderer.domElement);
+
+      // La scène vit dans l'espace pixel de la photo (1024x571) :
+      // la plaque (photo sans vantaux) est le fond, les deux vantaux
+      // sont des plans colorés pivotant sur leurs gonds.
+      const IMG_W = 1024;
+      const IMG_H = 571;
 
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0xdfe4e6);
-      scene.fog = new THREE.Fog(0xdfe4e6, 9, 22);
 
-      const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 60);
+      const camera = new THREE.OrthographicCamera(0, 1, 0, 1, 0.1, 2000);
+      camera.position.z = 500;
 
-      scene.add(new THREE.HemisphereLight(0xe8eef4, 0x7d7868, 0.85));
-      const sun = new THREE.DirectionalLight(0xfff1dd, 2.4);
-      sun.position.set(5, 7, 5);
-      sun.castShadow = true;
-      sun.shadow.mapSize.set(1024, 1024);
-      sun.shadow.camera.near = 1;
-      sun.shadow.camera.far = 22;
-      sun.shadow.camera.left = -6;
-      sun.shadow.camera.right = 6;
-      sun.shadow.camera.top = 6;
-      sun.shadow.camera.bottom = -4;
-      sun.shadow.bias = -0.0004;
+      // Lumière : comme sur la photo (soleil haut devant à gauche).
+      scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+      const sun = new THREE.DirectionalLight(0xfff4e4, 1.9);
+      sun.position.set(-0.35, -0.9, 1).normalize();
       scene.add(sun);
 
-      const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(40, 40),
-        new THREE.MeshStandardMaterial({ color: 0xb3b0aa, roughness: 0.95 })
-      );
-      ground.rotation.x = -Math.PI / 2;
-      ground.receiveShadow = true;
-      scene.add(ground);
+      // Vantaux — anthracite RAL 7016, pivot au bord côté gonds.
+      const anthracite = new THREE.MeshLambertMaterial({ color: 0x353b3f });
+      const gateGroup = new THREE.Group();
+      scene.add(gateGroup);
 
-      const backdropMat = new THREE.MeshBasicMaterial({ color: 0xd8dcdf });
-      const backdrop = new THREE.Mesh(new THREE.PlaneGeometry(18, 10), backdropMat);
-      backdrop.position.set(0, 3.2, -6);
-      scene.add(backdrop);
-      new THREE.TextureLoader().load(canvasHost.dataset.backdrop ?? '', (t) => {
-        t.colorSpace = THREE.SRGBColorSpace;
-        backdropMat.map = t;
-        backdropMat.needsUpdate = true;
-        render();
-      });
+      const GAP_L = 160; // bord intérieur pilier gauche (px image)
+      const GAP_R = 870; // bord intérieur pilier droit
+      const PANEL_W = (GAP_R - GAP_L) / 2; // 355
+      const PANEL_H = 330;
+      const PANEL_Y = 278; // centre vertical des vantaux
 
-      const concrete = new THREE.MeshStandardMaterial({ color: 0xcac7c1, roughness: 0.92 });
-      const pillarGeo = new THREE.BoxGeometry(0.4, 2.1, 0.4);
-      const pillarL = new THREE.Mesh(pillarGeo, concrete);
-      pillarL.position.set(-1.38, 1.05, 0);
-      pillarL.castShadow = pillarL.receiveShadow = true;
-      const pillarR = pillarL.clone();
-      pillarR.position.x = 1.38;
-      scene.add(pillarL, pillarR);
-
-      const anthracite = new THREE.MeshStandardMaterial({
-        color: 0x33383d,
-        metalness: 0.55,
-        roughness: 0.5,
-      });
-      const panelGeoL = new THREE.BoxGeometry(1.16, 1.62, 0.045);
-      panelGeoL.translate(0.58, 0, 0);
-      const panelGeoR = new THREE.BoxGeometry(1.16, 1.62, 0.045);
-      panelGeoR.translate(-0.58, 0, 0);
+      const geoL = new THREE.BoxGeometry(PANEL_W, PANEL_H, 6);
+      geoL.translate(PANEL_W / 2, 0, 0);
+      const geoR = new THREE.BoxGeometry(PANEL_W, PANEL_H, 6);
+      geoR.translate(-PANEL_W / 2, 0, 0);
 
       const hingeL = new THREE.Group();
-      hingeL.position.set(-1.18, 0.86, 0.05);
-      const panelL = new THREE.Mesh(panelGeoL, anthracite);
-      panelL.castShadow = panelL.receiveShadow = true;
-      hingeL.add(panelL);
-
+      hingeL.position.set(GAP_L, PANEL_Y, 0);
+      hingeL.add(new THREE.Mesh(geoL, anthracite));
       const hingeR = new THREE.Group();
-      hingeR.position.set(1.18, 0.86, 0.05);
-      const panelR = new THREE.Mesh(panelGeoR, anthracite);
-      panelR.castShadow = panelR.receiveShadow = true;
-      hingeR.add(panelR);
-      scene.add(hingeL, hingeR);
+      hingeR.position.set(GAP_R, PANEL_Y, 0);
+      hingeR.add(new THREE.Mesh(geoR, anthracite));
+      gateGroup.add(hingeL, hingeR);
 
       const render = () => renderer.render(scene, camera);
+
+      let bgTex: InstanceType<typeof THREE.Texture> | null = null;
+      new THREE.TextureLoader().load(canvasHost.dataset.plate ?? '', (t) => {
+        t.colorSpace = THREE.SRGBColorSpace;
+        bgTex = t;
+        scene.background = t;
+        onResize();
+      });
 
       const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
       const smooth = (t: number) => t * t * (3 - 2 * t);
 
       const update = (p: number) => {
         const open = smooth(clamp01((p - 0.15) / 0.85));
-        const angle = open * 1.35;
+        const angle = open * 1.0; // ~57°, comme sur la photo
         hingeL.rotation.y = angle;
         hingeR.rotation.y = -angle;
-        camera.position.set(-0.3 + 0.6 * p, 1.62 - 0.14 * p, 5.2 - 0.9 * p);
-        camera.lookAt(0, 0.92, 0);
+        // Léger glissement latéral des vantaux vs le fond = parallaxe.
+        gateGroup.position.x = (window.innerWidth - IMG_W * gateGroup.scale.x) / 2 + (p - 0.5) * 14;
         if (caption) caption.style.opacity = String(Math.max(0, 1 - p * 4));
         render();
       };
@@ -226,8 +201,21 @@ import gatePhoto from '../assets/gate/portail-reference.webp';
         const h = canvasHost.clientHeight;
         if (!w || !h) return;
         renderer.setSize(w, h, false);
-        camera.aspect = w / h;
+        camera.right = w;
+        camera.bottom = h;
         camera.updateProjectionMatrix();
+
+        // Mise à l'échelle « cover » : la photo remplit l'écran.
+        const s = Math.max(w / IMG_W, h / IMG_H);
+        gateGroup.scale.set(s, s, 1);
+        gateGroup.position.set((w - IMG_W * s) / 2, (h - IMG_H * s) / 2, 0);
+
+        if (bgTex) {
+          const fracX = Math.min(1, w / (IMG_W * s));
+          const fracY = Math.min(1, h / (IMG_H * s));
+          bgTex.repeat.set(fracX, fracY);
+          bgTex.offset.set((1 - fracX) / 2, (1 - fracY) / 2);
+        }
         render();
       };
 
