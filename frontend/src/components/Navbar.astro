@@ -647,10 +647,17 @@ const navLinks = settings.nav.map((link) => ({
     background: color-mix(in srgb, var(--forest) 18%, transparent);
   }
 
-  /* Vignette isométrique dans la pastille — le picto remplace l'icône. */
+  .nav-dd__link:hover .nav-dd__media--img,
+  .nav-dd__link:focus-visible .nav-dd__media--img {
+    background: none;
+  }
+
+  /* Vignette isométrique dans la pastille — le picto remplace l'icône.
+     Pas de pastille de fond : les pictos iso ont leur propre matière. */
   .nav-dd__media--img {
     width: 2.3rem;
     padding: 0.15rem;
+    background: none;
   }
 
   .nav-dd__media--img :global(.nav-dd__icon) {
