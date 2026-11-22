@@ -216,6 +216,8 @@ const jsonLd = [{
   {/* ── Thème « Signature » : landing produit (visible uniquement sous
       data-theme='signature', masquée via theme-signature.css) ── */}
   <div class="signature-home">
+    <GateScene />
+
     <section class="sig-hero">
       <div class="container sig-hero__grid">
         <div class="sig-hero__content">
@@ -257,8 +259,6 @@ const jsonLd = [{
         ))}
       </div>
     </section>
-
-    <GateScene />
 
     <section class="sig-activities container" id="activites">
       <h2 class="sig-title">{signature.activitiesTitle}</h2>
