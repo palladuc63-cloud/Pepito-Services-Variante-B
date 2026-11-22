@@ -1,5 +1,6 @@
 ---
 import gatePoster from '../assets/gate/gate-poster.webp';
+import logo from '../assets/pepito-logo.svg';
 const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
 ---
 
@@ -21,6 +22,11 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
       alt="Portail battant aluminium anthracite posé par Pépito Services"
       loading="lazy"
     />
+    <div class="gate-scene__welcome">
+      <img src={logo.src} alt="Pépito Services" />
+      <h2>Bienvenue chez Pépito Services</h2>
+      <p>Une entreprise artisanale au service de vos projets extérieurs.</p>
+    </div>
   </div>
 </section>
 
@@ -76,6 +82,41 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
   .gate-scene--fallback .gate-scene__fallback {
     display: block;
   }
+  .gate-scene__welcome {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.7rem, 1.8vh, 1.1rem);
+    padding: 0 1.5rem;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  .gate-scene__welcome img {
+    height: clamp(3.2rem, 9vh, 5.5rem);
+    width: auto;
+    filter: drop-shadow(0 2px 20px rgb(255 255 255 / 0.75));
+  }
+  .gate-scene__welcome h2 {
+    font-family: var(--font-display, Montserrat, sans-serif);
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #24282c;
+    margin: 0;
+    text-shadow: 0 1px 18px rgb(255 255 255 / 0.75);
+  }
+  .gate-scene__welcome p {
+    font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+    color: #3f454a;
+    margin: 0;
+    text-shadow: 0 1px 14px rgb(255 255 255 / 0.7);
+  }
   @media (max-width: 900px) {
     .gate-scene {
       height: 260vh;
@@ -86,6 +127,7 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
 <script>
   const gateScene = document.querySelector<HTMLElement>('.gate-scene');
   const video = gateScene?.querySelector<HTMLVideoElement>('video');
+  const welcome = gateScene?.querySelector<HTMLElement>('.gate-scene__welcome');
 
   if (gateScene && video) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -105,6 +147,13 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
         // quasi instantanés mais on évite le travail inutile.
         if (Math.abs(video.currentTime - t) > 0.033) video.currentTime = t;
       }
+      if (welcome) {
+        // Le logo + le message apparaissent dans l'ouverture des vantaux.
+        const w = clamp01((target - 0.45) / 0.35);
+        const ws = w * w * (3 - 2 * w);
+        welcome.style.opacity = String(ws);
+        welcome.style.transform = `translateY(${(1 - ws) * 24}px)`;
+      }
     };
 
     const onScroll = () => {
@@ -118,6 +167,7 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
       video.addEventListener('loadedmetadata', () => {
         video.currentTime = video.duration * 0.5;
       });
+      if (welcome) welcome.style.opacity = '1';
     } else {
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();
