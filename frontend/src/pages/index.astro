@@ -336,12 +336,12 @@ const jsonLd = [{
 
   <script>
     // Pictos des activités roulant le long de la courbe concave du hero
-    // Signature. Positions calculées sur l'ellipse RÉELLE du ::after en
-    // transform fractionnaire : chaque item est un calque GPU
-    // (will-change) dont la texture — texte compris — glisse sans
-    // re-rasterisation. Le fondu entrée/sortie est posé en opacity par
-    // item : un mask-image sur le conteneur forçait le navigateur à
-    // repeindre tout le groupe à chaque frame → sautillement.
+    // Signature. L'ellipse RÉELLE du ::after est échantillonnée en 49
+    // keyframes (transform + opacity) joués par element.animate() :
+    // animation DÉCLARATIVE → compositée GPU, y compris dans Firefox où
+    // le JS par frame ne l'est jamais (cause des saccades). Le fondu
+    // entrée/sortie est en opacity par item — pas de mask-image sur le
+    // conteneur, qui forçait le repaint du groupe à chaque frame.
     const sigHero = document.querySelector('.sig-hero');
     const sigOrbit = sigHero?.querySelector('.sig-hero__orbit');
     if (sigHero && sigOrbit) {
@@ -350,8 +350,11 @@ const jsonLd = [{
       const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
       const SPEED = 0.028; // fraction de la largeur du hero parcourue / s
       const SPAN = 1.25; // amplitude de la boucle (× largeur du hero)
-      let W = 0, cx = 0, cy = 0, rx = 1, ry = 1, offset = 0;
-      let raf = 0, last = 0, dragging = false, dragX = 0;
+      const KEYS = 48; // points du chemin précalculé
+      let W = 0, cx = 0, cy = 0, rx = 1, ry = 1;
+      let T = 45000, range = 0;
+      let dragPx = 0, dragging = false, dragX = 0;
+      let anims: Animation[] = [];
       let dims: { w: number; h: number }[] = [];
 
       // Géométrie de l'ellipse ::after : son bord supérieur forme l'arc
@@ -364,6 +367,8 @@ const jsonLd = [{
         ry = parseFloat(cs.height) / 2;
         cx = parseFloat(cs.left) + rx;
         cy = parseFloat(cs.top) + ry;
+        range = SPAN * W;
+        T = (range / (SPEED * W)) * 1000;
         // Le picto est carré (aspect-ratio: 1) : sa hauteur vaut sa largeur.
         dims = icons.map((item) => {
           const w = item.offsetWidth;
@@ -377,74 +382,112 @@ const jsonLd = [{
         return cy - ry * Math.sqrt(Math.max(0, 1 - t * t));
       };
 
-      // Fondu d'entrée (à droite) / sortie (à gauche), en remplacement
-      // du mask-image sur le conteneur.
+      // Fondu d'entrée (à droite) / sortie (à gauche).
       const fade = (sx: number) => {
         const fin = Math.min(1, (sx + 0.02 * W) / (0.14 * W));
         const fout = Math.min(1, (W - sx) / (0.12 * W));
         return Math.max(0, Math.min(fin, fout));
       };
 
-      const paint = () => {
-        const range = SPAN * W;
-        const spacing = range / icons.length;
+      // Transform de l'item à l'abscisse sx : base du picto légèrement
+      // sous l'arc (~85 % de sa hauteur chevauche la photo), le libellé
+      // flotte sous la courbe.
+      const place = (item: HTMLElement, d: { w: number; h: number }, sx: number) => {
+        item.style.transform = `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
+          arcY(sx) - d.h * 0.85
+        ).toFixed(2)}px, 0)`;
+        item.style.opacity = fade(sx).toFixed(3);
+      };
+
+      // Progression 0→1 = droite → gauche. Items tous de même taille :
+      // un seul tableau de keyframes partagé.
+      const buildFrames = (d: { w: number; h: number }) => {
+        const frames: Keyframe[] = [];
+        for (let k = 0; k <= KEYS; k++) {
+          const sx = (1 - k / KEYS) * range - 0.1 * W;
+          frames.push({
+            transform: `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
+              arcY(sx) - d.h * 0.85
+            ).toFixed(2)}px, 0)`,
+            opacity: fade(sx).toFixed(3),
+          });
+        }
+        return frames;
+      };
+
+      // Délai de l'item i : déphasage régulier + décalage du drag,
+      // replié dans (-T, 0] pour rester négatif (boucle continue).
+      const delayOf = (i: number) => {
+        const raw = (-i * T) / icons.length + (dragPx * T) / range;
+        return ((raw % T) + T) % T - T;
+      };
+
+      const apply = () => {
+        anims.forEach((a) => a.cancel());
+        anims = [];
+        if (mqReduced.matches) {
+          // Reduced motion : pictos répartis statiquement sur l'arc.
+          const spacing = range / icons.length;
+          icons.forEach((item, i) => {
+            let sx = ((i * spacing + dragPx) % range + range) % range - 0.1 * W;
+            place(item, dims[i] ?? { w: 0, h: 0 }, sx);
+          });
+          return;
+        }
+        const frames = buildFrames(dims[0] ?? { w: 0, h: 0 });
         icons.forEach((item, i) => {
-          let x = (i * spacing + offset) % range;
-          if (x < 0) x += range;
-          const sx = x - 0.1 * W;
-          // Base du picto légèrement sous l'arc : il chevauche la photo
-          // de ~85 % de sa hauteur ; le libellé flotte sous la courbe.
-          // Positions fractionnaires : l'item est composité GPU
-          // (will-change) → la texture se déplace sans re-rasterisation
-          // du texte. L'arrondi au pixel rendait le mouvement saccadé.
-          const d = dims[i] ?? { w: 0, h: 0 };
-          item.style.transform = `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
-            arcY(sx) - d.h * 0.85
-          ).toFixed(2)}px, 0)`;
-          item.style.opacity = fade(sx).toFixed(3);
+          anims.push(
+            item.animate(frames, {
+              duration: T,
+              iterations: Infinity,
+              delay: delayOf(i),
+            })
+          );
         });
       };
 
-      const tick = (t: number) => {
-        raf = requestAnimationFrame(tick);
-        const dt = Math.min(0.05, last ? (t - last) / 1000 : 0);
-        last = t;
-        if (!dragging) offset -= SPEED * W * dt;
-        paint();
-      };
-
       const update = () => {
-        cancelAnimationFrame(raf);
-        raf = 0;
         if (!mqDesktop.matches) {
+          anims.forEach((a) => a.cancel());
+          anims = [];
           sigOrbit.classList.remove('is-running');
           return;
         }
         sigOrbit.classList.add('is-running');
         measure();
-        last = 0;
-        // Reduced motion : les pictos restent répartis statiquement sur
-        // l'arc au lieu de défiler.
-        if (!mqReduced.matches) raf = requestAnimationFrame(tick);
-        else paint();
+        apply();
       };
 
-      // Drag : clic maintenu sur un picto → on tire le convoi à gauche ou
-      // à droite ; le défilement auto reprend au relâchement.
+      // Drag : clic maintenu → pause des animations + décalage du
+      // currentTime de chaque item ; le défilement reprend au relâchement
+      // depuis la position tirée.
       sigOrbit.addEventListener('pointerdown', (e) => {
         dragging = true;
         dragX = (e as PointerEvent).clientX;
+        anims.forEach((a) => a.pause());
         sigOrbit.classList.add('is-dragging');
         e.preventDefault(); // empêche le drag natif de l'image
       });
       window.addEventListener('pointermove', (e) => {
         if (!dragging) return;
-        offset += e.clientX - dragX;
+        const dx = e.clientX - dragX;
         dragX = e.clientX;
-        paint(); // utile aussi en reduced-motion où le rAF ne tourne pas
+        dragPx += dx;
+        const dms = (dx * T) / range; // px → ms sur la timeline
+        anims.forEach((a) => {
+          a.currentTime = (((Number(a.currentTime) || 0) - dms) % T + T) % T;
+        });
+        if (mqReduced.matches) {
+          const spacing = range / icons.length;
+          icons.forEach((item, i) => {
+            let sx = (((i * spacing + dragPx) % range) + range) % range - 0.1 * W;
+            place(item, dims[i] ?? { w: 0, h: 0 }, sx);
+          });
+        }
       });
       const endDrag = () => {
         dragging = false;
+        anims.forEach((a) => a.play());
         sigOrbit.classList.remove('is-dragging');
       };
       window.addEventListener('pointerup', endDrag);
@@ -455,7 +498,7 @@ const jsonLd = [{
       window.addEventListener('resize', () => {
         if (!mqDesktop.matches) return;
         measure();
-        if (mqReduced.matches) paint();
+        apply();
       });
       update();
     }
