@@ -69,6 +69,22 @@
   isolation: isolate;
 }
 
+/* Grande courbe concave sous le hero (signature de la maquette) :
+   immense ellipse couleur fond dont le bord supérieur découpe le bas
+   du pan gris et de la photo — apex vers le bord droit. */
+.sig-hero::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -70%;
+  top: 55%;
+  width: 300%;
+  height: 500%;
+  background: var(--paper);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
 /* Large bande diagonale gris clair derrière le visuel (signature de la
    maquette) : bords parallèles à ceux de la photo (même pente −20 %),
    décalés à gauche → une bande grise reste visible le long de l'image. */
