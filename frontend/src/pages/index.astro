@@ -384,11 +384,14 @@ const jsonLd = [{
         return cy - ry * Math.sqrt(Math.max(0, 1 - t * t));
       };
 
-      // Fondu d'entrée (à droite) / sortie (à gauche).
+      // Fondus en smoothstep. Sortie à gauche : longue dissolution sur
+      // ~30 % de la largeur, nulle dès que le picto approche le bord —
+      // il ne touche jamais la coupure overflow du hero encore visible.
+      const smooth = (t: number) => t * t * (3 - 2 * t);
       const fade = (sx: number) => {
-        const fin = Math.min(1, (sx + 0.02 * W) / (0.14 * W));
-        const fout = Math.min(1, (W - sx) / (0.12 * W));
-        return Math.max(0, Math.min(fin, fout));
+        const foutLeft = smooth(Math.min(1, Math.max(0, (sx - 0.05 * W) / (0.3 * W))));
+        const finRight = smooth(Math.min(1, Math.max(0, (W - sx) / (0.12 * W))));
+        return Math.min(foutLeft, finRight);
       };
 
       // Transform de l'item à l'abscisse sx : base du picto légèrement
