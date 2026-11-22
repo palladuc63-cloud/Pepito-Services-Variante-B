@@ -247,6 +247,13 @@ const jsonLd = [{
           )}
         </div>
       </div>
+      {/* Pictos des activités circulant le long de la courbe du bas, en
+          léger surplomb du diaporama (positionnés par JS, desktop ≥900px) */}
+      <div class="sig-hero__orbit" aria-hidden="true">
+        {signature.activities.map((a) => (
+          <img src={a.img.src} alt="" loading="lazy" />
+        ))}
+      </div>
     </section>
 
     <section class="sig-activities container" id="activites">
@@ -323,6 +330,90 @@ const jsonLd = [{
       </div>
     </section>
   </div>
+
+  <script>
+    // Pictos des activités roulant le long de la courbe concave du hero
+    // Signature. Les positions sont calculées sur l'ellipse RÉELLE du
+    // pseudo-élément ::after (relue via getComputedStyle) → les pictos
+    // suivent exactement la géométrie CSS, même si elle est retouchée.
+    const sigHero = document.querySelector('.sig-hero');
+    const sigOrbit = sigHero?.querySelector('.sig-hero__orbit');
+    if (sigHero && sigOrbit) {
+      const icons = Array.from(sigOrbit.querySelectorAll('img'));
+      const mqDesktop = window.matchMedia('(min-width: 900px)');
+      const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const SPEED = 0.028; // fraction de la largeur du hero parcourue / s
+      const SPAN = 1.25; // amplitude de la boucle (× largeur du hero)
+      let W = 0, cx = 0, cy = 0, rx = 1, ry = 1, offset = 0;
+      let raf = 0, last = 0;
+
+      // Géométrie de l'ellipse ::after : son bord supérieur forme l'arc
+      // visible sous le hero.
+      const measure = () => {
+        const cs = getComputedStyle(sigHero, '::after');
+        W = sigHero.clientWidth;
+        rx = parseFloat(cs.width) / 2;
+        ry = parseFloat(cs.height) / 2;
+        cx = parseFloat(cs.left) + rx;
+        cy = parseFloat(cs.top) + ry;
+      };
+
+      // Ordonnée du bord supérieur de l'ellipse à l'abscisse x.
+      const arcY = (x: number) => {
+        const t = (x - cx) / rx;
+        return cy - ry * Math.sqrt(Math.max(0, 1 - t * t));
+      };
+
+      const paint = () => {
+        const range = SPAN * W;
+        const spacing = range / icons.length;
+        icons.forEach((img, i) => {
+          let x = (i * spacing + offset) % range;
+          if (x < 0) x += range;
+          const sx = x - 0.1 * W;
+          // Base du picto légèrement sous l'arc : il chevauche la photo
+          // de ~80 % de sa hauteur, comme posé sur la courbe.
+          img.style.transform = `translate(${sx - img.offsetWidth / 2}px, ${
+            arcY(sx) - img.offsetHeight * 0.82
+          }px)`;
+        });
+      };
+
+      const tick = (t: number) => {
+        raf = requestAnimationFrame(tick);
+        const dt = Math.min(0.05, last ? (t - last) / 1000 : 0);
+        last = t;
+        // Pause quand on survole un picto (pointer-events: auto sur img).
+        if (!sigOrbit.matches(':hover')) offset -= SPEED * W * dt;
+        paint();
+      };
+
+      const update = () => {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        if (!mqDesktop.matches) {
+          sigOrbit.classList.remove('is-running');
+          return;
+        }
+        sigOrbit.classList.add('is-running');
+        measure();
+        last = 0;
+        // Reduced motion : les pictos restent répartis statiquement sur
+        // l'arc au lieu de défiler.
+        if (!mqReduced.matches) raf = requestAnimationFrame(tick);
+        else paint();
+      };
+
+      mqDesktop.addEventListener('change', update);
+      mqReduced.addEventListener('change', update);
+      window.addEventListener('resize', () => {
+        if (!mqDesktop.matches) return;
+        measure();
+        if (mqReduced.matches) paint();
+      });
+      update();
+    }
+  </script>
 </MainLayout>
 
 <style>
