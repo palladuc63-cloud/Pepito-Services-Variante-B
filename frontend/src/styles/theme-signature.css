@@ -81,7 +81,7 @@
   top: 70%;
   width: 380%;
   height: 500%;
-  background: var(--paper);
+  background: transparent;
   border-radius: 50%;
   pointer-events: none;
 }
@@ -96,6 +96,17 @@
   z-index: -1;
   background: var(--paper-deep);
   clip-path: polygon(46% 0, 100% 0, 100% 100%, 26% 100%);
+}
+
+@media (min-width: 900px) {
+  .sig-hero::before {
+    -webkit-mask-image: radial-gradient(
+      ellipse 190% 250% at 90% 320%,
+      transparent 99.6%,
+      #000 100%
+    );
+    mask-image: radial-gradient(ellipse 190% 250% at 90% 320%, transparent 99.6%, #000 100%);
+  }
 }
 
 .sig-hero__grid {
@@ -234,6 +245,12 @@
     position: absolute;
     inset: 0;
     z-index: -1;
+    -webkit-mask-image: radial-gradient(
+      ellipse 190% 250% at 90% 320%,
+      transparent 99.6%,
+      #000 100%
+    );
+    mask-image: radial-gradient(ellipse 190% 250% at 90% 320%, transparent 99.6%, #000 100%);
   }
 
   .sig-hero__photo {
