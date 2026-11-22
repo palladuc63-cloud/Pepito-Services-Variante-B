@@ -252,7 +252,7 @@ const jsonLd = [{
       <div class="sig-hero__orbit" aria-hidden="true">
         {signature.activities.map((a) => (
           <span class="sig-hero__orbit-item">
-            <img src={a.img.src} alt="" loading="lazy" />
+            <img src={a.img.src} alt="" loading="eager" />
             <span class="sig-hero__orbit-label">{a.label}</span>
           </span>
         ))}
@@ -349,9 +349,11 @@ const jsonLd = [{
       const SPAN = 1.25; // amplitude de la boucle (× largeur du hero)
       let W = 0, cx = 0, cy = 0, rx = 1, ry = 1, offset = 0;
       let raf = 0, last = 0, dragging = false, dragX = 0;
+      let dims: { w: number; h: number }[] = [];
 
       // Géométrie de l'ellipse ::after : son bord supérieur forme l'arc
-      // visible sous le hero.
+      // visible sous le hero. Dimensions des items mises en cache ici
+      // (relues au resize) pour ne pas forcer de layout à chaque frame.
       const measure = () => {
         const cs = getComputedStyle(sigHero, '::after');
         W = sigHero.clientWidth;
@@ -359,6 +361,11 @@ const jsonLd = [{
         ry = parseFloat(cs.height) / 2;
         cx = parseFloat(cs.left) + rx;
         cy = parseFloat(cs.top) + ry;
+        // Le picto est carré (aspect-ratio: 1) : sa hauteur vaut sa largeur.
+        dims = icons.map((item) => {
+          const w = item.offsetWidth;
+          return { w, h: w };
+        });
       };
 
       // Ordonnée du bord supérieur de l'ellipse à l'abscisse x.
@@ -376,10 +383,11 @@ const jsonLd = [{
           const sx = x - 0.1 * W;
           // Base du picto légèrement sous l'arc : il chevauche la photo
           // de ~85 % de sa hauteur ; le libellé flotte sous la courbe.
-          const ih = item.querySelector('img')?.offsetHeight ?? item.offsetHeight;
-          item.style.transform = `translate(${sx - item.offsetWidth / 2}px, ${
-            arcY(sx) - ih * 0.85
-          }px)`;
+          // translate3d : la transform reste compositée GPU (fluidité).
+          const d = dims[i] ?? { w: 0, h: 0 };
+          item.style.transform = `translate3d(${sx - d.w / 2}px, ${
+            arcY(sx) - d.h * 0.85
+          }px, 0)`;
         });
       };
 
@@ -387,9 +395,10 @@ const jsonLd = [{
         raf = requestAnimationFrame(tick);
         const dt = Math.min(0.05, last ? (t - last) / 1000 : 0);
         last = t;
-        // Pause quand on survole un picto (pointer-events: auto sur les
-        // items) ou quand on est en train de les tirer.
-        if (!dragging && !sigOrbit.matches(':hover')) offset -= SPEED * W * dt;
+        // Pas de pause au survol : un picto glissant sous le curseur
+        // immobile figeait le convoi → effet « sautillement ». Le drag
+        // reste le seul contrôle manuel.
+        if (!dragging) offset -= SPEED * W * dt;
         paint();
       };
 
