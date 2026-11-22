@@ -82,6 +82,11 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     margin: 0;
     text-shadow: 0 1px 12px rgba(255, 255, 255, 0.6);
   }
+  @media (min-width: 901px) {
+    .gate-scene__video {
+      object-fit: contain;
+    }
+  }
   @media (max-width: 900px) {
     .gate-scene {
       height: 260vh;
