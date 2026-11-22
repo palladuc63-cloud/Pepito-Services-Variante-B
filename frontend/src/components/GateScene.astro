@@ -148,10 +148,9 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
         if (Math.abs(video.currentTime - t) > 0.033) video.currentTime = t;
       }
       // Fade-in piloté par l'entrée de la section dans le viewport (visT,
-      // calculé dans onScroll) : la vidéo apparaît dès qu'elle pointe sous
-      // le hero et est pleinement visible à ~80 % de remontée — juste avant
-      // l'épinglage, compromis entre anticipation et progression.
-      const fin = clamp01(visT / 0.8);
+      // calculé dans onScroll) : le fondu ne démarre qu'à ~30 % de remontée
+      // et se termine à ~95 %, quasiment à l'épinglage.
+      const fin = clamp01((visT - 0.3) / 0.65);
       video.style.opacity = String(fin * fin * (3 - 2 * fin));
       if (welcome) {
         // Le logo + le message apparaissent dans l'ouverture des vantaux.
