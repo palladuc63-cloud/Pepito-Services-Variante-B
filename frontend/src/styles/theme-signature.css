@@ -220,6 +220,7 @@
 
 .sig-activities {
   padding-block: clamp(2.5rem, 5vw, 4rem) clamp(1.5rem, 3vw, 2.5rem);
+  scroll-margin-top: 5.5rem;
 }
 
 .sig-activities__row {
