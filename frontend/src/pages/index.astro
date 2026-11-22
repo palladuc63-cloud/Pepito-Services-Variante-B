@@ -422,7 +422,7 @@ const jsonLd = [{
       // Délai de l'item i : déphasage régulier + décalage du drag,
       // replié dans (-T, 0] pour rester négatif (boucle continue).
       const delayOf = (i: number) => {
-        const raw = (-i * T) / icons.length + (dragPx * T) / range;
+        const raw = (-i * T) / icons.length - (dragPx * T) / range;
         return ((raw % T) + T) % T - T;
       };
 
@@ -479,7 +479,7 @@ const jsonLd = [{
         dragPx += dx;
         const dms = (dx * T) / range; // px → ms sur la timeline
         anims.forEach((a) => {
-          a.currentTime = (((Number(a.currentTime) || 0) - dms) % T + T) % T;
+          a.currentTime = (((Number(a.currentTime) || 0) + dms) % T + T) % T;
         });
         if (mqReduced.matches) {
           const spacing = range / icons.length;
