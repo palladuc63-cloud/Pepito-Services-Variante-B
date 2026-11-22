@@ -62,9 +62,10 @@
   --shadow-md: 0 6px 14px -4px rgb(70 50 20 / 0.12);
   --shadow-lg: 0 20px 32px -12px rgb(70 50 20 / 0.22);
 
-  /* Décors : aucun motif dans ce thème */
+  /* Décors : grain film appliqué sur les fonds clairs de tout le site
+     (body + .section-cream) — speckles noirs feTurbulence, ~12 % max. */
   --deco: none;
-  --grain-img: none;
+  --grain-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   --cta-img: radial-gradient(circle at 15% 0%, rgb(255 255 255 / 0.07), transparent 55%);
 
   /* Étiquette de catégorie (pastille douce) */
@@ -152,7 +153,6 @@
   --shadow-lg: 0 18px 36px -16px rgb(28 45 28 / 0.3);
 
   --deco: none;
-  --grain-img: none;
   --cta-img: none;
 
   --tag-bg: var(--paper);
@@ -222,7 +222,6 @@
   --shadow-lg: none;
 
   --deco: none;
-  --grain-img: none;
   --cta-img: none;
 
   --tag-bg: transparent;
@@ -298,7 +297,6 @@
   --shadow-lg: 0 24px 40px -16px rgb(20 40 22 / 0.25);
 
   --deco: none;
-  --grain-img: none;
   --cta-img: none;
 
   --tag-bg: var(--forest-soft);
