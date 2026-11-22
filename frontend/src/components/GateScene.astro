@@ -107,11 +107,18 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     opacity: 0;
     pointer-events: none;
     will-change: opacity, transform;
+    // Halo blanc centré sur le bloc : détache le logo du fond vidéo.
+    background: radial-gradient(
+      ellipse 52% 46% at 50% 40%,
+      rgb(255 255 255 / 0.72),
+      rgb(255 255 255 / 0.35) 55%,
+      transparent 80%
+    );
   }
   .gate-scene__welcome img {
     height: clamp(6.4rem, 18vh, 11rem);
     width: auto;
-    filter: drop-shadow(0 2px 20px rgb(255 255 255 / 0.75));
+    filter: drop-shadow(0 2px 26px rgb(255 255 255 / 0.9));
   }
   .gate-scene__welcome p {
     font-size: clamp(0.9rem, 1.4vw, 1.05rem);
