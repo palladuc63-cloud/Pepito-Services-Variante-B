@@ -72,21 +72,6 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
       #000 100%
     );
   }
-  /* Voile léger en bas de l'image : l'allée s'estompe doucement dans la
-     couleur de fond sans masquer la vidéo (contrairement au masque). */
-  .gate-scene__sticky::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background: linear-gradient(
-      to bottom,
-      transparent 62%,
-      color-mix(in srgb, var(--paper, #eeece6) 45%, transparent) 82%,
-      color-mix(in srgb, var(--paper, #eeece6) 75%, transparent) 100%
-    );
-  }
   .gate-scene__fallback {
     display: none;
   }
