@@ -383,14 +383,14 @@ const jsonLd = [{
         return cy - ry * Math.sqrt(Math.max(0, 1 - t * t));
       };
 
-      // Fondus en smoothstep. Sortie à gauche : longue dissolution sur
-      // ~30 % de la largeur, nulle dès que le picto approche le bord —
-      // il ne touche jamais la coupure overflow du hero encore visible.
+      // Fondus en smoothstep. Sens gauche → droite : sortie à droite en
+      // longue dissolution sur ~30 % de la largeur, nulle dès que le
+      // picto approche le bord — aucune coupure nette à l'overflow.
       const smooth = (t: number) => t * t * (3 - 2 * t);
       const fade = (sx: number) => {
-        const foutLeft = smooth(Math.min(1, Math.max(0, (sx - 0.05 * W) / (0.3 * W))));
-        const finRight = smooth(Math.min(1, Math.max(0, (W - sx) / (0.12 * W))));
-        return Math.min(foutLeft, finRight);
+        const finLeft = smooth(Math.min(1, Math.max(0, (sx + 0.02 * W) / (0.12 * W))));
+        const foutRight = smooth(Math.min(1, Math.max(0, (0.95 * W - sx) / (0.3 * W))));
+        return Math.min(finLeft, foutRight);
       };
 
       // Transform de l'item à l'abscisse sx : base du picto légèrement
@@ -403,12 +403,12 @@ const jsonLd = [{
         item.style.opacity = fade(sx).toFixed(3);
       };
 
-      // Progression 0→1 = droite → gauche. Items tous de même taille :
+      // Progression 0→1 = gauche → droite. Items tous de même taille :
       // un seul tableau de keyframes partagé.
       const buildFrames = (d: { w: number; h: number }) => {
         const frames: Keyframe[] = [];
         for (let k = 0; k <= KEYS; k++) {
-          const sx = (1 - k / KEYS) * range - 0.1 * W;
+          const sx = (k / KEYS) * range - 0.1 * W;
           frames.push({
             transform: `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
               arcY(sx) - d.h * 0.85
