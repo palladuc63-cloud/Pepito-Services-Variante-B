@@ -1,14 +1,23 @@
 ---
-import gatePlate from '../assets/gate/gate-plate.webp';
-import gatePhoto from '../assets/gate/portail-reference.webp';
+import gatePoster from '../assets/gate/gate-poster.webp';
+const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
 ---
 
 <section class="gate-scene" aria-label="Portail battant aluminium sur mesure">
   <div class="gate-scene__sticky">
-    <div class="gate-scene__canvas" data-plate={gatePlate.src}></div>
+    <video
+      class="gate-scene__video"
+      src={videoSrc}
+      poster={gatePoster.src}
+      muted
+      playsinline
+      preload="auto"
+      disablepictureinpicture
+      aria-hidden="true"
+    ></video>
     <img
       class="gate-scene__fallback"
-      src={gatePhoto.src}
+      src={gatePoster.src}
       alt="Portail battant aluminium anthracite posé par Pépito Services"
       loading="lazy"
     />
@@ -31,16 +40,15 @@ import gatePhoto from '../assets/gate/portail-reference.webp';
     overflow: hidden;
     background: var(--paper, #eeece6);
   }
-  .gate-scene__canvas {
+  .gate-scene__video,
+  .gate-scene__fallback {
     position: absolute;
     inset: 0;
-  }
-  .gate-scene__canvas canvas {
-    display: block;
     width: 100%;
     height: 100%;
+    object-fit: cover;
   }
-  .gate-scene__canvas,
+  .gate-scene__video,
   .gate-scene__fallback {
     -webkit-mask-image: linear-gradient(
       to bottom,
@@ -53,11 +61,6 @@ import gatePhoto from '../assets/gate/portail-reference.webp';
   }
   .gate-scene__fallback {
     display: none;
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
   }
   .gate-scene--fallback .gate-scene__fallback {
     display: block;
@@ -77,6 +80,7 @@ import gatePhoto from '../assets/gate/portail-reference.webp';
     letter-spacing: 0.14em;
     text-transform: uppercase;
     margin: 0;
+    text-shadow: 0 1px 12px rgba(255, 255, 255, 0.6);
   }
   @media (max-width: 900px) {
     .gate-scene {
@@ -87,151 +91,44 @@ import gatePhoto from '../assets/gate/portail-reference.webp';
 
 <script>
   const gateScene = document.querySelector<HTMLElement>('.gate-scene');
-  const canvasHost = gateScene?.querySelector<HTMLElement>('.gate-scene__canvas');
+  const video = gateScene?.querySelector<HTMLVideoElement>('video');
   const caption = gateScene?.querySelector<HTMLElement>('.gate-scene__caption');
 
-  if (gateScene && canvasHost) {
+  if (gateScene && video) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const showFallback = () => gateScene.classList.add('gate-scene--fallback');
+    const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          io.disconnect();
-          void boot();
-        }
-      },
-      { rootMargin: '600px' }
-    );
-    io.observe(gateScene);
+    video.addEventListener('error', () => gateScene.classList.add('gate-scene--fallback'));
 
-    async function boot() {
-      try {
-        const THREE = await import('three');
-        init(THREE);
-      } catch {
-        showFallback();
+    let target = 0;
+    let raf = 0;
+
+    const tick = () => {
+      raf = 0;
+      if (video.readyState >= 2 && video.duration > 0) {
+        const t = target * video.duration;
+        // Seek uniquement si l'écart dépasse ~1 frame : la vidéo est
+        // encodée avec une keyframe tous les 6 frames, les seeks sont
+        // quasi instantanés mais on évite le travail inutile.
+        if (Math.abs(video.currentTime - t) > 0.033) video.currentTime = t;
       }
-    }
-
-    const init = (THREE: typeof import('three')) => {
-      let renderer: InstanceType<typeof THREE.WebGLRenderer>;
-      try {
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-      } catch {
-        showFallback();
-        return;
-      }
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      canvasHost.appendChild(renderer.domElement);
-
-      // La scène vit dans l'espace pixel de la photo (1024x571) :
-      // la plaque (photo sans vantaux) est le fond, les deux vantaux
-      // sont des plans colorés pivotant sur leurs gonds.
-      const IMG_W = 1024;
-      const IMG_H = 571;
-
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xdfe4e6);
-
-      const camera = new THREE.OrthographicCamera(0, 1, 0, 1, 0.1, 2000);
-      camera.position.z = 500;
-
-      // Lumière : comme sur la photo (soleil haut devant à gauche).
-      scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-      const sun = new THREE.DirectionalLight(0xfff4e4, 1.9);
-      sun.position.set(-0.35, -0.9, 1).normalize();
-      scene.add(sun);
-
-      // Vantaux — anthracite RAL 7016, pivot au bord côté gonds.
-      const anthracite = new THREE.MeshLambertMaterial({ color: 0x353b3f });
-      const gateGroup = new THREE.Group();
-      scene.add(gateGroup);
-
-      const GAP_L = 160; // bord intérieur pilier gauche (px image)
-      const GAP_R = 870; // bord intérieur pilier droit
-      const PANEL_W = (GAP_R - GAP_L) / 2; // 355
-      const PANEL_H = 330;
-      const PANEL_Y = 278; // centre vertical des vantaux
-
-      const geoL = new THREE.BoxGeometry(PANEL_W, PANEL_H, 6);
-      geoL.translate(PANEL_W / 2, 0, 0);
-      const geoR = new THREE.BoxGeometry(PANEL_W, PANEL_H, 6);
-      geoR.translate(-PANEL_W / 2, 0, 0);
-
-      const hingeL = new THREE.Group();
-      hingeL.position.set(GAP_L, PANEL_Y, 0);
-      hingeL.add(new THREE.Mesh(geoL, anthracite));
-      const hingeR = new THREE.Group();
-      hingeR.position.set(GAP_R, PANEL_Y, 0);
-      hingeR.add(new THREE.Mesh(geoR, anthracite));
-      gateGroup.add(hingeL, hingeR);
-
-      const render = () => renderer.render(scene, camera);
-
-      let bgTex: InstanceType<typeof THREE.Texture> | null = null;
-      new THREE.TextureLoader().load(canvasHost.dataset.plate ?? '', (t) => {
-        t.colorSpace = THREE.SRGBColorSpace;
-        bgTex = t;
-        scene.background = t;
-        onResize();
-      });
-
-      const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
-      const smooth = (t: number) => t * t * (3 - 2 * t);
-
-      const update = (p: number) => {
-        const open = smooth(clamp01((p - 0.15) / 0.85));
-        const angle = open * 1.0; // ~57°, comme sur la photo
-        hingeL.rotation.y = angle;
-        hingeR.rotation.y = -angle;
-        // Léger glissement latéral des vantaux vs le fond = parallaxe.
-        gateGroup.position.x = (window.innerWidth - IMG_W * gateGroup.scale.x) / 2 + (p - 0.5) * 14;
-        if (caption) caption.style.opacity = String(Math.max(0, 1 - p * 4));
-        render();
-      };
-
-      const onScroll = () => {
-        const rect = gateScene.getBoundingClientRect();
-        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-        update(clamp01(-rect.top / (rect.height - window.innerHeight)));
-      };
-
-      const onResize = () => {
-        const w = canvasHost.clientWidth;
-        const h = canvasHost.clientHeight;
-        if (!w || !h) return;
-        renderer.setSize(w, h, false);
-        camera.right = w;
-        camera.bottom = h;
-        camera.updateProjectionMatrix();
-
-        // Mise à l'échelle « cover » : la photo remplit l'écran.
-        const s = Math.max(w / IMG_W, h / IMG_H);
-        gateGroup.scale.set(s, s, 1);
-        gateGroup.position.set((w - IMG_W * s) / 2, (h - IMG_H * s) / 2, 0);
-
-        if (bgTex) {
-          const fracX = Math.min(1, w / (IMG_W * s));
-          const fracY = Math.min(1, h / (IMG_H * s));
-          bgTex.repeat.set(fracX, fracY);
-          bgTex.offset.set((1 - fracX) / 2, (1 - fracY) / 2);
-        }
-        render();
-      };
-
-      new ResizeObserver(() => {
-        onResize();
-        onScroll();
-      }).observe(canvasHost);
-      onResize();
-
-      if (reduced) {
-        update(0.55);
-      } else {
-        window.addEventListener('scroll', onScroll, { passive: true });
-        onScroll();
-      }
+      if (caption) caption.style.opacity = String(Math.max(0, 1 - target * 4));
     };
+
+    const onScroll = () => {
+      const rect = gateScene.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+      target = clamp01(-rect.top / (rect.height - window.innerHeight));
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
+    if (reduced) {
+      video.addEventListener('loadedmetadata', () => {
+        video.currentTime = video.duration * 0.5;
+      });
+    } else {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
   }
 </script>
