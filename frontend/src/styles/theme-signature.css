@@ -109,6 +109,27 @@
   }
 }
 
+/* Voile couleur page au-dessus de la vidéo glissée sous le hero :
+   opaque partout sauf sous l'arc — le portail n'est visible que
+   sous la courbe, jamais au-dessus. */
+.sig-hero__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--paper);
+  pointer-events: none;
+}
+@media (min-width: 900px) {
+  .sig-hero__veil {
+    -webkit-mask-image: radial-gradient(
+      ellipse 190% 250% at 90% 320%,
+      transparent 99.6%,
+      #000 100%
+    );
+    mask-image: radial-gradient(ellipse 190% 250% at 90% 320%, transparent 99.6%, #000 100%);
+  }
+}
+
 .sig-hero__grid {
   display: grid;
   gap: 2.5rem;
