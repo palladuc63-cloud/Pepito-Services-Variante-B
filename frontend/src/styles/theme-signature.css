@@ -536,6 +536,35 @@
   color: var(--stone);
 }
 
+/* ═══ Ligne de progression scrollée ═══
+   Trait épais qui descend le bord gauche de l'écran pendant les
+   arguments, vire à 90° au niveau du ruban et le « devient » : les
+   chevrons sont révélés de gauche à droite au passage de la pointe
+   (clip-path piloté en JS, couleur identique → le trait se fond dans
+   les chevrons). Overlay SVG sans viewBox : 1 unité = 1 px. */
+
+.sig-scrollpath {
+  position: relative;
+}
+
+.sig-scrollpath__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+}
+
+.sig-scrollpath__path {
+  fill: none;
+  stroke: var(--basalt);
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 /* ═══ Dernières installations ═══ */
 
 .sig-installs {
