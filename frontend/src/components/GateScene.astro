@@ -135,6 +135,7 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     video.addEventListener('error', () => gateScene.classList.add('gate-scene--fallback'));
 
     let target = 0;
+    let visT = 0;
     let raf = 0;
 
     const tick = () => {
@@ -146,8 +147,10 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
         // quasi instantanés mais on évite le travail inutile.
         if (Math.abs(video.currentTime - t) > 0.033) video.currentTime = t;
       }
-      // Fade-in de la vidéo sur les ~12 premiers % du scroll (réversible).
-      const fin = clamp01(target / 0.12);
+      // Fade-in piloté par l'entrée de la section dans le viewport (visT,
+      // calculé dans onScroll) : la vidéo apparaît dès qu'elle pointe sous
+      // le hero, pleinement visible bien avant l'épinglage.
+      const fin = clamp01(visT / 0.55);
       video.style.opacity = String(fin * fin * (3 - 2 * fin));
       if (welcome) {
         // Le logo + le message apparaissent dans l'ouverture des vantaux.
@@ -162,6 +165,7 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
       const rect = gateScene.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top > window.innerHeight) return;
       target = clamp01(-rect.top / (rect.height - window.innerHeight));
+      visT = clamp01(1 - rect.top / window.innerHeight);
       if (!raf) raf = requestAnimationFrame(tick);
     };
 
