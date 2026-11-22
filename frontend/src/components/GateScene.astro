@@ -50,11 +50,21 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     -webkit-mask-image: linear-gradient(
       to bottom,
       transparent 0%,
-      #000 20%,
-      #000 80%,
+      rgb(0 0 0 / 0.35) 16%,
+      #000 36%,
+      #000 64%,
+      rgb(0 0 0 / 0.35) 84%,
       transparent 100%
     );
-    mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgb(0 0 0 / 0.35) 16%,
+      #000 36%,
+      #000 64%,
+      rgb(0 0 0 / 0.35) 84%,
+      transparent 100%
+    );
   }
   .gate-scene__fallback {
     display: none;
