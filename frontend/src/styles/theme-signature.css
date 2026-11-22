@@ -63,6 +63,7 @@
 
 .sig-hero {
   position: relative;
+  z-index: 2;
   overflow: hidden;
   padding-top: clamp(2rem, 5vw, 4rem);
   padding-bottom: clamp(2.5rem, 5vw, 4rem);
