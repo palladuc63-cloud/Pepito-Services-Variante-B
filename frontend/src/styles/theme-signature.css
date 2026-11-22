@@ -116,7 +116,7 @@
      (au-dessus du milieu de la grille). */
   .sig-hero__content {
     align-self: start;
-    padding-top: clamp(1.5rem, 11vh, 7rem);
+    padding-top: clamp(1.5rem, 5vh, 7rem);
   }
 }
 
