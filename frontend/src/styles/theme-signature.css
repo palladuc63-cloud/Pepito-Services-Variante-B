@@ -109,7 +109,7 @@
   .sig-hero__grid {
     grid-template-columns: 1.05fr 1fr;
     gap: 1.5rem;
-    min-height: clamp(28rem, 74vh, 44rem);
+    min-height: clamp(30rem, 86vh, 50rem);
   }
 }
 
