@@ -336,11 +336,12 @@ const jsonLd = [{
 
   <script>
     // Pictos des activités roulant le long de la courbe concave du hero
-    // Signature. Positions calculées sur l'ellipse RÉELLE du ::after et
-    // ARRONDIES au pixel entier : le sub-pixel faisait re-rasteriser les
-    // libellés à chaque frame (texte « sautillant »). Le fondu entrée/
-    // sortie est posé en opacity par item : un mask-image sur le
-    // conteneur forçait Firefox à repeindre tout le groupe par frame.
+    // Signature. Positions calculées sur l'ellipse RÉELLE du ::after en
+    // transform fractionnaire : chaque item est un calque GPU
+    // (will-change) dont la texture — texte compris — glisse sans
+    // re-rasterisation. Le fondu entrée/sortie est posé en opacity par
+    // item : un mask-image sur le conteneur forçait le navigateur à
+    // repeindre tout le groupe à chaque frame → sautillement.
     const sigHero = document.querySelector('.sig-hero');
     const sigOrbit = sigHero?.querySelector('.sig-hero__orbit');
     if (sigHero && sigOrbit) {
@@ -393,11 +394,13 @@ const jsonLd = [{
           const sx = x - 0.1 * W;
           // Base du picto légèrement sous l'arc : il chevauche la photo
           // de ~85 % de sa hauteur ; le libellé flotte sous la courbe.
-          // Math.round : positions entières → texte net, rendu fluide.
+          // Positions fractionnaires : l'item est composité GPU
+          // (will-change) → la texture se déplace sans re-rasterisation
+          // du texte. L'arrondi au pixel rendait le mouvement saccadé.
           const d = dims[i] ?? { w: 0, h: 0 };
-          item.style.transform = `translate3d(${Math.round(sx - d.w / 2)}px, ${Math.round(
+          item.style.transform = `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
             arcY(sx) - d.h * 0.85
-          )}px, 0)`;
+          ).toFixed(2)}px, 0)`;
           item.style.opacity = fade(sx).toFixed(3);
         });
       };
