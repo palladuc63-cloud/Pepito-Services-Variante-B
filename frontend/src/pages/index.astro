@@ -14,6 +14,7 @@ import isoMotorisation from '../assets/iso/motorisation.webp';
 import isoMinipelle from '../assets/iso/minipelle.webp';
 import isoMaconnerie from '../assets/iso/maconnerie.webp';
 import heroCloture from '../assets/hero/cloture-rigide-sousbassement.webp';
+import GateScene from '../components/GateScene.astro';
 import { getSite } from '../lib/site.js';
 import { getProjects } from '../lib/api.js';
 import type { Project, Service } from '../data/types';
@@ -256,6 +257,8 @@ const jsonLd = [{
         ))}
       </div>
     </section>
+
+    <GateScene />
 
     <section class="sig-activities container" id="activites">
       <h2 class="sig-title">{signature.activitiesTitle}</h2>

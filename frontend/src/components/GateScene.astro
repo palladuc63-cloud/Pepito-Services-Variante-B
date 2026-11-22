@@ -1,0 +1,248 @@
+---
+import gateBackdrop from '../assets/gate/backdrop-blur.webp';
+import gatePhoto from '../assets/gate/portail-reference.webp';
+---
+
+<section class="gate-scene" aria-label="Portail battant aluminium sur mesure">
+  <div class="gate-scene__sticky">
+    <div class="gate-scene__canvas" data-backdrop={gateBackdrop.src}></div>
+    <img
+      class="gate-scene__fallback"
+      src={gatePhoto.src}
+      alt="Portail battant aluminium anthracite posé par Pépito Services"
+      loading="lazy"
+    />
+    <div class="gate-scene__caption" aria-hidden="true">
+      <p class="gate-scene__kicker">Portails &amp; accès sur mesure</p>
+      <p class="gate-scene__hint">Faites défiler pour entrer</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .gate-scene {
+    position: relative;
+    height: 320vh;
+  }
+  .gate-scene__sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+    background: #dfe4e6;
+  }
+  .gate-scene__canvas {
+    position: absolute;
+    inset: 0;
+  }
+  .gate-scene__canvas canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .gate-scene__fallback {
+    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .gate-scene--fallback .gate-scene__fallback {
+    display: block;
+  }
+  .gate-scene__caption {
+    position: absolute;
+    top: clamp(3rem, 10vh, 6rem);
+    left: 0;
+    right: 0;
+    z-index: 2;
+    text-align: center;
+    pointer-events: none;
+  }
+  .gate-scene__kicker {
+    font-family: var(--font-display, Montserrat, sans-serif);
+    font-size: clamp(1.35rem, 3vw, 2.4rem);
+    font-weight: 700;
+    color: #2f3439;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem;
+    text-shadow: 0 1px 14px rgba(255, 255, 255, 0.55);
+  }
+  .gate-scene__hint {
+    font-size: 0.85rem;
+    color: #5b6167;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  @media (max-width: 900px) {
+    .gate-scene {
+      height: 260vh;
+    }
+  }
+</style>
+
+<script>
+  const gateScene = document.querySelector<HTMLElement>('.gate-scene');
+  const canvasHost = gateScene?.querySelector<HTMLElement>('.gate-scene__canvas');
+  const caption = gateScene?.querySelector<HTMLElement>('.gate-scene__caption');
+
+  if (gateScene && canvasHost) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const showFallback = () => gateScene.classList.add('gate-scene--fallback');
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          void boot();
+        }
+      },
+      { rootMargin: '600px' }
+    );
+    io.observe(gateScene);
+
+    async function boot() {
+      try {
+        const THREE = await import('three');
+        init(THREE);
+      } catch {
+        showFallback();
+      }
+    }
+
+    const init = (THREE: typeof import('three')) => {
+      let renderer: InstanceType<typeof THREE.WebGLRenderer>;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+      } catch {
+        showFallback();
+        return;
+      }
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+      canvasHost.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xdfe4e6);
+      scene.fog = new THREE.Fog(0xdfe4e6, 9, 22);
+
+      const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 60);
+
+      scene.add(new THREE.HemisphereLight(0xe8eef4, 0x7d7868, 0.85));
+      const sun = new THREE.DirectionalLight(0xfff1dd, 2.4);
+      sun.position.set(5, 7, 5);
+      sun.castShadow = true;
+      sun.shadow.mapSize.set(1024, 1024);
+      sun.shadow.camera.near = 1;
+      sun.shadow.camera.far = 22;
+      sun.shadow.camera.left = -6;
+      sun.shadow.camera.right = 6;
+      sun.shadow.camera.top = 6;
+      sun.shadow.camera.bottom = -4;
+      sun.shadow.bias = -0.0004;
+      scene.add(sun);
+
+      const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(40, 40),
+        new THREE.MeshStandardMaterial({ color: 0xb3b0aa, roughness: 0.95 })
+      );
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      const backdropMat = new THREE.MeshBasicMaterial({ color: 0xd8dcdf });
+      const backdrop = new THREE.Mesh(new THREE.PlaneGeometry(18, 10), backdropMat);
+      backdrop.position.set(0, 3.2, -6);
+      scene.add(backdrop);
+      new THREE.TextureLoader().load(canvasHost.dataset.backdrop ?? '', (t) => {
+        t.colorSpace = THREE.SRGBColorSpace;
+        backdropMat.map = t;
+        backdropMat.needsUpdate = true;
+        render();
+      });
+
+      const concrete = new THREE.MeshStandardMaterial({ color: 0xcac7c1, roughness: 0.92 });
+      const pillarGeo = new THREE.BoxGeometry(0.4, 2.1, 0.4);
+      const pillarL = new THREE.Mesh(pillarGeo, concrete);
+      pillarL.position.set(-1.38, 1.05, 0);
+      pillarL.castShadow = pillarL.receiveShadow = true;
+      const pillarR = pillarL.clone();
+      pillarR.position.x = 1.38;
+      scene.add(pillarL, pillarR);
+
+      const anthracite = new THREE.MeshStandardMaterial({
+        color: 0x33383d,
+        metalness: 0.55,
+        roughness: 0.5,
+      });
+      const panelGeoL = new THREE.BoxGeometry(1.16, 1.62, 0.045);
+      panelGeoL.translate(0.58, 0, 0);
+      const panelGeoR = new THREE.BoxGeometry(1.16, 1.62, 0.045);
+      panelGeoR.translate(-0.58, 0, 0);
+
+      const hingeL = new THREE.Group();
+      hingeL.position.set(-1.18, 0.86, 0.05);
+      const panelL = new THREE.Mesh(panelGeoL, anthracite);
+      panelL.castShadow = panelL.receiveShadow = true;
+      hingeL.add(panelL);
+
+      const hingeR = new THREE.Group();
+      hingeR.position.set(1.18, 0.86, 0.05);
+      const panelR = new THREE.Mesh(panelGeoR, anthracite);
+      panelR.castShadow = panelR.receiveShadow = true;
+      hingeR.add(panelR);
+      scene.add(hingeL, hingeR);
+
+      const render = () => renderer.render(scene, camera);
+
+      const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+      const smooth = (t: number) => t * t * (3 - 2 * t);
+
+      const update = (p: number) => {
+        const open = smooth(clamp01((p - 0.15) / 0.85));
+        const angle = open * 1.35;
+        hingeL.rotation.y = angle;
+        hingeR.rotation.y = -angle;
+        camera.position.set(-0.3 + 0.6 * p, 1.62 - 0.14 * p, 5.2 - 0.9 * p);
+        camera.lookAt(0, 0.92, 0);
+        if (caption) caption.style.opacity = String(Math.max(0, 1 - p * 4));
+        render();
+      };
+
+      const onScroll = () => {
+        const rect = gateScene.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        update(clamp01(-rect.top / (rect.height - window.innerHeight)));
+      };
+
+      const onResize = () => {
+        const w = canvasHost.clientWidth;
+        const h = canvasHost.clientHeight;
+        if (!w || !h) return;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        render();
+      };
+
+      new ResizeObserver(() => {
+        onResize();
+        onScroll();
+      }).observe(canvasHost);
+      onResize();
+
+      if (reduced) {
+        update(0.55);
+      } else {
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      }
+    };
+  }
+</script>
