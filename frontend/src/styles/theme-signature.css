@@ -111,6 +111,13 @@
     gap: 1.5rem;
     min-height: clamp(30rem, 86vh, 50rem);
   }
+
+  /* Le bloc texte se centre sur le centre visuel du pan photo
+     (au-dessus du milieu de la grille). */
+  .sig-hero__content {
+    align-self: start;
+    padding-top: clamp(1.5rem, 11vh, 7rem);
+  }
 }
 
 .sig-hero h1 {
