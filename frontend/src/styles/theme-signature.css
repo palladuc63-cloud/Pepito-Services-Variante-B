@@ -273,11 +273,26 @@
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  will-change: transform;
+  offset-distance: 0%;
+  /* Point de l'item qui épouse la courbe : ~15 % de picto sous l'arc,
+     le libellé flotte dessous. */
+  offset-anchor: 50% 90%;
+  /* Pas de rotation le long du chemin : les pictos restent droits. */
+  offset-rotate: 0deg;
+  will-change: offset-distance;
+}
+
+/* Animation offset-path : le navigateur déplace l'item de 0 à 100 %
+   du path généré — composité, sans JS par frame. */
+@keyframes sig-orbit {
+  to {
+    offset-distance: 100%;
+  }
 }
 
 .sig-hero__orbit.is-dragging .sig-hero__orbit-item {
   cursor: grabbing;
+  animation-play-state: paused;
 }
 
 .sig-hero__orbit-item img {
