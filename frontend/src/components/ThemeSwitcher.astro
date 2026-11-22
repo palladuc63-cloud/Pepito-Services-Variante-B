@@ -1,14 +1,14 @@
 ---
+// Thèmes mis de côté (réactivables en décommentant) :
+// nature, immersif, bento, editorial.
 const themes = [
-  { id: 'nature', label: 'Nature' },
-  { id: 'immersif', label: 'Immersif' },
-  { id: 'bento', label: 'Bento' },
-  { id: 'editorial', label: 'Éditorial' },
   { id: 'signature', label: 'Signature' },
 ];
 ---
 
-<div class="theme-switcher" role="group" aria-label="Choisir le thème du site">
+{
+  themes.length > 1 && (
+    <div class="theme-switcher" role="group" aria-label="Choisir le thème du site">
   <span class="theme-switcher__icon" aria-hidden="true">🎨</span>
   <span class="theme-switcher__title">Thème</span>
   {
@@ -19,6 +19,8 @@ const themes = [
     ))
   }
 </div>
+  )
+}
 
 <script>
   (function () {
@@ -34,8 +36,8 @@ const themes = [
     function syncPressed() {
       // Ré-applique le thème sauvegardé : le swap de navigation peut
       // réinitialiser data-theme sur <html>.
-      const known = ['nature', 'immersif', 'bento', 'editorial', 'signature'];
-      let saved = document.documentElement.dataset.theme || 'nature';
+      const known = ['signature'];
+      let saved = document.documentElement.dataset.theme || 'signature';
       try {
         const stored = localStorage.getItem('pepito-theme');
         if (stored && known.includes(stored)) saved = stored;
@@ -54,7 +56,7 @@ const themes = [
     });
 
     document.addEventListener('astro:page-load', syncPressed);
-    apply(document.documentElement.dataset.theme || 'nature');
+    apply(document.documentElement.dataset.theme || 'signature');
   })();
 </script>
 
