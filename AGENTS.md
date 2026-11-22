@@ -28,7 +28,7 @@ techniques basiques ; tout le reste part en escalade vers le prestataire.
   `frontend/src/pages/admin/dashboard.astro`. Désactivation :
   `PUBLIC_SAV_WIDGET=0`.
 - **Déploiement** : sur le VPS `/opt/pepito` —
-  `git pull && docker compose -p pepito -f infra/docker-compose.production.yml --env-file .env up -d --build backend frontend`
+  `git pull && docker compose -p pepito -f infra/docker-compose.production.yml --env-file infra/.env up -d --build backend frontend`
 
 ## Posts réseaux — Facebook + fiche Google
 
