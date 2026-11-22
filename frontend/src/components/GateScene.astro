@@ -25,7 +25,11 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     <div class="gate-scene__welcome">
       <img src={logo.src} alt="Pépito Services" />
       <h2>Bienvenue chez Pépito Services</h2>
-      <p>Une entreprise artisanale au service de vos projets extérieurs.</p>
+      <p>
+        Clôtures rigides, portails et portillons sur mesure, murets et
+        aménagements extérieurs&nbsp;: votre artisan local pour sécuriser et
+        embellir votre propriété.
+      </p>
     </div>
   </div>
 </section>
@@ -106,7 +110,7 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     will-change: opacity, transform;
   }
   .gate-scene__welcome img {
-    height: clamp(3.2rem, 9vh, 5.5rem);
+    height: clamp(6.4rem, 18vh, 11rem);
     width: auto;
     filter: drop-shadow(0 2px 20px rgb(255 255 255 / 0.75));
   }
@@ -121,8 +125,10 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
   }
   .gate-scene__welcome p {
     font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+    line-height: 1.55;
     color: #3f454a;
     margin: 0;
+    max-width: 34rem;
     text-shadow: 0 1px 14px rgb(255 255 255 / 0.7);
   }
   @media (max-width: 900px) {
