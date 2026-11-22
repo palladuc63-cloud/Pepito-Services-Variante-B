@@ -251,7 +251,10 @@ const jsonLd = [{
           léger surplomb du diaporama (positionnés par JS, desktop ≥900px) */}
       <div class="sig-hero__orbit" aria-hidden="true">
         {signature.activities.map((a) => (
-          <img src={a.img.src} alt="" loading="lazy" />
+          <span class="sig-hero__orbit-item">
+            <img src={a.img.src} alt="" loading="lazy" />
+            <span class="sig-hero__orbit-label">{a.label}</span>
+          </span>
         ))}
       </div>
     </section>
@@ -339,7 +342,7 @@ const jsonLd = [{
     const sigHero = document.querySelector('.sig-hero');
     const sigOrbit = sigHero?.querySelector('.sig-hero__orbit');
     if (sigHero && sigOrbit) {
-      const icons = Array.from(sigOrbit.querySelectorAll('img'));
+      const icons = Array.from(sigOrbit.querySelectorAll<HTMLElement>('.sig-hero__orbit-item'));
       const mqDesktop = window.matchMedia('(min-width: 900px)');
       const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
       const SPEED = 0.028; // fraction de la largeur du hero parcourue / s
@@ -367,14 +370,15 @@ const jsonLd = [{
       const paint = () => {
         const range = SPAN * W;
         const spacing = range / icons.length;
-        icons.forEach((img, i) => {
+        icons.forEach((item, i) => {
           let x = (i * spacing + offset) % range;
           if (x < 0) x += range;
           const sx = x - 0.1 * W;
           // Base du picto légèrement sous l'arc : il chevauche la photo
-          // de ~80 % de sa hauteur, comme posé sur la courbe.
-          img.style.transform = `translate(${sx - img.offsetWidth / 2}px, ${
-            arcY(sx) - img.offsetHeight * 0.82
+          // de ~85 % de sa hauteur ; le libellé flotte sous la courbe.
+          const ih = item.querySelector('img')?.offsetHeight ?? item.offsetHeight;
+          item.style.transform = `translate(${sx - item.offsetWidth / 2}px, ${
+            arcY(sx) - ih * 0.85
           }px)`;
         });
       };
