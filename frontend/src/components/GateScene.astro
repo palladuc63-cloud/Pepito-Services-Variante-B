@@ -107,9 +107,9 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     opacity: 0;
     pointer-events: none;
     will-change: opacity, transform;
-    /* Halo blanc centré sur le bloc : détache le logo du fond vidéo. */
+    /* Halo blanc resserré sur le logo (~7x moins étendu). */
     background: radial-gradient(
-      ellipse 52% 46% at 50% 40%,
+      ellipse 7.4% 6.6% at 50% 40%,
       rgb(255 255 255 / 0.72),
       rgb(255 255 255 / 0.35) 55%,
       transparent 80%
