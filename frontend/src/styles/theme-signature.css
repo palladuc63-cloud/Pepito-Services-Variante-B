@@ -104,9 +104,12 @@
 }
 
 @media (min-width: 900px) {
+  /* Le hero prend une vraie hauteur : le pan diagonal/photo est grand
+     comme sur la maquette, pas écrasé par la seule hauteur du texte. */
   .sig-hero__grid {
     grid-template-columns: 1.05fr 1fr;
     gap: 1.5rem;
+    min-height: clamp(28rem, 74vh, 44rem);
   }
 }
 
