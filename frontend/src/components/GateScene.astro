@@ -21,9 +21,6 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
       alt="Portail battant aluminium anthracite posé par Pépito Services"
       loading="lazy"
     />
-    <div class="gate-scene__caption" aria-hidden="true">
-      <p class="gate-scene__hint">Faites défiler pour entrer</p>
-    </div>
   </div>
 </section>
 
@@ -65,23 +62,6 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
   .gate-scene--fallback .gate-scene__fallback {
     display: block;
   }
-  .gate-scene__caption {
-    position: absolute;
-    top: clamp(3rem, 10vh, 6rem);
-    left: 0;
-    right: 0;
-    z-index: 2;
-    text-align: center;
-    pointer-events: none;
-  }
-  .gate-scene__hint {
-    font-size: 0.85rem;
-    color: #5b6167;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin: 0;
-    text-shadow: 0 1px 12px rgba(255, 255, 255, 0.6);
-  }
   @media (min-width: 901px) {
     .gate-scene__video {
       object-fit: contain;
@@ -97,7 +77,6 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
 <script>
   const gateScene = document.querySelector<HTMLElement>('.gate-scene');
   const video = gateScene?.querySelector<HTMLVideoElement>('video');
-  const caption = gateScene?.querySelector<HTMLElement>('.gate-scene__caption');
 
   if (gateScene && video) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -117,7 +96,6 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
         // quasi instantanés mais on évite le travail inutile.
         if (Math.abs(video.currentTime - t) > 0.033) video.currentTime = t;
       }
-      if (caption) caption.style.opacity = String(Math.max(0, 1 - target * 4));
     };
 
     const onScroll = () => {
