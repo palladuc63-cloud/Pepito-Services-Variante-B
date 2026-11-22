@@ -13,6 +13,7 @@ import isoPortail from '../assets/iso/portail.webp';
 import isoMotorisation from '../assets/iso/motorisation.webp';
 import isoMinipelle from '../assets/iso/minipelle.webp';
 import isoMaconnerie from '../assets/iso/maconnerie.webp';
+import heroCloture from '../assets/hero/cloture-rigide-sousbassement.webp';
 import { getSite } from '../lib/site.js';
 import { getProjects } from '../lib/api.js';
 import type { Project, Service } from '../data/types';
@@ -29,6 +30,7 @@ const signature = {
   // Photos du hero : diaporama en fondu (~5 s/image, cycle 30 s pour 6).
   // Liste vide = repli auto sur la réalisation « sous-bassement ».
   heroImages: [
+    heroCloture.src,
     '/uploads/fb-import/lot-086/lot-086-01-hd.webp',
     '/uploads/fb-import/lot-085/lot-085-01-hd.webp',
     '/uploads/fb-import/lot-065/lot-065-01-hd.webp',
@@ -239,7 +241,7 @@ const jsonLd = [{
                   src={src}
                   alt={i === 0 ? 'Clôture rigide posée par Pépito Services' : ''}
                   aria-hidden={i === 0 ? undefined : 'true'}
-                  style={`--d:${i * 5}s`}
+                  style={`--d:${(i * 30) / sigHeroImgs.length}s`}
                   loading={i === 0 ? 'eager' : 'lazy'}
                 />
               ))}

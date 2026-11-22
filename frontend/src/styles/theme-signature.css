@@ -184,9 +184,10 @@
   background: var(--paper-deep);
 }
 
-/* Diaporama en fondu (6 images, cycle 30 s : ~5 s chacune).
-   Chaque slide occupe une fenêtre de 100/6 ≈ 16,7 % du cycle ;
-   --d (inline) décale chaque image de 5 s. */
+/* Diaporama en fondu (7 images, cycle 30 s : ~4,3 s chacune).
+   Chaque slide occupe une fenêtre de 100/7 ≈ 14,3 % du cycle ;
+   --d (inline) décale chaque image de ~4,3 s. Si le nombre d'images
+   change, ajuster les pourcentages des keyframes (fenêtre = 100/n). */
 .sig-hero__photo img {
   position: absolute;
   inset: 0;
@@ -200,9 +201,9 @@
 
 @keyframes sig-hero-fade {
   0% { opacity: 0; }
-  3.5% { opacity: 1; }
-  16.7% { opacity: 1; }
-  20.2% { opacity: 0; }
+  3% { opacity: 1; }
+  14.28% { opacity: 1; }
+  17.28% { opacity: 0; }
   100% { opacity: 0; }
 }
 
