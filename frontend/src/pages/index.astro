@@ -260,18 +260,6 @@ const jsonLd = [{
 
     <GateScene />
 
-    <section class="sig-activities container" id="activites">
-      <h2 class="sig-title">{signature.activitiesTitle}</h2>
-      <ul class="sig-activities__row">
-        {signature.activities.map((a) => (
-          <li class="sig-activity">
-            <img src={a.img.src} alt="" aria-hidden="true" loading="lazy" />
-            <span>{a.label}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-
     <section class="sig-benefits">
       <div class="container">
         <h2 class="sig-title">{signature.benefitsTitle}</h2>
@@ -322,6 +310,18 @@ const jsonLd = [{
           ))}
         </ol>
       </div>
+    </section>
+
+    <section class="sig-activities container" id="activites">
+      <h2 class="sig-title">{signature.activitiesTitle}</h2>
+      <ul class="sig-activities__row">
+        {signature.activities.map((a) => (
+          <li class="sig-activity">
+            <img src={a.img.src} alt="" aria-hidden="true" loading="lazy" />
+            <span>{a.label}</span>
+          </li>
+        ))}
+      </ul>
     </section>
 
     <section class="sig-installs container">
