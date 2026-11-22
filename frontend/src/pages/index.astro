@@ -348,7 +348,7 @@ const jsonLd = [{
       const SPEED = 0.028; // fraction de la largeur du hero parcourue / s
       const SPAN = 1.25; // amplitude de la boucle (× largeur du hero)
       let W = 0, cx = 0, cy = 0, rx = 1, ry = 1, offset = 0;
-      let raf = 0, last = 0;
+      let raf = 0, last = 0, dragging = false, dragX = 0;
 
       // Géométrie de l'ellipse ::after : son bord supérieur forme l'arc
       // visible sous le hero.
@@ -387,8 +387,9 @@ const jsonLd = [{
         raf = requestAnimationFrame(tick);
         const dt = Math.min(0.05, last ? (t - last) / 1000 : 0);
         last = t;
-        // Pause quand on survole un picto (pointer-events: auto sur img).
-        if (!sigOrbit.matches(':hover')) offset -= SPEED * W * dt;
+        // Pause quand on survole un picto (pointer-events: auto sur les
+        // items) ou quand on est en train de les tirer.
+        if (!dragging && !sigOrbit.matches(':hover')) offset -= SPEED * W * dt;
         paint();
       };
 
@@ -407,6 +408,26 @@ const jsonLd = [{
         if (!mqReduced.matches) raf = requestAnimationFrame(tick);
         else paint();
       };
+
+      // Drag : clic maintenu sur un picto → on tire le convoi à gauche ou
+      // à droite ; le défilement auto reprend au relâchement.
+      sigOrbit.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        dragX = (e as PointerEvent).clientX;
+        sigOrbit.classList.add('is-dragging');
+        e.preventDefault(); // empêche le drag natif de l'image
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        offset += e.clientX - dragX;
+        dragX = e.clientX;
+      });
+      const endDrag = () => {
+        dragging = false;
+        sigOrbit.classList.remove('is-dragging');
+      };
+      window.addEventListener('pointerup', endDrag);
+      window.addEventListener('pointercancel', endDrag);
 
       mqDesktop.addEventListener('change', update);
       mqReduced.addEventListener('change', update);

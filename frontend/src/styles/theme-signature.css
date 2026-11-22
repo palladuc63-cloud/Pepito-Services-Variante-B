@@ -269,13 +269,22 @@
   width: clamp(5.7rem, 8.25vw, 8.25rem);
   text-align: center;
   pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   will-change: transform;
+}
+
+.sig-hero__orbit.is-dragging .sig-hero__orbit-item {
+  cursor: grabbing;
 }
 
 .sig-hero__orbit-item img {
   width: 100%;
   aspect-ratio: 1;
   object-fit: contain;
+  -webkit-user-drag: none;
   filter: drop-shadow(0 5px 9px rgba(15, 23, 18, 0.38));
 }
 
