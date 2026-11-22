@@ -252,6 +252,10 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  /* Fondu d'entrée/sortie : les pictos apparaissent à droite et
+     s'estompent à gauche au lieu d'être coupés aux bords. */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 88%, transparent 100%);
 }
 
 .sig-hero__orbit img {
