@@ -57,9 +57,8 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     -webkit-mask-image: linear-gradient(
       to bottom,
       transparent 0%,
-      rgb(0 0 0 / 0.25) 14%,
-      rgb(0 0 0 / 0.6) 26%,
-      #000 38%,
+      rgb(0 0 0 / 0.55) 7%,
+      #000 14%,
       #000 62%,
       rgb(0 0 0 / 0.6) 74%,
       rgb(0 0 0 / 0.25) 86%,
@@ -68,9 +67,8 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     mask-image: linear-gradient(
       to bottom,
       transparent 0%,
-      rgb(0 0 0 / 0.25) 14%,
-      rgb(0 0 0 / 0.6) 26%,
-      #000 38%,
+      rgb(0 0 0 / 0.55) 7%,
+      #000 14%,
       #000 62%,
       rgb(0 0 0 / 0.6) 74%,
       rgb(0 0 0 / 0.25) 86%,
@@ -148,6 +146,9 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
         // quasi instantanés mais on évite le travail inutile.
         if (Math.abs(video.currentTime - t) > 0.033) video.currentTime = t;
       }
+      // Fade-in de la vidéo sur les ~12 premiers % du scroll (réversible).
+      const fin = clamp01(target / 0.12);
+      video.style.opacity = String(fin * fin * (3 - 2 * fin));
       if (welcome) {
         // Le logo + le message apparaissent dans l'ouverture des vantaux.
         const w = clamp01((target - 0.45) / 0.35);
@@ -168,6 +169,7 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
       video.addEventListener('loadedmetadata', () => {
         video.currentTime = video.duration * 0.5;
       });
+      video.style.opacity = '1';
       if (welcome) welcome.style.opacity = '1';
     } else {
       window.addEventListener('scroll', onScroll, { passive: true });
