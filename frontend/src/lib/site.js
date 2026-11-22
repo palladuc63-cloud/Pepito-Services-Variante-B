@@ -13,7 +13,38 @@ export async function getSite() {
   // Menu calqué sur la maquette : 4 liens + bouton « Demander un devis ».
   const nav = [
     { label: 'Accueil', href: '/', icon: 'home' },
-    { label: 'Nos services', href: '/#activites', icon: 'fence' },
+    {
+      label: 'Nos services',
+      href: '/#activites',
+      icon: 'fence',
+      children: [
+        {
+          label: 'Clôtures rigides',
+          href: '/realisations/?categorie=clotures',
+          icon: 'fence',
+        },
+        {
+          label: 'Clôtures alu & palissades',
+          href: '/realisations/?categorie=clotures-alu-palissades',
+          icon: 'palissade',
+        },
+        {
+          label: 'Portails & portillons',
+          href: '/realisations/?categorie=portails',
+          icon: 'gate',
+        },
+        {
+          label: 'Motorisation portail',
+          href: '/realisations/?categorie=motorisation-portail',
+          icon: 'motor',
+        },
+        {
+          label: 'Terrassement mini-pelle',
+          href: '/realisations/?categorie=terrassements',
+          icon: 'digger',
+        },
+      ],
+    },
     {
       label: 'Terrassement & Maçonnerie',
       href: '/realisations/?categorie=terrassements',

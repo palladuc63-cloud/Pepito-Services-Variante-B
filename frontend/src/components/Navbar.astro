@@ -560,8 +560,8 @@ const navLinks = settings.nav.map((link) => ({
     position: absolute;
     top: 100%;
     left: 0;
-    min-width: 18rem;
-    padding: var(--space-3);
+    min-width: 17rem;
+    padding: 0.45rem;
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
@@ -584,14 +584,19 @@ const navLinks = settings.nav.map((link) => ({
   .nav-dd__grid {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+  }
+
+  /* Séparateur fin entre les entrées — style « simple raffiné ». */
+  .nav-dd__item + .nav-dd__item {
+    border-top: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
   }
 
   .nav-dd__link {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    padding: 0.5rem 0.65rem;
+    padding: 0.55rem 0.65rem;
     border-radius: var(--radius-md);
     color: var(--ink);
     font-size: 0.92rem;
@@ -600,12 +605,30 @@ const navLinks = settings.nav.map((link) => ({
     transition: background-color var(--transition-fast), color var(--transition-fast);
   }
 
+  /* Micro-flèche révélée au survol (même esprit que les collections
+     type HyperUI/Preline). */
+  .nav-dd__link::after {
+    content: '→';
+    margin-left: auto;
+    color: var(--forest);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.16s ease, transform 0.16s ease;
+  }
+
   .nav-dd__link:hover,
   .nav-dd__link:focus-visible {
     background: var(--forest-soft);
     color: var(--forest-dark);
   }
 
+  .nav-dd__link:hover::after,
+  .nav-dd__link:focus-visible::after {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Pastille icône — reprend le vocabulaire des pictos du site. */
   .nav-dd__media {
     display: flex;
     align-items: center;
@@ -613,7 +636,15 @@ const navLinks = settings.nav.map((link) => ({
     width: 2rem;
     height: 2rem;
     flex-shrink: 0;
+    border-radius: var(--radius-md);
+    background: var(--forest-soft);
     color: var(--forest);
+    transition: background-color var(--transition-fast);
+  }
+
+  .nav-dd__link:hover .nav-dd__media,
+  .nav-dd__link:focus-visible .nav-dd__media {
+    background: color-mix(in srgb, var(--forest) 18%, transparent);
   }
 
   .nav-dd__thumb {
