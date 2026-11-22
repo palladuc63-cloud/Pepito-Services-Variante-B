@@ -647,11 +647,25 @@ const navLinks = settings.nav.map((link) => ({
     background: color-mix(in srgb, var(--forest) 18%, transparent);
   }
 
+  /* Vignette isométrique dans la pastille — le picto remplace l'icône. */
+  .nav-dd__media--img {
+    width: 2.3rem;
+    padding: 0.15rem;
+  }
+
+  .nav-dd__media--img :global(.nav-dd__icon) {
+    display: none;
+  }
+
   .nav-dd__thumb {
     display: none;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+  }
+
+  .nav-dd__media--img .nav-dd__thumb {
+    display: block;
   }
 
   .nav-dd__subs {
