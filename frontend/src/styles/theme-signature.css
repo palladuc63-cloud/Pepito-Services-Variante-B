@@ -115,7 +115,7 @@
 .sig-hero__veil {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   background: var(--paper);
   pointer-events: none;
 }
