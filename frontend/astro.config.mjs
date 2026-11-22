@@ -51,6 +51,14 @@ export default defineConfig({
       styles: ['normal'],
       subsets: ['latin'],
     },
+    {
+      provider: fontProviders.google(),
+      name: 'Montserrat',
+      cssVariable: '--font-montserrat',
+      weights: [600, 700, 800],
+      styles: ['normal'],
+      subsets: ['latin'],
+    },
   ],
   vite: {
     plugins: [tailwindcss()],

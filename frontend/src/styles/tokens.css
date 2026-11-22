@@ -169,7 +169,7 @@
   --header-top-border: 0;
   --hero-rgb: 16 26 16;
 
-  --font-display: var(--font-poppins), 'Poppins', system-ui, sans-serif;
+  --font-display: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
 
   --signal-light: #6f9a73;
 }
