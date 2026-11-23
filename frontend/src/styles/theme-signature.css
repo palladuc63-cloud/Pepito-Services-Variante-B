@@ -586,7 +586,7 @@
 .sig-scrollpath__path {
   fill: none;
   stroke: var(--basalt);
-  stroke-width: 12;
+  stroke-width: 16;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
