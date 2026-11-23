@@ -553,8 +553,13 @@ const jsonLd = [{
 
       const drawPath = () => {
         const r = scrollPath.getBoundingClientRect();
-        // 0 = haut de la zone au bas de l'écran, 1 = bas de la zone atteint.
-        const p = Math.min(1, Math.max(0, (window.innerHeight - r.top) / r.height));
+        // Le tracé ne démarre qu'après ~30 % d'écran parcouru dans la
+        // zone (d0) : la ligne suit vraiment le scroll au lieu d'être
+        // déjà avancée à l'arrivée. p=1 quand le bas de la zone
+        // atteint le bas de l'écran.
+        const vh = window.innerHeight;
+        const d0 = vh * 0.3;
+        const p = Math.min(1, Math.max(0, (vh - r.top - d0) / (r.height - d0)));
         let drawn: number;
         if (mqNarrow.matches) {
           drawn = p * total;
