@@ -586,6 +586,10 @@ const jsonLd = [{
         const r = scrollPath.getBoundingClientRect();
         const vh = window.innerHeight;
         let drawn: number;
+        // Le SVG (fixed) est clippé sous le haut de la section : la
+        // ligne ne peut pas s'afficher par-dessus la vidéo — elle
+        // « émerge » du bord inférieur de la vidéo.
+        svgEl.style.clipPath = `inset(${Math.max(0, r.top).toFixed(1)}px 0 0 0)`;
         if (mqNarrow.matches) {
           // SVG fixed : visible seulement tant que la section est à
           // l'écran.
