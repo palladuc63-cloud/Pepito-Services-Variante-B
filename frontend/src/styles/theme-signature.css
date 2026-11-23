@@ -570,8 +570,11 @@
   will-change: transform;
 }
 
+/* SVG ancré au VIEWPORT (fixed) : la ligne commence à descendre le
+   bord gauche pendant le scroll normal, puis continue à l'identique
+   dans la vue épinglée — mêmes coordonnées avant et pendant le gel. */
 .sig-scrollpath__svg {
-  position: absolute;
+  position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
