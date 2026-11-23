@@ -532,10 +532,13 @@ const jsonLd = [{
       const mqReducedPath = window.matchMedia('(prefers-reduced-motion: reduce)');
       const chevEl = stepsEl.querySelector<HTMLElement>('.sig-step__chev');
       const X0 = 11; // bord gauche écran ≈ demi-épaisseur du trait
-      // Phases de la vue épinglée : temps mort, puis pan du contenu +
-      // descente de la ligne, puis ruban horizontal chevron à chevron.
-      const HOLD = 0.05;
-      const PAN_END = 0.38;
+      // Phases de la vue épinglée : pan du contenu quasi immédiat et
+      // court, puis le ruban horizontal démarre PENDANT que le bloc
+      // finit de se caler — pas de temps mort entre le gel et le 1er
+      // chevron.
+      const HOLD = 0.02;
+      const PAN_END = 0.25;
+      const H_START = 0.12;
       let dashTotal = 1, downLen = 0, sideLen = 0, endX = 0;
       let ryFinal = 0, panT = 0;
 
@@ -609,7 +612,7 @@ const jsonLd = [{
           const q = Math.min(1, Math.max(0, -r.top / (r.height - vh)));
           const panE = smooth01((q - HOLD) / (PAN_END - HOLD));
           innerEl.style.transform = `translate3d(0, ${(-panT * panE).toFixed(1)}px, 0)`;
-          const hfrac = Math.min(1, Math.max(0, (q - PAN_END) / (1 - PAN_END)));
+          const hfrac = Math.min(1, Math.max(0, (q - H_START) / (1 - H_START)));
           drawn = a * ryFinal + hfrac * sideLen;
           // Révélation par paliers : le 1er chevron (colonne = 20 %)
           // dès le virage, puis chaque chevron apparaît ENTIER quand la
