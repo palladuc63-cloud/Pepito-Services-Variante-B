@@ -547,28 +547,26 @@
   position: relative;
 }
 
-/* Piste de scroll supplémentaire (desktop) : le ruban reste épinglé
-   pendant ~90vh de défilement, le temps que la ligne finisse de le
-   dessiner — l'animation demande plus de scroll sans espace vide. */
+/* Vue figée (desktop, activée par JS via .is-pinned) : la piste fait
+   100vh + ~260vh de défilement ; le contenu est épinglé plein écran
+   pendant que la ligne se dessine au scroll — la page ne bouge pas.
+   Sans JS / reduced-motion / mobile : flux normal, rien d'épinglé. */
 @media (min-width: 900px) {
-  .sig-scrollpath {
-    padding-bottom: 90vh;
+  .sig-scrollpath.is-pinned {
+    height: calc(100vh + 260vh);
   }
 
-  .sig-process {
+  .sig-scrollpath.is-pinned .sig-scrollpath__sticky {
     position: sticky;
-    top: 15vh;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .sig-scrollpath {
-    padding-bottom: 0;
-  }
-
-  .sig-process {
-    position: static;
-  }
+.sig-scrollpath__inner {
+  will-change: transform;
 }
 
 .sig-scrollpath__svg {
