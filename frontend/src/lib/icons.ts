@@ -45,6 +45,12 @@ export const ICONS: Record<string, string> = {
   calendar:
     '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M4 11h16"/>',
   check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  // Crayon (étude & traçage)
+  pencil:
+    '<path d="M4 20l4-1 11-11a2.1 2.1 0 0 0-3-3L5 16l-1 4z"/><path d="M13.5 6.5l3 3"/>',
+  // Strates empilées (scellement & sous-bassement béton)
+  layers:
+    '<path d="M12 3l9 4.5-9 4.5-9-4.5L12 3z"/><path d="m3 12 9 4.5 9-4.5"/><path d="m3 16.5 9 4.5 9-4.5"/>',
   'arrow-left': '<path d="M19 12H5"/><path d="m11 18-6-6 6-6"/>',
   'arrow-right': '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
   'chevron-left': '<path d="m15 18-6-6 6-6"/>',

@@ -7,6 +7,7 @@ import ServiceCard from '../components/ServiceCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import logo from '../assets/pepito-logo.svg';
 import { signature } from '../data/signature';
+import { ICONS } from '../lib/icons';
 import GateScene from '../components/GateScene.astro';
 import { getSite } from '../lib/site.js';
 import { getProjects } from '../lib/api.js';
@@ -186,7 +187,19 @@ const jsonLd = [{
         <ol class="sig-steps">
           {signature.steps.map((s, i) => (
             <li class="sig-step">
-              <span class="sig-step__chev" aria-hidden="true">{i + 1}.</span>
+              <span class="sig-step__marker" aria-hidden="true">
+                <svg
+                  class="sig-step__icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  set:html={ICONS[s.icon] ?? ICONS.check}
+                />
+                <span class="sig-step__num">{i + 1}</span>
+              </span>
               <div class="sig-step__body">
                 <h3>{s.title}</h3>
                 <p>{s.text}</p>
@@ -239,7 +252,10 @@ const jsonLd = [{
     if (scrollPath && svgEl && pathEl && innerEl && stepsEl) {
       const mqNarrow = window.matchMedia('(max-width: 899px)');
       const mqReducedPath = window.matchMedia('(prefers-reduced-motion: reduce)');
-      const chevEl = stepsEl.querySelector<HTMLElement>('.sig-step__chev');
+      const markerEl = stepsEl.querySelector<HTMLElement>('.sig-step__marker');
+      const stepEls = Array.from(
+        stepsEl.querySelectorAll<HTMLElement>('.sig-step')
+      );
       const X0 = 8; // bord gauche écran = demi-épaisseur du trait (16px)
       // Phases de la vue épinglée : pan du contenu quasi immédiat et
       // court, puis le ruban horizontal démarre PENDANT que le bloc
@@ -272,13 +288,15 @@ const jsonLd = [{
           sideLen = 0;
         } else {
           const vh = window.innerHeight;
-          const chevH = chevEl?.offsetHeight ?? 42;
+          const markerH = markerEl?.offsetHeight ?? 58;
           const stepsTop = naturalTop();
           // Pan : remonte le contenu pour placer le haut du ruban à
           // ~62 % de l'écran — le cadre figé montre le tracé complet.
           panT = Math.max(0, Math.min(stepsTop - vh * 0.6, innerEl.scrollHeight - vh));
-          ryFinal = stepsTop - panT + chevH / 2;
-          endX = sr.right - ir.left - 4;
+          ryFinal = stepsTop - panT + markerH / 2;
+          // Le trait s'arrête au centre du dernier cercle — la pointe
+          // « entre » dans le marqueur quand celui-ci pop.
+          endX = sr.left - ir.left + (4.5 * sr.width) / 5;
           sideLen = Math.max(0, endX - X0);
           pathEl.setAttribute(
             'd',
@@ -309,8 +327,10 @@ const jsonLd = [{
           const d0 = vh * 0.3;
           const p = Math.min(1, Math.max(0, (vh - r.top - d0) / (r.height - d0)));
           drawn = p * dashTotal;
-          const rev = Math.floor(p * 5.999) / 5;
-          stepsEl.style.clipPath = `inset(0 0 ${(100 - rev * 100).toFixed(2)}% 0)`;
+          // Étapes révélées une à une pendant la descente mobile.
+          stepEls.forEach((el, i) =>
+            el.classList.toggle('is-on', p > i / 5 + 0.02)
+          );
         } else {
           // Descente de la ligne PENDANT le scroll normal : 0 quand la
           // piste entre en bas d'écran, 1 (= ryFinal, au coin du futur
@@ -323,15 +343,15 @@ const jsonLd = [{
           innerEl.style.transform = `translate3d(0, ${(-panT * panE).toFixed(1)}px, 0)`;
           const hfrac = Math.min(1, Math.max(0, (q - H_START) / (1 - H_START)));
           drawn = a * ryFinal + hfrac * sideLen;
-          // Révélation calée sur la pointe : chaque chevron n'apparaît
-          // ENTIER que lorsque le trait atteint sa colonne — jamais de
-          // flèche affichée en avance ni à moitié découpée à l'arrêt.
+          // Chaque cercle « pop » quand la pointe du trait atteint son
+          // centre — jamais d'étape affichée en avance.
           const tipX = X0 + hfrac * sideLen;
           const sr = stepsEl.getBoundingClientRect();
-          const f = (tipX - sr.left) / sr.width;
-          const shown =
-            f <= 0 ? 0 : Math.min(100, (Math.floor(f * 5) + 1) * 20);
-          stepsEl.style.clipPath = `inset(0 ${(100 - shown).toFixed(2)}% 0 0)`;
+          const colW = sr.width / stepEls.length;
+          stepEls.forEach((el, i) => {
+            const center = sr.left + (i + 0.5) * colW;
+            el.classList.toggle('is-on', tipX >= center - 6);
+          });
         }
         pathEl.style.strokeDashoffset = `${Math.max(0, dashTotal - drawn)}`;
       };
@@ -339,10 +359,13 @@ const jsonLd = [{
       const syncPath = () => {
         const pinned = !mqReducedPath.matches && !mqNarrow.matches;
         scrollPath.classList.toggle('is-pinned', pinned);
+        // .is-anim masque les étapes (pop à l'arrivée du trait) ; sans
+        // JS ou en reduced-motion tout reste visible normalement.
+        scrollPath.classList.toggle('is-anim', !mqReducedPath.matches);
         if (mqReducedPath.matches) {
           svgEl.style.display = 'none';
-          stepsEl.style.clipPath = 'none';
           innerEl.style.transform = '';
+          stepEls.forEach((el) => el.classList.remove('is-on'));
           return;
         }
         if (!pinned) innerEl.style.transform = '';

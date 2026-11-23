@@ -55,14 +55,31 @@ export const signature = {
   ],
   processTitle: 'Notre processus de pose en 5 étapes',
   steps: [
-    { title: 'Étude & traçage', text: 'Analyse du terrain, alignement, repères.' },
-    { title: 'Terrassement', text: 'Petites excavations pour les poteaux à la mini-pelle.' },
     {
+      icon: 'pencil',
+      title: 'Étude & traçage',
+      text: 'Analyse du terrain, alignement, repères.',
+    },
+    {
+      icon: 'digger',
+      title: 'Terrassement',
+      text: 'Petites excavations pour les poteaux à la mini-pelle.',
+    },
+    {
+      icon: 'layers',
       title: 'Scellement & sous-bassement',
       text: 'Mise en place des poteaux et glissement des plaques de sous-bassement béton.',
     },
-    { title: 'Pose des panneaux', text: 'Installation et fixation des grilles en acier rigide.' },
-    { title: 'Réception', text: 'Ajustements finaux — chantier livré clé en main.' },
+    {
+      icon: 'fence',
+      title: 'Pose des panneaux',
+      text: 'Installation et fixation des grilles en acier rigide.',
+    },
+    {
+      icon: 'check',
+      title: 'Réception',
+      text: 'Ajustements finaux — chantier livré clé en main.',
+    },
   ],
   installsTitle: 'Nos dernières installations',
 };
