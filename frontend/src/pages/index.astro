@@ -203,16 +203,20 @@ const jsonLd = [{
           {signature.steps.map((s, i) => (
             <li class="sig-step">
               <span class="sig-step__marker" aria-hidden="true">
-                <svg
-                  class="sig-step__icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  set:html={ICONS[s.icon] ?? ICONS.check}
-                />
+                {s.img ? (
+                  <img class="sig-step__photo" src={s.img} alt="" loading="lazy" />
+                ) : (
+                  <svg
+                    class="sig-step__icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    set:html={ICONS[s.icon] ?? ICONS.check}
+                  />
+                )}
                 <span class="sig-step__num">{i + 1}</span>
               </span>
               <div class="sig-step__body">

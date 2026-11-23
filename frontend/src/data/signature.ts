@@ -54,29 +54,36 @@ export const signature = {
     },
   ],
   processTitle: 'Notre processus de pose en 5 étapes',
+  // Photos réelles de chantier dans les cercles du stepper
+  // (miniatures public/steps — vrais lots FB).
   steps: [
     {
       icon: 'pencil',
+      img: `${base}steps/step-1.webp`,
       title: 'Étude & traçage',
       text: 'Analyse du terrain, alignement, repères.',
     },
     {
       icon: 'digger',
+      img: `${base}steps/step-2.webp`,
       title: 'Terrassement',
       text: 'Petites excavations pour les poteaux à la mini-pelle.',
     },
     {
       icon: 'layers',
+      img: `${base}steps/step-3.webp`,
       title: 'Scellement & sous-bassement',
       text: 'Mise en place des poteaux et glissement des plaques de sous-bassement béton.',
     },
     {
       icon: 'fence',
+      img: `${base}steps/step-4.webp`,
       title: 'Pose des panneaux',
       text: 'Installation et fixation des grilles en acier rigide.',
     },
     {
       icon: 'check',
+      img: `${base}steps/step-5.webp`,
       title: 'Réception',
       text: 'Ajustements finaux — chantier livré clé en main.',
     },
