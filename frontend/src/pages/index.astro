@@ -240,7 +240,7 @@ const jsonLd = [{
       const mqNarrow = window.matchMedia('(max-width: 899px)');
       const mqReducedPath = window.matchMedia('(prefers-reduced-motion: reduce)');
       const chevEl = stepsEl.querySelector<HTMLElement>('.sig-step__chev');
-      let X0 = 0; // 10vw du bord gauche — recalculé à chaque mesure
+      const X0 = 8; // bord gauche écran = demi-épaisseur du trait (16px)
       // Phases de la vue épinglée : pan du contenu quasi immédiat et
       // court, puis le ruban horizontal démarre PENDANT que le bloc
       // finit de se caler — pas de temps mort entre le gel et le 1er
@@ -264,7 +264,6 @@ const jsonLd = [{
       };
 
       const measurePath = () => {
-        X0 = window.innerWidth * 0.1;
         const sr = stepsEl.getBoundingClientRect();
         const ir = innerEl.getBoundingClientRect();
         if (mqNarrow.matches) {
