@@ -48,6 +48,10 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
   .gate-scene {
     position: relative;
     height: 320vh;
+    /* Remonte sous le header sticky (~81px) : la section touche le haut
+       de la fenêtre dès le chargement → la vidéo est épinglée
+       immédiatement, sans le petit scroll libre préalable. */
+    margin-top: -5.06rem;
     /* Fond uni (sans le grain du body) : la zone entre la courbe du
        hero et le haut de la vidéo reste propre et plane. */
     background: var(--paper, #eeece6);
@@ -269,10 +273,15 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
       }
     };
 
+    // Chevauchement sous le header (margin-top négative) : la vidéo est
+    // déjà épinglée au chargement — on la soustrait pour que le scrub
+    // démarre à 0 quand même.
+    const overlap = -parseFloat(getComputedStyle(gateScene).marginTop) || 0;
+
     const onScroll = () => {
       const rect = gateScene.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-      target = clamp01(-rect.top / (rect.height - window.innerHeight));
+      target = clamp01((-rect.top - overlap) / (rect.height - window.innerHeight));
       visT = clamp01(1 - rect.top / window.innerHeight);
       if (!raf) raf = requestAnimationFrame(tick);
     };
