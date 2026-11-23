@@ -30,6 +30,17 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
         embellir votre propriété.
       </p>
     </div>
+    <div class="gate-scene__hint" aria-hidden="true">
+      <span class="gate-scene__hint-mouse">
+        <span class="gate-scene__hint-dot"></span>
+      </span>
+      <svg class="gate-scene__hint-chevs" viewBox="0 0 20 24" aria-hidden="true">
+        <path d="M3 3l7 6 7-6" />
+        <path d="M3 10l7 6 7-6" />
+        <path d="M3 17l7 6 7-6" />
+      </svg>
+      <span class="gate-scene__hint-label">Faites défiler</span>
+    </div>
   </div>
 </section>
 
@@ -98,6 +109,114 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     max-width: 34rem;
     text-shadow: 0 1px 14px rgb(255 255 255 / 0.7);
   }
+  /* Indication de scroll en bas de l'écran épinglé : souris dont le
+     point descend en s'estompant (opacité + position), chevrons en
+     cascade, libellé qui respire. Teinte sombre — le bas de la vidéo
+     est un sol clair. L'ensemble s'efface au premier scroll (JS). */
+  .gate-scene__hint {
+    position: absolute;
+    left: 50%;
+    bottom: 3.5vh;
+    transform: translateX(-50%);
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: #2f3a35;
+    pointer-events: none;
+    will-change: opacity;
+  }
+  .gate-scene__hint-mouse {
+    position: relative;
+    width: 1.4rem;
+    height: 2.3rem;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+    opacity: 0.9;
+  }
+  .gate-scene__hint-dot {
+    position: absolute;
+    left: 50%;
+    top: 20%;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: gate-hint-dot 1.9s ease-in-out infinite;
+  }
+  @keyframes gate-hint-dot {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    18% {
+      opacity: 1;
+    }
+    62% {
+      transform: translateY(0.85rem);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(1.05rem);
+      opacity: 0;
+    }
+  }
+  .gate-scene__hint-chevs {
+    width: 1.05rem;
+    height: auto;
+    display: block;
+  }
+  .gate-scene__hint-chevs path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: gate-hint-chev 1.9s ease-in-out infinite;
+  }
+  .gate-scene__hint-chevs path:nth-child(2) {
+    animation-delay: 0.16s;
+  }
+  .gate-scene__hint-chevs path:nth-child(3) {
+    animation-delay: 0.32s;
+  }
+  @keyframes gate-hint-chev {
+    0%,
+    100% {
+      opacity: 0.22;
+      transform: translateY(0);
+    }
+    42% {
+      opacity: 1;
+      transform: translateY(1.5px);
+    }
+  }
+  .gate-scene__hint-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: gate-hint-breathe 1.9s ease-in-out infinite;
+  }
+  @keyframes gate-hint-breathe {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gate-scene__hint-mouse,
+    .gate-scene__hint-dot,
+    .gate-scene__hint-chevs path,
+    .gate-scene__hint-label {
+      animation: none;
+    }
+  }
   @media (max-width: 900px) {
     .gate-scene {
       height: 260vh;
@@ -109,6 +228,7 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
   const gateScene = document.querySelector<HTMLElement>('.gate-scene');
   const video = gateScene?.querySelector<HTMLVideoElement>('video');
   const welcome = gateScene?.querySelector<HTMLElement>('.gate-scene__welcome');
+  const hint = gateScene?.querySelector<HTMLElement>('.gate-scene__hint');
 
   if (gateScene && video) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -140,6 +260,11 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
         const ws = w * w * (3 - 2 * w);
         welcome.style.opacity = String(ws);
         welcome.style.transform = `translateY(${(1 - ws) * 24}px)`;
+      }
+      if (hint) {
+        // L'indication de scroll s'efface sur les premiers ~10 % de la
+        // piste — elle a rempli son rôle dès que l'utilisateur défile.
+        hint.style.opacity = String(1 - clamp01(target / 0.1));
       }
     };
 
