@@ -20,7 +20,7 @@ export async function getSite() {
     { label: 'Accueil', href: '/', icon: 'home' },
     {
       label: 'Nos services',
-      href: '/#activites',
+      href: '/services/',
       icon: 'fence',
       children: [
         {

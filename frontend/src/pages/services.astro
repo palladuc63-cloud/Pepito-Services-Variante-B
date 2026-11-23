@@ -1,0 +1,38 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import SigHero from '../components/SigHero.astro';
+import { signature, sigHeroImgs } from '../data/signature';
+import { getSite } from '../lib/site.js';
+import { getProjects } from '../lib/api.js';
+
+const { settings } = await getSite();
+const projects = await getProjects();
+const images = sigHeroImgs(projects);
+const base = import.meta.env.BASE_URL;
+---
+
+<MainLayout
+  title={`Nos services — ${settings.name}`}
+  description={settings.description}
+  canonicalPath="/services/"
+>
+  <div class="signature-home">
+    <SigHero images={images} />
+
+    <section class="sig-activities container" id="activites">
+      <h2 class="sig-title">{signature.activitiesTitle}</h2>
+      <ul class="sig-activities__row">
+        {signature.activities.map((a) => (
+          <li class="sig-activity">
+            <img src={a.img.src} alt="" aria-hidden="true" loading="lazy" />
+            <span>{a.label}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="container" style="padding-block: 2.5rem 4rem; text-align: center;">
+      <a href={`${base}contact/`} class="sig-btn sig-btn--primary">Demander un devis</a>
+    </section>
+  </div>
+</MainLayout>

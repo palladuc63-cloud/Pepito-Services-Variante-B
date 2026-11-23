@@ -1,0 +1,225 @@
+---
+import { signature } from '../data/signature';
+
+interface Props {
+  images: string[];
+}
+
+const { images } = Astro.props;
+---
+
+<section class="sig-hero">
+  <div class="container sig-hero__grid">
+    <div class="sig-hero__content">
+      <h1>{signature.heroTitle}</h1>
+      <p class="sig-hero__sub">{signature.heroSubtitle}</p>
+      <div class="sig-hero__actions">
+        <a href={signature.ctaPrimary.href} class="sig-btn sig-btn--primary">
+          {signature.ctaPrimary.label}
+        </a>
+        <a href={signature.ctaSecondary.href} class="sig-btn sig-btn--ghost">
+          {signature.ctaSecondary.label}
+        </a>
+      </div>
+    </div>
+    <div class="sig-hero__visual">
+      {images.length > 0 && (
+        <div class="sig-hero__photo">
+          {images.map((src, i) => (
+            <img
+              src={src}
+              alt={i === 0 ? 'Clôture rigide posée par Pépito Services' : ''}
+              aria-hidden={i === 0 ? undefined : 'true'}
+              style={`--d:${(i * 30) / images.length}s`}
+              loading={i === 0 ? 'eager' : 'lazy'}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+  {/* Pictos des activités circulant le long de la courbe du bas, en
+      léger surplomb du diaporama (positionnés par JS, desktop ≥900px) */}
+  <div class="sig-hero__orbit" aria-hidden="true">
+    {signature.activities.map((a) => (
+      <span class="sig-hero__orbit-item">
+        <img src={a.img.src} alt="" loading="eager" />
+        <span class="sig-hero__orbit-label">{a.label}</span>
+      </span>
+    ))}
+  </div>
+  <div class="sig-hero__veil" aria-hidden="true"></div>
+</section>
+
+<script>
+  // Pictos des activités roulant le long de la courbe concave du hero
+  // Signature. L'ellipse RÉELLE du ::after est échantillonnée en 49
+  // keyframes (transform + opacity) joués par element.animate() :
+  // animation DÉCLARATIVE → compositée GPU, y compris dans Firefox où
+  // le JS par frame ne l'est jamais (cause des saccades). Le fondu
+  // entrée/sortie est en opacity par item — pas de mask-image sur le
+  // conteneur, qui forçait le repaint du groupe à chaque frame.
+  const sigHero = document.querySelector('.sig-hero');
+  const sigOrbit = sigHero?.querySelector('.sig-hero__orbit');
+  if (sigHero && sigOrbit) {
+    const icons = Array.from(sigOrbit.querySelectorAll<HTMLElement>('.sig-hero__orbit-item'));
+    const mqDesktop = window.matchMedia('(min-width: 900px)');
+    const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const SPEED = 0.028; // fraction de la largeur du hero parcourue / s
+    const SPAN = 1.25; // amplitude de la boucle (× largeur du hero)
+    const KEYS = 48; // points du chemin précalculé
+    let W = 0, cx = 0, cy = 0, rx = 1, ry = 1;
+    let T = 45000, range = 0;
+    let dragPx = 0, dragging = false, dragX = 0;
+    let anims: Animation[] = [];
+    let dims: { w: number; h: number }[] = [];
+
+    // Géométrie de l'ellipse ::after : son bord supérieur forme l'arc
+    // visible sous le hero. Dimensions des items mises en cache ici
+    // (relues au resize) pour ne pas forcer de layout à chaque frame.
+    const measure = () => {
+      const cs = getComputedStyle(sigHero, '::after');
+      W = sigHero.clientWidth;
+      rx = parseFloat(cs.width) / 2;
+      ry = parseFloat(cs.height) / 2;
+      cx = parseFloat(cs.left) + rx;
+      cy = parseFloat(cs.top) + ry;
+      range = SPAN * W;
+      T = (range / (SPEED * W)) * 1000;
+      // Le picto est carré (aspect-ratio: 1) : sa hauteur vaut sa largeur.
+      dims = icons.map((item) => {
+        const w = item.offsetWidth;
+        return { w, h: w };
+      });
+    };
+
+    // Ordonnée du bord supérieur de l'ellipse à l'abscisse x.
+    const arcY = (x: number) => {
+      const t = (x - cx) / rx;
+      return cy - ry * Math.sqrt(Math.max(0, 1 - t * t));
+    };
+
+    // Fondus en smoothstep. Sens gauche → droite : sortie à droite en
+    // longue dissolution sur ~30 % de la largeur, nulle dès que le
+    // picto approche le bord — aucune coupure nette à l'overflow.
+    const smooth = (t: number) => t * t * (3 - 2 * t);
+    const fade = (sx: number) => {
+      const finLeft = smooth(Math.min(1, Math.max(0, (sx + 0.02 * W) / (0.12 * W))));
+      const foutRight = smooth(Math.min(1, Math.max(0, (0.95 * W - sx) / (0.3 * W))));
+      return Math.min(finLeft, foutRight);
+    };
+
+    // Transform de l'item à l'abscisse sx : base du picto légèrement
+    // sous l'arc (~85 % de sa hauteur chevauche la photo), le libellé
+    // flotte sous la courbe.
+    const place = (item: HTMLElement, d: { w: number; h: number }, sx: number) => {
+      item.style.transform = `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
+        arcY(sx) - d.h * 0.85
+      ).toFixed(2)}px, 0)`;
+      item.style.opacity = fade(sx).toFixed(3);
+    };
+
+    // Progression 0→1 = gauche → droite. Items tous de même taille :
+    // un seul tableau de keyframes partagé.
+    const buildFrames = (d: { w: number; h: number }) => {
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= KEYS; k++) {
+        const sx = (k / KEYS) * range - 0.1 * W;
+        frames.push({
+          transform: `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
+            arcY(sx) - d.h * 0.85
+          ).toFixed(2)}px, 0)`,
+          opacity: fade(sx).toFixed(3),
+        });
+      }
+      return frames;
+    };
+
+    // Délai de l'item i : déphasage régulier + décalage du drag,
+    // replié dans (-T, 0] pour rester négatif (boucle continue).
+    const delayOf = (i: number) => {
+      const raw = (-i * T) / icons.length - (dragPx * T) / range;
+      return ((raw % T) + T) % T - T;
+    };
+
+    const apply = () => {
+      anims.forEach((a) => a.cancel());
+      anims = [];
+      if (mqReduced.matches) {
+        // Reduced motion : pictos répartis statiquement sur l'arc.
+        const spacing = range / icons.length;
+        icons.forEach((item, i) => {
+          let sx = ((i * spacing + dragPx) % range + range) % range - 0.1 * W;
+          place(item, dims[i] ?? { w: 0, h: 0 }, sx);
+        });
+        return;
+      }
+      const frames = buildFrames(dims[0] ?? { w: 0, h: 0 });
+      icons.forEach((item, i) => {
+        anims.push(
+          item.animate(frames, {
+            duration: T,
+            iterations: Infinity,
+            delay: delayOf(i),
+          })
+        );
+      });
+    };
+
+    const update = () => {
+      if (!mqDesktop.matches) {
+        anims.forEach((a) => a.cancel());
+        anims = [];
+        sigOrbit.classList.remove('is-running');
+        return;
+      }
+      sigOrbit.classList.add('is-running');
+      measure();
+      apply();
+    };
+
+    // Drag : clic maintenu → pause des animations + décalage du
+    // currentTime de chaque item ; le défilement reprend au relâchement
+    // depuis la position tirée.
+    sigOrbit.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      dragX = (e as PointerEvent).clientX;
+      anims.forEach((a) => a.pause());
+      sigOrbit.classList.add('is-dragging');
+      e.preventDefault(); // empêche le drag natif de l'image
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - dragX;
+      dragX = e.clientX;
+      dragPx += dx;
+      const dms = (dx * T) / range; // px → ms sur la timeline
+      anims.forEach((a) => {
+        a.currentTime = (((Number(a.currentTime) || 0) + dms) % T + T) % T;
+      });
+      if (mqReduced.matches) {
+        const spacing = range / icons.length;
+        icons.forEach((item, i) => {
+          let sx = (((i * spacing + dragPx) % range) + range) % range - 0.1 * W;
+          place(item, dims[i] ?? { w: 0, h: 0 }, sx);
+        });
+      }
+    });
+    const endDrag = () => {
+      dragging = false;
+      anims.forEach((a) => a.play());
+      sigOrbit.classList.remove('is-dragging');
+    };
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+
+    mqDesktop.addEventListener('change', update);
+    mqReduced.addEventListener('change', update);
+    window.addEventListener('resize', () => {
+      if (!mqDesktop.matches) return;
+      measure();
+      apply();
+    });
+    update();
+  }
+</script>
