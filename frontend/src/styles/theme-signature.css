@@ -644,6 +644,45 @@
   stroke-linejoin: round;
 }
 
+/* ═══ Clôture construite au scroll (desktop) ═══
+   La descente du trait fait office de poteau de départ ; les deux
+   lisses et le grillage soudé sont révélés au front de construction
+   (clip-path piloté en JS), et chaque poteau se plante sous son
+   cercle d'étape quand le front l'atteint. */
+
+.sig-fence__rail {
+  stroke: var(--basalt);
+  stroke-width: 5;
+}
+
+.sig-fence__mesh line {
+  stroke: var(--basalt);
+  stroke-width: 1.4;
+  opacity: 0.34;
+}
+
+.sig-fence__post {
+  fill: var(--basalt);
+  opacity: 0;
+  transform: translateY(-16px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.45s cubic-bezier(0.2, 0.9, 0.35, 1.25);
+}
+
+.sig-fence__post.is-on {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Le texte des étapes descend pour laisser la bande poteaux+lisses
+   respirer sous les cercles. */
+@media (min-width: 900px) {
+  .sig-scrollpath.is-anim .sig-step__body {
+    margin-top: 3.7rem;
+  }
+}
+
 /* ═══ Dernières installations ═══ */
 
 .sig-installs {
