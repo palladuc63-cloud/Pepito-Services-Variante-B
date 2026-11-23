@@ -568,7 +568,11 @@ const jsonLd = [{
           const down = Math.min(1, p / V_PHASE) * downLen;
           const hfrac = Math.min(1, Math.max(0, (p - V_PHASE) / (1 - V_PHASE)));
           drawn = down + hfrac * sideLen;
-          stepsEl.style.clipPath = `inset(0 ${(100 - hfrac * 100).toFixed(2)}% 0 0)`;
+          // Dès que le trait vire à l'horizontale, le 1er chevron (une
+          // colonne = 20 %) s'affiche entier ; les 4 autres se révèlent
+          // ensuite au passage de la pointe.
+          const shown = hfrac <= 0 ? 0 : 20 + hfrac * 80;
+          stepsEl.style.clipPath = `inset(0 ${(100 - shown).toFixed(2)}% 0 0)`;
         }
         pathEl.style.strokeDashoffset = `${Math.max(0, total - drawn)}`;
       };
