@@ -614,12 +614,14 @@ const jsonLd = [{
           innerEl.style.transform = `translate3d(0, ${(-panT * panE).toFixed(1)}px, 0)`;
           const hfrac = Math.min(1, Math.max(0, (q - H_START) / (1 - H_START)));
           drawn = a * ryFinal + hfrac * sideLen;
-          // Révélation par paliers : le 1er chevron (colonne = 20 %)
-          // dès le virage, puis chaque chevron apparaît ENTIER quand la
-          // pointe atteint son début — jamais de flèche à moitié
-          // découpée à l'arrêt. Le clip transite en douceur (CSS).
+          // Révélation calée sur la pointe : chaque chevron n'apparaît
+          // ENTIER que lorsque le trait atteint sa colonne — jamais de
+          // flèche affichée en avance ni à moitié découpée à l'arrêt.
+          const tipX = X0 + hfrac * sideLen;
+          const sr = stepsEl.getBoundingClientRect();
+          const f = (tipX - sr.left) / sr.width;
           const shown =
-            hfrac <= 0 ? 0 : 20 + Math.min(4, Math.floor(hfrac * 5)) * 20;
+            f <= 0 ? 0 : Math.min(100, (Math.floor(f * 5) + 1) * 20);
           stepsEl.style.clipPath = `inset(0 ${(100 - shown).toFixed(2)}% 0 0)`;
         }
         pathEl.style.strokeDashoffset = `${Math.max(0, dashTotal - drawn)}`;
