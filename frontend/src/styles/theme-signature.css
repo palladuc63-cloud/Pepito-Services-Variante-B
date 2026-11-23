@@ -611,6 +611,14 @@
   }
 }
 
+/* Le contenu épinglé passe au premier plan : le trait (svg fixed,
+   z-5) glisse DERRIÈRE les cercles et les textes — effet connecteur,
+   la ligne entre dans le nœud au lieu de le traverser visuellement. */
+.sig-scrollpath__sticky {
+  position: relative;
+  z-index: 6;
+}
+
 .sig-scrollpath__inner {
   will-change: transform;
 }
