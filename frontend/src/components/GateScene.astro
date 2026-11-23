@@ -116,22 +116,23 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
   .gate-scene__hint {
     position: absolute;
     left: 50%;
-    bottom: 3.5vh;
+    bottom: 13.5vh;
     transform: translateX(-50%);
     z-index: 4;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    color: #2f3a35;
+    gap: 0.55rem;
+    color: #fff;
+    filter: drop-shadow(0 1px 8px rgb(0 0 0 / 0.4));
     pointer-events: none;
     will-change: opacity;
   }
   .gate-scene__hint-mouse {
     position: relative;
-    width: 1.4rem;
-    height: 2.3rem;
-    border: 2px solid currentColor;
+    width: 1.7rem;
+    height: 2.8rem;
+    border: 2.5px solid currentColor;
     border-radius: 999px;
     opacity: 0.9;
   }
@@ -139,9 +140,9 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     position: absolute;
     left: 50%;
     top: 20%;
-    width: 4px;
-    height: 4px;
-    margin-left: -2px;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
     border-radius: 50%;
     background: currentColor;
     animation: gate-hint-dot 1.9s ease-in-out infinite;
@@ -155,16 +156,16 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
       opacity: 1;
     }
     62% {
-      transform: translateY(0.85rem);
+      transform: translateY(1rem);
       opacity: 1;
     }
     100% {
-      transform: translateY(1.05rem);
+      transform: translateY(1.25rem);
       opacity: 0;
     }
   }
   .gate-scene__hint-chevs {
-    width: 1.05rem;
+    width: 1.3rem;
     height: auto;
     display: block;
   }
@@ -194,7 +195,7 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     }
   }
   .gate-scene__hint-label {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.15em;
     text-transform: uppercase;
