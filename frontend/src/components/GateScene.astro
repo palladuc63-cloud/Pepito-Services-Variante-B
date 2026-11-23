@@ -278,10 +278,18 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     // démarre à 0 quand même.
     const overlap = -parseFloat(getComputedStyle(gateScene).marginTop) || 0;
 
+    // One-shot : une fois le portail entièrement ouvert, il le reste
+    // (vidéo figée sur la fin + bloc bienvenue affiché) même en
+    // remontant — le reset n'a lieu qu'au rechargement de la page.
+    let played = false;
+
     const onScroll = () => {
       const rect = gateScene.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-      target = clamp01((-rect.top - overlap) / (rect.height - window.innerHeight));
+      let t = clamp01((-rect.top - overlap) / (rect.height - window.innerHeight));
+      if (t >= 0.995) played = true;
+      if (played) t = 1;
+      target = t;
       visT = clamp01(1 - rect.top / window.innerHeight);
       if (!raf) raf = requestAnimationFrame(tick);
     };
