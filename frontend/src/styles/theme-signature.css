@@ -460,6 +460,7 @@
   padding: 0;
   list-style: none;
   counter-reset: sigstep;
+  transition: clip-path 0.35s ease;
 }
 
 @media (min-width: 900px) {
