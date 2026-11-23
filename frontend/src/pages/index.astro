@@ -528,7 +528,21 @@ const jsonLd = [{
       const chevEl = stepsEl.querySelector<HTMLElement>('.sig-step__chev');
       const X0 = 11; // bord gauche écran ≈ demi-épaisseur du trait
       const V_PHASE = 0.6; // part du scroll dédiée à la descente
-      let total = 1, downLen = 0, sideLen = 0;
+      let dashTotal = 1, downLen = 0, sideLen = 0, endX = 0;
+      let chevH = 42, runway = 0;
+
+      // Position de mise en page du ruban (offsetTop) : constante même
+      // quand .sig-process est épinglé en sticky — sert de référence
+      // pour la longueur « naturelle » de la descente.
+      const naturalTop = () => {
+        let n = 0;
+        let el: HTMLElement | null = stepsEl;
+        while (el && el !== scrollPath) {
+          n += el.offsetTop;
+          el = el.offsetParent as HTMLElement | null;
+        }
+        return n;
+      };
 
       const measurePath = () => {
         const wr = scrollPath.getBoundingClientRect();
@@ -537,35 +551,44 @@ const jsonLd = [{
           pathEl.setAttribute('d', `M ${X0} 0 L ${X0} ${wr.height.toFixed(1)}`);
           downLen = wr.height;
           sideLen = 0;
+          runway = 0;
         } else {
-          const ribbonY = sr.top - wr.top + (chevEl?.offsetHeight ?? 42) / 2;
-          const endX = sr.right - wr.left - 4;
-          pathEl.setAttribute(
-            'd',
-            `M ${X0} 0 L ${X0} ${ribbonY.toFixed(1)} L ${endX.toFixed(1)} ${ribbonY.toFixed(1)}`
-          );
-          downLen = ribbonY;
+          chevH = chevEl?.offsetHeight ?? 42;
+          downLen = naturalTop() + chevH / 2;
+          runway = parseFloat(getComputedStyle(scrollPath).paddingBottom) || 0;
+          endX = sr.right - wr.left - 4;
           sideLen = Math.max(0, endX - X0);
         }
-        total = downLen + sideLen;
-        pathEl.style.strokeDasharray = `${total}`;
+        // dasharray inclut la piste sticky : le coin du L peut suivre le
+        // ruban épinglé (delta ≤ runway) sans casser le tracé.
+        dashTotal = downLen + runway + sideLen;
+        pathEl.style.strokeDasharray = `${dashTotal}`;
       };
 
       const drawPath = () => {
         const r = scrollPath.getBoundingClientRect();
         // Le tracé ne démarre qu'après ~30 % d'écran parcouru dans la
-        // zone (d0) : la ligne suit vraiment le scroll au lieu d'être
-        // déjà avancée à l'arrivée. p=1 quand le bas de la zone
-        // atteint le bas de l'écran.
+        // zone (d0). La piste sticky (+90vh) rallonge le scroll total :
+        // p=1 quand le bas du wrapper atteint le bas de l'écran.
         const vh = window.innerHeight;
         const d0 = vh * 0.3;
         const p = Math.min(1, Math.max(0, (vh - r.top - d0) / (r.height - d0)));
         let drawn: number;
         if (mqNarrow.matches) {
-          drawn = p * total;
+          drawn = p * dashTotal;
           stepsEl.style.clipPath = `inset(0 0 ${(100 - p * 100).toFixed(2)}% 0)`;
         } else {
-          const down = Math.min(1, p / V_PHASE) * downLen;
+          // Coin du L recalé à chaque frame sur la position LIVE du
+          // ruban : quand la section s'épingle (sticky), le virage la
+          // suit au lieu de rester collé à la position d'origine.
+          const ryCur =
+            stepsEl.getBoundingClientRect().top - r.top + chevH / 2;
+          const delta = Math.max(0, Math.min(runway, ryCur - downLen));
+          pathEl.setAttribute(
+            'd',
+            `M ${X0} 0 L ${X0} ${ryCur.toFixed(1)} L ${endX.toFixed(1)} ${ryCur.toFixed(1)}`
+          );
+          const down = Math.min(1, p / V_PHASE) * downLen + delta;
           const hfrac = Math.min(1, Math.max(0, (p - V_PHASE) / (1 - V_PHASE)));
           drawn = down + hfrac * sideLen;
           // Dès que le trait vire à l'horizontale, le 1er chevron (une
@@ -574,7 +597,7 @@ const jsonLd = [{
           const shown = hfrac <= 0 ? 0 : 20 + hfrac * 80;
           stepsEl.style.clipPath = `inset(0 ${(100 - shown).toFixed(2)}% 0 0)`;
         }
-        pathEl.style.strokeDashoffset = `${Math.max(0, total - drawn)}`;
+        pathEl.style.strokeDashoffset = `${Math.max(0, dashTotal - drawn)}`;
       };
 
       const syncPath = () => {
