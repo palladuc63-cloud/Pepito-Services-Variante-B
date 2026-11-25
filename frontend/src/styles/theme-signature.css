@@ -503,6 +503,7 @@
 
 @media (min-width: 900px) {
   .sig-step__marker {
+    align-self: center;
     width: 14.4rem;
     height: 14.4rem;
   }
