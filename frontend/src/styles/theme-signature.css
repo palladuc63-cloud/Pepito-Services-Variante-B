@@ -172,18 +172,22 @@
 }
 
 .sig-btn--primary {
+  border: 2px solid var(--cta-text);
   background: var(--cta);
   color: var(--cta-text);
+  --cta-frame-mask: var(--cta);
 }
 
 .sig-btn--primary:hover,
 .sig-btn--primary:focus-visible {
   background: var(--cta-dark);
+  --cta-frame-mask: var(--cta-dark);
 }
 
 .sig-btn--ghost {
-  border: 1.5px solid var(--ink);
+  border: 2px solid var(--ink);
   color: var(--ink);
+  --cta-frame-mask: var(--paper);
 }
 
 .sig-btn--ghost:hover,
@@ -207,62 +211,68 @@
   transform: translateX(3px);
 }
 
-/* ═══ Équerres de traçage — cadre de sélection technique ═══
-   4 cornières (2 pseudo-éléments × 2 angles) qui glissent depuis
-   chaque côté et se verrouillent aux coins du bouton au survol.
-   ::before = paire gauche, ::after = paire droite ; la couleur suit
-   currentColor (crème sur primary, encre sur ghost). */
-.sig-btn::before,
-.sig-btn::after,
-:root[data-theme='signature'] .nav-quote::before,
-:root[data-theme='signature'] .nav-quote::after {
-  content: '';
-  position: absolute;
-  top: -5px;
-  bottom: -5px;
-  width: 13px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.18s ease, transform 0.24s cubic-bezier(0.34, 0.9, 0.35, 1);
-  background-repeat: no-repeat;
+/* From Uiverse.io by TISEPSE - https://uiverse.io/TISEPSE/perfect-pig-59
+   MIT License, Copyright (c) https://www.youtube.com/watch?v=B7Z6qERVTvM
+   Adapté au thème Signature : la bordure du bouton est masquée au repos
+   par deux bandes couleur fond (milieux vertical et horizontal) ; au
+   survol elles s'effondrent en deux temps — les côtés d'abord, puis
+   haut/bas en décalé — et le cadre complet se dessine. La couleur de
+   masque suit chaque variante via --cta-frame-mask. */
+:root[data-theme='signature'] .nav-quote {
+  border: 2px solid var(--cta-text);
+  --cta-frame-mask: var(--cta);
 }
 
 .sig-btn::before,
 :root[data-theme='signature'] .nav-quote::before {
-  left: -5px;
-  transform: translateX(-7px);
-  background-image:
-    linear-gradient(currentColor, currentColor),
-    linear-gradient(currentColor, currentColor),
-    linear-gradient(currentColor, currentColor),
-    linear-gradient(currentColor, currentColor);
-  background-size: 12px 2px, 2px 12px, 12px 2px, 2px 12px;
-  background-position: left top, left top, left bottom, left bottom;
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% - 12px);
+  background: var(--cta-frame-mask, var(--cta));
+  transform: scaleY(1);
+  transition: transform 0.3s ease-in-out;
+  pointer-events: none;
 }
 
 .sig-btn::after,
 :root[data-theme='signature'] .nav-quote::after {
-  right: -5px;
-  transform: translateX(7px);
-  background-image:
-    linear-gradient(currentColor, currentColor),
-    linear-gradient(currentColor, currentColor),
-    linear-gradient(currentColor, currentColor),
-    linear-gradient(currentColor, currentColor);
-  background-size: 12px 2px, 2px 12px, 12px 2px, 2px 12px;
-  background-position: right top, right top, right bottom, right bottom;
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: -2px;
+  height: calc(100% + 4px);
+  width: calc(100% - 12px);
+  background: var(--cta-frame-mask, var(--cta));
+  transform: scaleX(1);
+  transition: transform 0.3s ease-in-out;
+  transition-delay: 0.5s;
+  pointer-events: none;
 }
 
 .sig-btn:hover::before,
-.sig-btn:hover::after,
 .sig-btn:focus-visible::before,
-.sig-btn:focus-visible::after,
 :root[data-theme='signature'] .nav-quote:hover::before,
+:root[data-theme='signature'] .nav-quote:focus-visible::before {
+  transform: scaleY(0);
+}
+
+.sig-btn:hover::after,
+.sig-btn:focus-visible::after,
 :root[data-theme='signature'] .nav-quote:hover::after,
-:root[data-theme='signature'] .nav-quote:focus-visible::before,
 :root[data-theme='signature'] .nav-quote:focus-visible::after {
-  opacity: 1;
-  transform: translateX(0);
+  transform: scaleX(0);
+}
+
+/* Libellé et flèche au-dessus des bandes de masque. */
+.sig-btn > span,
+.sig-btn > svg,
+:root[data-theme='signature'] .nav-quote > span,
+:root[data-theme='signature'] .nav-quote > svg {
+  position: relative;
+  z-index: 1;
 }
 
 /* Visuel : la photo remplit tout le pan diagonal, bord d'écran à diagonale */

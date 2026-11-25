@@ -16,10 +16,10 @@ const { images } = Astro.props;
       <p class="sig-hero__sub">{signature.heroSubtitle}</p>
       <div class="sig-hero__actions">
         <a href={signature.ctaPrimary.href} class="sig-btn sig-btn--primary">
-          {signature.ctaPrimary.label}<Icon name="move-right" size={16} class="cta-arrow" />
+          <span>{signature.ctaPrimary.label}</span><Icon name="move-right" size={16} class="cta-arrow" />
         </a>
         <a href={signature.ctaSecondary.href} class="sig-btn sig-btn--ghost">
-          {signature.ctaSecondary.label}<Icon name="move-right" size={16} class="cta-arrow" />
+          <span>{signature.ctaSecondary.label}</span><Icon name="move-right" size={16} class="cta-arrow" />
         </a>
       </div>
     </div>
