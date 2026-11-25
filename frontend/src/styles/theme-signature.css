@@ -536,6 +536,26 @@
   filter: none;
 }
 
+/* Diorama isométrique : l'image flotte librement (elle contient son
+   propre socle d'herbe) — pas de rognage circulaire, taille ×2. */
+.sig-step__marker--iso {
+  width: 4.4rem;
+  height: 4.4rem;
+}
+
+@media (min-width: 900px) {
+  .sig-step__marker--iso {
+    width: 8.8rem;
+    height: 8.8rem;
+  }
+}
+
+.sig-step__marker--iso .sig-step__photo {
+  object-fit: contain;
+  border-radius: 0;
+  filter: grayscale(0.45) saturate(0.65) brightness(0.92) opacity(0.8);
+}
+
 .sig-step__num {
   position: absolute;
   top: -0.4rem;

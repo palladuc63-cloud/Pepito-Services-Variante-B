@@ -184,7 +184,7 @@ const jsonLd = [{
         <ol class="sig-steps">
           {signature.steps.map((s, i) => (
             <li class="sig-step">
-              <span class="sig-step__marker" aria-hidden="true">
+              <span class:list={['sig-step__marker', { 'sig-step__marker--iso': s.img }]} aria-hidden="true">
                 {s.img ? (
                   <img class="sig-step__photo" src={s.img} alt="" loading="lazy" />
                 ) : (
