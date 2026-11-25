@@ -39,18 +39,37 @@
   margin-left: 0.75rem;
   padding: 0.55rem 1.3rem;
   border-radius: 999px;
-  background: var(--cta);
+  background-color: var(--cta);
+  /* Jauge : le cta-dark se remplit de gauche à droite au survol
+     (background-size animé — coulée dans la pill). */
+  background-image: linear-gradient(var(--cta-dark), var(--cta-dark));
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 0% 100%;
   color: var(--cta-text);
   font-weight: 600;
   font-size: 0.875rem;
   line-height: 1;
   white-space: nowrap;
-  transition: background-color 0.2s ease;
+  /* Presse iso : ombre dure décalée, sans flou — le bouton se soulève
+     au survol, s'enfonce au clic. */
+  box-shadow: 0 3px 0 var(--cta-dark);
+  transition:
+    background-size 0.28s cubic-bezier(0.6, 0, 0.2, 1),
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 :root[data-theme='signature'] .nav-quote:hover,
 :root[data-theme='signature'] .nav-quote:focus-visible {
-  background: var(--cta-dark);
+  background-size: 100% 100%;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 var(--cta-dark);
+}
+
+:root[data-theme='signature'] .nav-quote:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--cta-dark);
 }
 
 @media (min-width: 768px) {
@@ -166,28 +185,59 @@
   font-weight: 600;
   font-size: 0.95rem;
   line-height: 1;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 0% 100%;
+  transition:
+    background-size 0.28s cubic-bezier(0.6, 0, 0.2, 1),
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
+/* Presse iso : ombre dure décalée (extrusion), soulèvement au survol,
+   enfoncement au clic — effet touche mécanique. */
 .sig-btn--primary {
-  background: var(--cta);
+  background-color: var(--cta);
+  /* Jauge : cta-dark se remplit de gauche à droite au survol. */
+  background-image: linear-gradient(var(--cta-dark), var(--cta-dark));
   color: var(--cta-text);
+  box-shadow: 0 3px 0 var(--cta-dark);
 }
 
 .sig-btn--primary:hover,
 .sig-btn--primary:focus-visible {
-  background: var(--cta-dark);
+  background-size: 100% 100%;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 var(--cta-dark);
+}
+
+.sig-btn--primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--cta-dark);
 }
 
 .sig-btn--ghost {
   border: 1.5px solid var(--ink);
+  /* Jauge : voile forest-soft qui coule de gauche à droite. */
+  background-image: linear-gradient(var(--forest-soft), var(--forest-soft));
   color: var(--ink);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--ink) 20%, transparent);
 }
 
 .sig-btn--ghost:hover,
 .sig-btn--ghost:focus-visible {
+  background-size: 100% 100%;
   border-color: var(--forest);
   color: var(--forest);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--ink) 20%, transparent);
+}
+
+.sig-btn--ghost:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 20%, transparent);
 }
 
 /* Visuel : la photo remplit tout le pan diagonal, bord d'écran à diagonale */
