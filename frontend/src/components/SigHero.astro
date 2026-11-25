@@ -98,13 +98,16 @@ const { images } = Astro.props;
       return cy - ry * Math.sqrt(Math.max(0, 1 - t * t));
     };
 
-    // Fondus en smoothstep. Sens gauche → droite : sortie à droite en
-    // longue dissolution sur ~30 % de la largeur, nulle dès que le
-    // picto approche le bord — aucune coupure nette à l'overflow.
+    // Fondus en smoothstep, calés sur la demi-largeur hw du picto :
+    // l'entrée démarre quand le bord droit du picto franchit le bord
+    // gauche du hero et s'achève quand il est ENTIÈREMENT dans le champ
+    // (+2 % de marge) — jamais de tranche visible à pleine opacité.
+    // Sortie symétrique : nulle dès que le bord droit du picto atteint
+    // le bord droit, dissoute sur ~30 % de la largeur en amont.
     const smooth = (t: number) => t * t * (3 - 2 * t);
-    const fade = (sx: number) => {
-      const finLeft = smooth(Math.min(1, Math.max(0, (sx + 0.02 * W) / (0.12 * W))));
-      const foutRight = smooth(Math.min(1, Math.max(0, (0.95 * W - sx) / (0.3 * W))));
+    const fade = (sx: number, hw: number) => {
+      const finLeft = smooth(Math.min(1, Math.max(0, (sx + hw) / (hw * 2 + 0.02 * W))));
+      const foutRight = smooth(Math.min(1, Math.max(0, (W - hw - sx) / (0.3 * W))));
       return Math.min(finLeft, foutRight);
     };
 
@@ -115,7 +118,7 @@ const { images } = Astro.props;
       item.style.transform = `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
         arcY(sx) - d.h * 0.85
       ).toFixed(2)}px, 0)`;
-      item.style.opacity = fade(sx).toFixed(3);
+      item.style.opacity = fade(sx, d.w / 2).toFixed(3);
     };
 
     // Progression 0→1 = gauche → droite. Items tous de même taille :
@@ -128,7 +131,7 @@ const { images } = Astro.props;
           transform: `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
             arcY(sx) - d.h * 0.85
           ).toFixed(2)}px, 0)`,
-          opacity: fade(sx).toFixed(3),
+          opacity: fade(sx, d.w / 2).toFixed(3),
         });
       }
       return frames;
