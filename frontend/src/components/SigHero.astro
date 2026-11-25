@@ -1,5 +1,6 @@
 ---
 import { signature } from '../data/signature';
+import Icon from './Icon.astro';
 
 interface Props {
   images: string[];
@@ -15,10 +16,10 @@ const { images } = Astro.props;
       <p class="sig-hero__sub">{signature.heroSubtitle}</p>
       <div class="sig-hero__actions">
         <a href={signature.ctaPrimary.href} class="sig-btn sig-btn--primary">
-          {signature.ctaPrimary.label}
+          {signature.ctaPrimary.label}<Icon name="move-right" size={16} class="cta-arrow" />
         </a>
         <a href={signature.ctaSecondary.href} class="sig-btn sig-btn--ghost">
-          {signature.ctaSecondary.label}
+          {signature.ctaSecondary.label}<Icon name="move-right" size={16} class="cta-arrow" />
         </a>
       </div>
     </div>

@@ -6,6 +6,7 @@ import Section from '../components/Section.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import logo from '../assets/pepito-logo.svg';
+import Icon from '../components/Icon.astro';
 import { signature } from '../data/signature';
 import { ICONS } from '../lib/icons';
 import GateScene from '../components/GateScene.astro';
@@ -232,7 +233,7 @@ const jsonLd = [{
         {previewProjects.map((project: Project) => <ProjectCard project={project} />)}
       </div>
       <div class="sig-installs__more">
-        <a href={`${base}realisations/`} class="sig-btn sig-btn--primary">Voir toutes les réalisations</a>
+        <a href={`${base}realisations/`} class="sig-btn sig-btn--primary">Voir toutes les réalisations<Icon name="move-right" size={16} class="cta-arrow" /></a>
       </div>
     </section>
   </div>

@@ -192,6 +192,21 @@
   color: var(--forest);
 }
 
+/* Flèche Lucide « move-right » dans les CTA : présente au repos,
+   nudge de +3px au survol — même easing que les équerres. */
+.cta-arrow {
+  margin-left: 0.55rem;
+  flex-shrink: 0;
+  transition: transform 0.24s cubic-bezier(0.34, 0.9, 0.35, 1);
+}
+
+.sig-btn:hover .cta-arrow,
+.sig-btn:focus-visible .cta-arrow,
+:root[data-theme='signature'] .nav-quote:hover .cta-arrow,
+:root[data-theme='signature'] .nav-quote:focus-visible .cta-arrow {
+  transform: translateX(3px);
+}
+
 /* ═══ Équerres de traçage — cadre de sélection technique ═══
    4 cornières (2 pseudo-éléments × 2 angles) qui glissent depuis
    chaque côté et se verrouillent aux coins du bouton au survol.

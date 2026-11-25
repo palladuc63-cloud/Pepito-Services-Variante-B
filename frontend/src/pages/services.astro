@@ -1,5 +1,6 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
+import Icon from '../components/Icon.astro';
 import SigHero from '../components/SigHero.astro';
 import { sigHeroImgs } from '../data/signature';
 import { getSite } from '../lib/site.js';
@@ -20,7 +21,7 @@ const base = import.meta.env.BASE_URL;
     <SigHero images={images} />
 
     <section class="container" style="padding-block: 2.5rem 4rem; text-align: center;">
-      <a href={`${base}contact/`} class="sig-btn sig-btn--primary">Demander un devis</a>
+      <a href={`${base}contact/`} class="sig-btn sig-btn--primary">Demander un devis<Icon name="move-right" size={16} class="cta-arrow" /></a>
     </section>
   </div>
 </MainLayout>
