@@ -598,21 +598,14 @@
   color: var(--stone);
 }
 
-/* ═══ Ligne de progression scrollée ═══
-   Trait épais qui descend le bord gauche de l'écran pendant les
-   arguments, vire à 90° au niveau du ruban et le « devient » : les
-   chevrons sont révélés de gauche à droite au passage de la pointe
-   (clip-path piloté en JS, couleur identique → le trait se fond dans
-   les chevrons). Overlay SVG sans viewBox : 1 unité = 1 px. */
-
+/* ═══ Vue figée des étapes (desktop) ═══
+   La piste fait 100vh + ~260vh de défilement ; le contenu est épinglé
+   plein écran pendant que le scroll révèle les étapes une à une.
+   Sans JS / reduced-motion / mobile : flux normal, rien d'épinglé. */
 .sig-scrollpath {
   position: relative;
 }
 
-/* Vue figée (desktop, activée par JS via .is-pinned) : la piste fait
-   100vh + ~260vh de défilement ; le contenu est épinglé plein écran
-   pendant que la ligne se dessine au scroll — la page ne bouge pas.
-   Sans JS / reduced-motion / mobile : flux normal, rien d'épinglé. */
 @media (min-width: 900px) {
   .sig-scrollpath.is-pinned {
     height: calc(100vh + 260vh);
@@ -627,76 +620,8 @@
   }
 }
 
-/* Le contenu épinglé passe au premier plan : le trait (svg fixed,
-   z-5) glisse DERRIÈRE les cercles et les textes — effet connecteur,
-   la ligne entre dans le nœud au lieu de le traverser visuellement. */
-.sig-scrollpath__sticky {
-  position: relative;
-  z-index: 6;
-}
-
 .sig-scrollpath__inner {
   will-change: transform;
-}
-
-/* SVG ancré au VIEWPORT (fixed) : la ligne commence à descendre le
-   bord gauche pendant le scroll normal, puis continue à l'identique
-   dans la vue épinglée — mêmes coordonnées avant et pendant le gel. */
-.sig-scrollpath__svg {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 5;
-  overflow: visible;
-}
-
-.sig-scrollpath__path {
-  fill: none;
-  stroke: var(--basalt);
-  stroke-width: 16;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-/* ═══ Clôture construite au scroll (desktop) ═══
-   La descente du trait fait office de poteau de départ ; les deux
-   lisses et le grillage soudé sont révélés au front de construction
-   (clip-path piloté en JS), et chaque poteau se plante sous son
-   cercle d'étape quand le front l'atteint. */
-
-.sig-fence__rail {
-  stroke: var(--basalt);
-  stroke-width: 5;
-}
-
-.sig-fence__mesh line {
-  stroke: var(--basalt);
-  stroke-width: 1.4;
-  opacity: 0.34;
-}
-
-.sig-fence__post {
-  fill: var(--basalt);
-  opacity: 0;
-  transform: translateY(-16px);
-  transition:
-    opacity 0.3s ease,
-    transform 0.45s cubic-bezier(0.2, 0.9, 0.35, 1.25);
-}
-
-.sig-fence__post.is-on {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Le texte des étapes descend pour laisser la bande poteaux+lisses
-   respirer sous les cercles. */
-@media (min-width: 900px) {
-  .sig-scrollpath.is-anim .sig-step__body {
-    margin-top: 3.7rem;
-  }
 }
 
 /* ═══ Dernières installations ═══ */
