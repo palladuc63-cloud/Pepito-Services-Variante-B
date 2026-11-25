@@ -98,15 +98,14 @@ const { images } = Astro.props;
       return cy - ry * Math.sqrt(Math.max(0, 1 - t * t));
     };
 
-    // Fondus en smoothstep, calés sur la demi-largeur hw du picto :
-    // l'entrée démarre quand le bord droit du picto franchit le bord
-    // gauche du hero et s'achève quand il est ENTIÈREMENT dans le champ
-    // (+2 % de marge) — jamais de tranche visible à pleine opacité.
-    // Sortie symétrique : nulle dès que le bord droit du picto atteint
-    // le bord droit, dissoute sur ~30 % de la largeur en amont.
+    // Fondus en smoothstep. La boucle démarre à sx = hw (picto déjà
+    // ENTIÈREMENT dans le champ, opacité nulle) : les pictos ne sont
+    // jamais tronqués par le bord gauche — l'entrée se matérialise en
+    // fondu pendant le déplacement. La traversée hors-écran se fait
+    // uniquement à droite, pendant que l'opacité est à 0.
     const smooth = (t: number) => t * t * (3 - 2 * t);
     const fade = (sx: number, hw: number) => {
-      const finLeft = smooth(Math.min(1, Math.max(0, (sx + hw) / (hw * 2 + 0.02 * W))));
+      const finLeft = smooth(Math.min(1, Math.max(0, (sx - hw) / (0.1 * W))));
       const foutRight = smooth(Math.min(1, Math.max(0, (W - hw - sx) / (0.3 * W))));
       return Math.min(finLeft, foutRight);
     };
@@ -125,8 +124,9 @@ const { images } = Astro.props;
     // un seul tableau de keyframes partagé.
     const buildFrames = (d: { w: number; h: number }) => {
       const frames: Keyframe[] = [];
+      const hw = d.w / 2;
       for (let k = 0; k <= KEYS; k++) {
-        const sx = (k / KEYS) * range - 0.1 * W;
+        const sx = hw + (k / KEYS) * range;
         frames.push({
           transform: `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
             arcY(sx) - d.h * 0.85
@@ -151,7 +151,8 @@ const { images } = Astro.props;
         // Reduced motion : pictos répartis statiquement sur l'arc.
         const spacing = range / icons.length;
         icons.forEach((item, i) => {
-          let sx = ((i * spacing + dragPx) % range + range) % range - 0.1 * W;
+          const hw = (dims[i]?.w ?? 0) / 2;
+          let sx = hw + (((i * spacing + dragPx) % range) + range) % range;
           place(item, dims[i] ?? { w: 0, h: 0 }, sx);
         });
         return;
@@ -202,7 +203,8 @@ const { images } = Astro.props;
       if (mqReduced.matches) {
         const spacing = range / icons.length;
         icons.forEach((item, i) => {
-          let sx = (((i * spacing + dragPx) % range) + range) % range - 0.1 * W;
+          const hw = (dims[i]?.w ?? 0) / 2;
+          let sx = hw + (((i * spacing + dragPx) % range) + range) % range;
           place(item, dims[i] ?? { w: 0, h: 0 }, sx);
         });
       }
