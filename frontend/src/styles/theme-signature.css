@@ -305,7 +305,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
-  width: clamp(5.7rem, 8.25vw, 8.25rem);
+  width: clamp(11.4rem, 16.5vw, 16.5rem);
   text-align: center;
   pointer-events: auto;
   cursor: grab;
@@ -335,7 +335,7 @@
 }
 
 .sig-hero__orbit-label {
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 600;
   line-height: 1.25;
   color: var(--ink);
