@@ -68,9 +68,8 @@
   padding-top: clamp(2rem, 5vw, 4rem);
   padding-bottom: clamp(2.5rem, 5vw, 4rem);
   isolation: isolate;
-  /* Fond papier uni : la zone sous la courbe (entre le bas du pan et le
-     haut de la vidéo) reste plane, sans le grain du body. */
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image: var(--grain-img);
 }
 
 /* Grande courbe concave sous le hero (signature de la maquette) :
@@ -103,27 +102,6 @@
 
 @media (min-width: 900px) {
   .sig-hero::before {
-    -webkit-mask-image: radial-gradient(
-      ellipse 190% 250% at 90% 320%,
-      transparent 99.6%,
-      #000 100%
-    );
-    mask-image: radial-gradient(ellipse 190% 250% at 90% 320%, transparent 99.6%, #000 100%);
-  }
-}
-
-/* Voile couleur page au-dessus de la vidéo glissée sous le hero :
-   opaque partout sauf sous l'arc — le portail n'est visible que
-   sous la courbe, jamais au-dessus. */
-.sig-hero__veil {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background: var(--paper);
-  pointer-events: none;
-}
-@media (min-width: 900px) {
-  .sig-hero__veil {
     -webkit-mask-image: radial-gradient(
       ellipse 190% 250% at 90% 320%,
       transparent 99.6%,
