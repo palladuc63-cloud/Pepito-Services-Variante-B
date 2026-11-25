@@ -62,16 +62,17 @@ const { images } = Astro.props;
   const sigOrbit = sigHero?.querySelector('.sig-hero__orbit');
   if (sigHero && sigOrbit) {
     const icons = Array.from(sigOrbit.querySelectorAll<HTMLElement>('.sig-hero__orbit-item'));
+    const labels = icons.map((item) => item.querySelector<HTMLElement>('.sig-hero__orbit-label'));
     const mqDesktop = window.matchMedia('(min-width: 900px)');
     const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const SPEED = 0.028; // fraction de la largeur du hero parcourue / s
     const SPAN = 1.25; // amplitude de la boucle (× largeur du hero)
     const KEYS = 48; // points du chemin précalculé
-    let W = 0, cx = 0, cy = 0, rx = 1, ry = 1;
+    let W = 0, H = 0, topPad = 0, cx = 0, cy = 0, rx = 1, ry = 1;
     let T = 45000, range = 0;
     let dragPx = 0, dragging = false, dragX = 0;
     let anims: Animation[] = [];
-    let dims: { w: number; h: number }[] = [];
+    let dims: { w: number; h: number; total: number }[] = [];
 
     // Géométrie de l'ellipse ::after : son bord supérieur forme l'arc
     // visible sous le hero. Dimensions des items mises en cache ici
@@ -79,16 +80,20 @@ const { images } = Astro.props;
     const measure = () => {
       const cs = getComputedStyle(sigHero, '::after');
       W = sigHero.clientWidth;
+      H = sigHero.clientHeight;
+      topPad = 0.08 * window.innerHeight; // = top: 8vh des items
       rx = parseFloat(cs.width) / 2;
       ry = parseFloat(cs.height) / 2;
       cx = parseFloat(cs.left) + rx;
       cy = parseFloat(cs.top) + ry;
       range = SPAN * W;
       T = (range / (SPEED * W)) * 1000;
-      // Le picto est carré (aspect-ratio: 1) : sa hauteur vaut sa largeur.
+      // Le picto est carré (aspect-ratio: 1) : sa hauteur vaut sa
+      // largeur. total = hauteur réelle de l'item (picto + libellé),
+      // pour le fondu contre le bord bas du hero.
       dims = icons.map((item) => {
         const w = item.offsetWidth;
-        return { w, h: w };
+        return { w, h: w, total: item.offsetHeight || w };
       });
     };
 
@@ -111,29 +116,47 @@ const { images } = Astro.props;
       return Math.min(finLeft, foutRight);
     };
 
+    // Fondu propre au libellé : son bas se dissout quand il approche
+    // le bord bas du hero — l'arc plonge à gauche, sans ce fondu le
+    // texte serait tranché net par l'overflow.
+    const labelFade = (bottomY: number) =>
+      smooth(Math.min(1, Math.max(0, (H - 10 - bottomY) / 64)));
+
     // Transform de l'item à l'abscisse sx : base du picto légèrement
     // sous l'arc (~85 % de sa hauteur chevauche la photo), le libellé
     // flotte sous la courbe.
-    const place = (item: HTMLElement, d: { w: number; h: number }, sx: number) => {
-      item.style.transform = `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
-        arcY(sx) - d.h * 0.85
-      ).toFixed(2)}px, 0)`;
+    const place = (item: HTMLElement, label: HTMLElement | null, d: { w: number; h: number; total: number }, sx: number) => {
+      const y = arcY(sx) - d.h * 0.85;
+      item.style.transform = `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
       item.style.opacity = fade(sx, d.w / 2).toFixed(3);
+      if (label) label.style.opacity = labelFade(topPad + y + d.total).toFixed(3);
     };
 
     // Progression 0→1 = gauche → droite. Items tous de même taille :
     // un seul tableau de keyframes partagé.
-    const buildFrames = (d: { w: number; h: number }) => {
+    const buildFrames = (d: { w: number; h: number; total: number }) => {
       const frames: Keyframe[] = [];
       const hw = d.w / 2;
       for (let k = 0; k <= KEYS; k++) {
         const sx = hw + EDGE() + (k / KEYS) * range;
+        const y = arcY(sx) - d.h * 0.85;
         frames.push({
-          transform: `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${(
-            arcY(sx) - d.h * 0.85
-          ).toFixed(2)}px, 0)`,
+          transform: `translate3d(${(sx - d.w / 2).toFixed(2)}px, ${y.toFixed(2)}px, 0)`,
           opacity: fade(sx, d.w / 2).toFixed(3),
         });
+      }
+      return frames;
+    };
+
+    // Keyframes d'opacité du libellé (animé séparément, même timeline) :
+    // le texte s'estompe dès que son bas approche le bord bas du hero.
+    const buildLabelFrames = (d: { w: number; h: number; total: number }) => {
+      const frames: Keyframe[] = [];
+      const hw = d.w / 2;
+      for (let k = 0; k <= KEYS; k++) {
+        const sx = hw + EDGE() + (k / KEYS) * range;
+        const y = arcY(sx) - d.h * 0.85;
+        frames.push({ opacity: labelFade(topPad + y + d.total).toFixed(3) });
       }
       return frames;
     };
@@ -154,19 +177,31 @@ const { images } = Astro.props;
         icons.forEach((item, i) => {
           const hw = (dims[i]?.w ?? 0) / 2;
           let sx = hw + EDGE() + (((i * spacing + dragPx) % range) + range) % range;
-          place(item, dims[i] ?? { w: 0, h: 0 }, sx);
+          place(item, labels[i] ?? null, dims[i] ?? { w: 0, h: 0, total: 0 }, sx);
         });
         return;
       }
-      const frames = buildFrames(dims[0] ?? { w: 0, h: 0 });
+      const frames = buildFrames(dims[0] ?? { w: 0, h: 0, total: 0 });
+      const labelFrames = buildLabelFrames(dims[0] ?? { w: 0, h: 0, total: 0 });
       icons.forEach((item, i) => {
+        const delay = delayOf(i);
         anims.push(
           item.animate(frames, {
             duration: T,
             iterations: Infinity,
-            delay: delayOf(i),
+            delay,
           })
         );
+        const label = labels[i];
+        if (label) {
+          anims.push(
+            label.animate(labelFrames, {
+              duration: T,
+              iterations: Infinity,
+              delay,
+            })
+          );
+        }
       });
     };
 
@@ -174,6 +209,7 @@ const { images } = Astro.props;
       if (!mqDesktop.matches) {
         anims.forEach((a) => a.cancel());
         anims = [];
+        labels.forEach((l) => l && (l.style.opacity = ''));
         sigOrbit.classList.remove('is-running');
         return;
       }
@@ -206,7 +242,7 @@ const { images } = Astro.props;
         icons.forEach((item, i) => {
           const hw = (dims[i]?.w ?? 0) / 2;
           let sx = hw + EDGE() + (((i * spacing + dragPx) % range) + range) % range;
-          place(item, dims[i] ?? { w: 0, h: 0 }, sx);
+          place(item, labels[i] ?? null, dims[i] ?? { w: 0, h: 0, total: 0 }, sx);
         });
       }
     });
