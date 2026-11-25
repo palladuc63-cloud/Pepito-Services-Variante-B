@@ -482,18 +482,18 @@
   }
 }
 
-/* Marqueur circulaire : icône métier centrée + numéro en badge. Sur la
-   piste animée (.is-anim), chaque étape est masquée puis « pop » quand
-   la pointe du trait atteint son centre — grossit avec rebond, se
-   remplit en basalt, le corps monte en fondu. */
+/* Marqueur circulaire : photo de chantier centrée + numéro en badge.
+   Sur la piste animée (.is-anim), chaque étape est masquée puis
+   « pop » au scroll — grossit avec rebond, le corps monte en fondu.
+   Pas de remplissage vert : la photo seule remplit le cercle. */
 .sig-step__marker {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 7.2rem;
+  height: 7.2rem;
   border: 2.5px solid var(--basalt);
   border-radius: 50%;
   background: var(--paper);
@@ -505,8 +505,8 @@
 }
 
 .sig-step__icon {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 3.2rem;
+  height: 3.2rem;
 }
 
 /* Photo réelle de chantier dans le cercle : légèrement désaturée
@@ -527,20 +527,20 @@
 
 .sig-step__num {
   position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
+  top: -0.4rem;
+  right: -0.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.55rem;
-  height: 1.55rem;
+  width: 2.2rem;
+  height: 2.2rem;
   border-radius: 50%;
   background: var(--paper);
   border: 2px solid var(--basalt);
   color: var(--basalt);
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 0.8rem;
+  font-size: 1.05rem;
   transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -562,14 +562,7 @@
 }
 
 .sig-scrollpath.is-anim .sig-step.is-on .sig-step__marker {
-  background: var(--basalt);
-  color: var(--on-dark);
   transform: scale(1);
-}
-
-.sig-scrollpath.is-anim .sig-step.is-on .sig-step__num {
-  background: var(--basalt);
-  color: var(--on-dark);
 }
 
 .sig-step__body {
