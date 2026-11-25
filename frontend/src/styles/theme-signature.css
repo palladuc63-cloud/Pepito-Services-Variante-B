@@ -34,42 +34,24 @@
 }
 
 :root[data-theme='signature'] .nav-quote {
+  position: relative;
   display: none;
   align-items: center;
   margin-left: 0.75rem;
   padding: 0.55rem 1.3rem;
   border-radius: 999px;
-  background-color: var(--cta);
-  /* Jauge : le cta-dark se remplit de gauche à droite au survol
-     (background-size animé — coulée dans la pill). */
-  background-image: linear-gradient(var(--cta-dark), var(--cta-dark));
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 0% 100%;
+  background: var(--cta);
   color: var(--cta-text);
   font-weight: 600;
   font-size: 0.875rem;
   line-height: 1;
   white-space: nowrap;
-  /* Presse iso : ombre dure décalée, sans flou — le bouton se soulève
-     au survol, s'enfonce au clic. */
-  box-shadow: 0 3px 0 var(--cta-dark);
-  transition:
-    background-size 0.28s cubic-bezier(0.6, 0, 0.2, 1),
-    transform 0.16s ease,
-    box-shadow 0.16s ease;
+  transition: background-color 0.2s ease;
 }
 
 :root[data-theme='signature'] .nav-quote:hover,
 :root[data-theme='signature'] .nav-quote:focus-visible {
-  background-size: 100% 100%;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 var(--cta-dark);
-}
-
-:root[data-theme='signature'] .nav-quote:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 0 var(--cta-dark);
+  background: var(--cta-dark);
 }
 
 @media (min-width: 768px) {
@@ -178,6 +160,7 @@
 }
 
 .sig-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   padding: 0.8rem 1.6rem;
@@ -185,59 +168,86 @@
   font-weight: 600;
   font-size: 0.95rem;
   line-height: 1;
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 0% 100%;
-  transition:
-    background-size 0.28s cubic-bezier(0.6, 0, 0.2, 1),
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-/* Presse iso : ombre dure décalée (extrusion), soulèvement au survol,
-   enfoncement au clic — effet touche mécanique. */
 .sig-btn--primary {
-  background-color: var(--cta);
-  /* Jauge : cta-dark se remplit de gauche à droite au survol. */
-  background-image: linear-gradient(var(--cta-dark), var(--cta-dark));
+  background: var(--cta);
   color: var(--cta-text);
-  box-shadow: 0 3px 0 var(--cta-dark);
 }
 
 .sig-btn--primary:hover,
 .sig-btn--primary:focus-visible {
-  background-size: 100% 100%;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 var(--cta-dark);
-}
-
-.sig-btn--primary:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 0 var(--cta-dark);
+  background: var(--cta-dark);
 }
 
 .sig-btn--ghost {
   border: 1.5px solid var(--ink);
-  /* Jauge : voile forest-soft qui coule de gauche à droite. */
-  background-image: linear-gradient(var(--forest-soft), var(--forest-soft));
   color: var(--ink);
-  box-shadow: 0 3px 0 color-mix(in srgb, var(--ink) 20%, transparent);
 }
 
 .sig-btn--ghost:hover,
 .sig-btn--ghost:focus-visible {
-  background-size: 100% 100%;
   border-color: var(--forest);
   color: var(--forest);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 color-mix(in srgb, var(--ink) 20%, transparent);
 }
 
-.sig-btn--ghost:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 20%, transparent);
+/* ═══ Équerres de traçage — cadre de sélection technique ═══
+   4 cornières (2 pseudo-éléments × 2 angles) qui glissent depuis
+   chaque côté et se verrouillent aux coins du bouton au survol.
+   ::before = paire gauche, ::after = paire droite ; la couleur suit
+   currentColor (crème sur primary, encre sur ghost). */
+.sig-btn::before,
+.sig-btn::after,
+:root[data-theme='signature'] .nav-quote::before,
+:root[data-theme='signature'] .nav-quote::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 13px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease, transform 0.24s cubic-bezier(0.34, 0.9, 0.35, 1);
+  background-repeat: no-repeat;
+}
+
+.sig-btn::before,
+:root[data-theme='signature'] .nav-quote::before {
+  left: -5px;
+  transform: translateX(-7px);
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor);
+  background-size: 12px 2px, 2px 12px, 12px 2px, 2px 12px;
+  background-position: left top, left top, left bottom, left bottom;
+}
+
+.sig-btn::after,
+:root[data-theme='signature'] .nav-quote::after {
+  right: -5px;
+  transform: translateX(7px);
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor);
+  background-size: 12px 2px, 2px 12px, 12px 2px, 2px 12px;
+  background-position: right top, right top, right bottom, right bottom;
+}
+
+.sig-btn:hover::before,
+.sig-btn:hover::after,
+.sig-btn:focus-visible::before,
+.sig-btn:focus-visible::after,
+:root[data-theme='signature'] .nav-quote:hover::before,
+:root[data-theme='signature'] .nav-quote:hover::after,
+:root[data-theme='signature'] .nav-quote:focus-visible::before,
+:root[data-theme='signature'] .nav-quote:focus-visible::after {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* Visuel : la photo remplit tout le pan diagonal, bord d'écran à diagonale */
