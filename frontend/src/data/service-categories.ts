@@ -25,19 +25,6 @@ export interface ServiceCategory {
 
 export const SERVICE_CATEGORIES: ServiceCategory[] = [
   {
-    slug: 'clotures-rigides',
-    label: 'Clôtures rigides',
-    title: 'Clôtures rigides',
-    subtitle:
-      'Panneaux soudés robustes et durables — pose propre, alignement parfait, sans entretien.',
-    icon: 'fence',
-    image: isoCloture.src,
-    group: 'Clôtures',
-    desc: 'Panneaux soudés, durables, sans entretien',
-    catSlug: 'clotures',
-    tag: 'rigide',
-  },
-  {
     slug: 'clotures-souples',
     label: 'Clôtures souples',
     title: 'Clôtures souples',
@@ -49,6 +36,19 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     desc: 'Grillage simple torsion, économique et rapide',
     catSlug: 'clotures',
     tag: 'souple',
+  },
+  {
+    slug: 'clotures-rigides',
+    label: 'Clôtures rigides',
+    title: 'Clôtures rigides',
+    subtitle:
+      'Panneaux soudés robustes et durables — pose propre, alignement parfait, sans entretien.',
+    icon: 'fence',
+    image: isoCloture.src,
+    group: 'Clôtures',
+    desc: 'Panneaux soudés, durables, sans entretien',
+    catSlug: 'clotures',
+    tag: 'rigide',
   },
   {
     slug: 'clotures-alu-palissades',
