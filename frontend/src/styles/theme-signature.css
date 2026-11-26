@@ -162,9 +162,10 @@ a.sig-topbar__item:hover {
   letter-spacing: 0;
 }
 
-/* Dropdown : panneau carré. */
+/* Dropdown : panneau carré, fond identique au site (papier). */
 :root[data-theme='signature'] .nav-dd {
   border-radius: 0;
+  background: var(--paper);
 }
 
 :root[data-theme='signature'] .nav-dd__media,
