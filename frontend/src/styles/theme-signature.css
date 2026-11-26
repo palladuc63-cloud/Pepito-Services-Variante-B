@@ -707,10 +707,50 @@ a.sig-topbar__item:hover {
   color: var(--stone);
 }
 
-/* ═══ Processus en chevrons ═══ */
+/* ═══ Processus en chevrons ═══
+   Bloc forest sombre détaché du fond crème par un bord supérieur
+   biaisé : une cale « papier » (::before) mord le haut du bloc — la
+   jointure descend de gauche à droite comme un talus. Le haut est
+   paddé en conséquence pour que le titre reste sous la diagonale. */
 
 .sig-process {
-  padding-block: clamp(2.5rem, 5vw, 4rem);
+  position: relative;
+  padding-block: calc(clamp(2.5rem, 5vw, 4rem) + 4rem) clamp(3rem, 6vw, 4.5rem);
+  background: var(--forest);
+}
+
+.sig-process::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 4.5rem;
+  background: var(--paper);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+/* Texte et marqueurs en clair sur le bloc forest. */
+
+.sig-process .sig-title {
+  color: var(--paper);
+}
+
+.sig-process .sig-step__marker {
+  color: var(--paper);
+}
+
+.sig-process .sig-step__num {
+  border-color: var(--paper);
+  color: var(--forest);
+}
+
+.sig-process .sig-step__body h3 {
+  color: var(--paper);
+}
+
+.sig-process .sig-step__body p {
+  color: rgb(247 249 247 / 0.72);
 }
 
 .sig-steps {
