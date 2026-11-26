@@ -52,7 +52,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
   },
   {
     slug: 'clotures-alu-palissades',
-    label: 'Clôtures alu & palissades',
+    label: 'Alu & palissades',
     title: 'Clôtures alu & palissades',
     subtitle:
       'Lames aluminium design et occultation sur mesure — modernité, intimité et zéro entretien.',
@@ -64,7 +64,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
   },
   {
     slug: 'portails-portillons',
-    label: 'Portails & portillons',
+    label: 'Portails',
     title: 'Portails & portillons',
     subtitle:
       'Battants, coulissants, aluminium sur mesure — l’entrée de votre propriété, soignée dans les détails.',
@@ -76,7 +76,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
   },
   {
     slug: 'motorisation-portail',
-    label: 'Motorisation portail',
+    label: 'Motorisation',
     title: 'Motorisation portail',
     subtitle:
       'Automatismes posés, réglés et expliqués sur site — confort au quotidien, sécurité garantie.',
@@ -88,7 +88,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
   },
   {
     slug: 'terrassement-mini-pelle',
-    label: 'Terrassement mini-pelle',
+    label: 'Mini-pelle',
     title: 'Terrassement mini-pelle',
     subtitle:
       'Préparation de terrain, fondations et tranchées — le sol prêt pour vos projets d’extérieur.',

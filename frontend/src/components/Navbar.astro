@@ -708,6 +708,16 @@ const navLinks = settings.nav.map((link) => {
     transform: translateX(0);
   }
 
+  /* Libellé sur une seule ligne — les intitulés du menu sont volontairement
+     courts pour ne jamais déborder de la colonne. */
+  .nav-dd__label {
+    white-space: nowrap;
+  }
+
+  .nav-dd__gloss {
+    white-space: normal;
+  }
+
   /* Pastille icône — reprend le vocabulaire des pictos du site. */
   .nav-dd__media {
     display: flex;
