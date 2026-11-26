@@ -11,18 +11,29 @@ const { settings } = Astro.props;
 const currentPath = Astro.url.pathname;
 const base = import.meta.env.BASE_URL;
 
-const navLinks = settings.nav.map((link) => ({
-  ...link,
-  href: link.href === '/' ? base : `${base}${link.href.replace(/^\//, '')}`,
-  isActive: link.href === '/'
-    ? currentPath === base || currentPath === `${base}`
-    : currentPath.startsWith(`${base}${link.href.replace(/^\//, '')}`),
-  children: link.children?.map((c) => ({
+const navLinks = settings.nav.map((link) => {
+  const children = link.children?.map((c) => ({
     ...c,
     href: `${base}${c.href.replace(/^\//, '')}`,
     subs: c.subs?.map((s) => ({ ...s, href: `${base}${s.href.replace(/^\//, '')}` })),
-  })),
-}));
+  }));
+  const groupLabels = [...new Set((children ?? []).map((c) => c.group ?? ''))];
+  return {
+    ...link,
+    href: link.href === '/' ? base : `${base}${link.href.replace(/^\//, '')}`,
+    isActive: link.href === '/'
+      ? currentPath === base || currentPath === `${base}`
+      : currentPath.startsWith(`${base}${link.href.replace(/^\//, '')}`),
+    children,
+    childGroups:
+      children?.length && groupLabels.some((g) => g !== '')
+        ? groupLabels.map((g) => ({
+            label: g,
+            items: children.filter((c) => (c.group ?? '') === g),
+          }))
+        : null,
+  };
+});
 ---
 
 {(settings.contact.phone || settings.contact.hours || settings.contact.serviceArea) && (
@@ -102,30 +113,40 @@ const navLinks = settings.nav.map((link) => ({
                           </span>
                         </a>
                       </div>
-                      {link.children.map((child) => (
-                        <div class="nav-dd__item" role="none">
-                          <a href={child.href} class="nav-dd__link" role="menuitem">
-                            <span class:list={['nav-dd__media', { 'nav-dd__media--img': child.image }]}>
-                              {child.image && (
-                                <img src={child.image} alt="" loading="lazy" class="nav-dd__thumb" />
-                              )}
-                              <Icon name={child.icon ?? 'grid'} size={18} class="nav-dd__icon" />
-                            </span>
-                            <span class="nav-dd__label">{child.label}</span>
-                          </a>
-                          {child.subs?.length ? (
-                            <ul class="nav-dd__subs">
-                              {child.subs.map((sub) => (
-                                <li>
-                                  <a href={sub.href} class="nav-dd__sub" role="menuitem">
-                                    {sub.label}
-                                  </a>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : null}
-                        </div>
-                      ))}
+                      <div class="nav-dd__sections">
+                        {(link.childGroups ?? [{ label: '', items: link.children }]).map((g) => (
+                          <div class="nav-dd__section">
+                            {g.label && <div class="nav-dd__section-title">{g.label}</div>}
+                            {g.items.map((child) => (
+                              <div class="nav-dd__item" role="none">
+                                <a href={child.href} class="nav-dd__link" role="menuitem">
+                                  <span class:list={['nav-dd__media', { 'nav-dd__media--img': child.image }]}>
+                                    {child.image && (
+                                      <img src={child.image} alt="" loading="lazy" class="nav-dd__thumb" />
+                                    )}
+                                    <Icon name={child.icon ?? 'grid'} size={18} class="nav-dd__icon" />
+                                  </span>
+                                  <span class="nav-dd__label">
+                                    {child.label}
+                                    {child.desc && <span class="nav-dd__gloss">{child.desc}</span>}
+                                  </span>
+                                </a>
+                                {child.subs?.length ? (
+                                  <ul class="nav-dd__subs">
+                                    {child.subs.map((sub) => (
+                                      <li>
+                                        <a href={sub.href} class="nav-dd__sub" role="menuitem">
+                                          {sub.label}
+                                        </a>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : null}
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </>
