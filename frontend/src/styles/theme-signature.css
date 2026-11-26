@@ -143,10 +143,9 @@ a.sig-topbar__item:hover {
   height: 2.5rem;
 }
 
-/* Liens collés à gauche après le logo ; le CTA reste à droite. */
+/* Liens alignés à droite, juste avant le CTA. */
 :root[data-theme='signature'] .desktop-nav {
-  margin-right: auto;
-  margin-left: 1.75rem;
+  margin-left: auto;
 }
 
 /* Liens compacts carrés : état doux en bloc net (Tailwind gère déjà
@@ -218,9 +217,9 @@ a.sig-topbar__item:hover {
 }
 
 .nav-dd:has(.nav-dd__promo) {
-  left: 50%;
-  translate: -50% 0;
-  min-width: 42rem;
+  left: auto;
+  right: 0;
+  min-width: 48rem;
   max-width: calc(100vw - 2rem);
 }
 
