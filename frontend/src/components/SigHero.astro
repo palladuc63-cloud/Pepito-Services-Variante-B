@@ -4,22 +4,32 @@ import Icon from './Icon.astro';
 
 interface Props {
   images: string[];
+  title?: string;
+  subtitle?: string;
+  ctaPrimary?: { label: string; href: string };
+  ctaSecondary?: { label: string; href: string };
 }
 
-const { images } = Astro.props;
+const {
+  images,
+  title = signature.heroTitle,
+  subtitle = signature.heroSubtitle,
+  ctaPrimary = signature.ctaPrimary,
+  ctaSecondary = signature.ctaSecondary,
+} = Astro.props;
 ---
 
 <section class="sig-hero">
   <div class="container sig-hero__grid">
     <div class="sig-hero__content">
-      <h1>{signature.heroTitle}</h1>
-      <p class="sig-hero__sub">{signature.heroSubtitle}</p>
+      <h1>{title}</h1>
+      <p class="sig-hero__sub">{subtitle}</p>
       <div class="sig-hero__actions">
-        <a href={signature.ctaPrimary.href} class="sig-btn sig-btn--primary">
-          <span>{signature.ctaPrimary.label}</span><Icon name="move-right" size={16} class="cta-arrow" />
+        <a href={ctaPrimary.href} class="sig-btn sig-btn--primary">
+          <span>{ctaPrimary.label}</span><Icon name="move-right" size={16} class="cta-arrow" />
         </a>
-        <a href={signature.ctaSecondary.href} class="sig-btn sig-btn--ghost">
-          <span>{signature.ctaSecondary.label}</span><Icon name="move-right" size={16} class="cta-arrow" />
+        <a href={ctaSecondary.href} class="sig-btn sig-btn--ghost">
+          <span>{ctaSecondary.label}</span><Icon name="move-right" size={16} class="cta-arrow" />
         </a>
       </div>
     </div>

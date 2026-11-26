@@ -1,9 +1,5 @@
 import { getContent } from './api.js';
-import isoCloture from '../assets/iso/cloture-rigide.webp';
-import isoPalissade from '../assets/iso/palissade.webp';
-import isoPortail from '../assets/iso/portail.webp';
-import isoMotorisation from '../assets/iso/motorisation.webp';
-import isoMinipelle from '../assets/iso/minipelle.webp';
+import { SERVICE_CATEGORIES } from '../data/service-categories.ts';
 
 // Transforme le contenu API (clé/valeur + catégories) en objet "settings"
 // compatible avec les composants existants.
@@ -28,48 +24,14 @@ export async function getSite() {
         cta: 'Demander un devis',
         href: '/contact/',
       },
-      children: [
-        {
-          label: 'Clôtures rigides',
-          href: '/realisations/?categorie=clotures',
-          icon: 'fence',
-          image: isoCloture.src,
-          group: 'Clôtures',
-          desc: 'Panneaux soudés, durables, sans entretien',
-        },
-        {
-          label: 'Clôtures alu & palissades',
-          href: '/realisations/?categorie=clotures-alu-palissades',
-          icon: 'palissade',
-          image: isoPalissade.src,
-          group: 'Clôtures',
-          desc: 'Lames alu design, occultation sur mesure',
-        },
-        {
-          label: 'Portails & portillons',
-          href: '/realisations/?categorie=portails',
-          icon: 'gate',
-          image: isoPortail.src,
-          group: 'Portails & extérieur',
-          desc: 'Battants, coulissants, alu sur mesure',
-        },
-        {
-          label: 'Motorisation portail',
-          href: '/realisations/?categorie=motorisation-portail',
-          icon: 'motor',
-          image: isoMotorisation.src,
-          group: 'Portails & extérieur',
-          desc: 'Automatismes posés et réglés sur site',
-        },
-        {
-          label: 'Terrassement mini-pelle',
-          href: '/realisations/?categorie=terrassements',
-          icon: 'digger',
-          image: isoMinipelle.src,
-          group: 'Portails & extérieur',
-          desc: 'Préparation de terrain et fondations',
-        },
-      ],
+      children: SERVICE_CATEGORIES.map((c) => ({
+        label: c.label,
+        href: `/${c.slug}/`,
+        icon: c.icon,
+        image: c.image,
+        group: c.group,
+        desc: c.desc,
+      })),
     },
     { label: 'Réalisations', href: '/realisations/', icon: 'grid' },
   ];

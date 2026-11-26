@@ -1,0 +1,25 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import SigServicePage from '../components/SigServicePage.astro';
+import {
+  SERVICE_CATEGORIES,
+  catProjects,
+  heroImagesFor,
+} from '../data/service-categories';
+import { getProjects } from '../lib/api.js';
+
+const cat = SERVICE_CATEGORIES.find((c) => c.slug === 'motorisation-portail')!;
+const projects = await getProjects();
+---
+
+<MainLayout
+  title={cat.label}
+  description={cat.subtitle}
+  canonicalPath={`/${cat.slug}/`}
+>
+  <SigServicePage
+    cat={cat}
+    projects={catProjects(cat, projects)}
+    heroImages={heroImagesFor(cat, projects)}
+  />
+</MainLayout>

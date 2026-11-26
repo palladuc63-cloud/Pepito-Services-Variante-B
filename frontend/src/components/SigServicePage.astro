@@ -1,0 +1,89 @@
+---
+import SigHero from './SigHero.astro';
+import ProjectCard from './ProjectCard.astro';
+import Icon from './Icon.astro';
+import type { Project } from '../data/types';
+import type { ServiceCategory } from '../data/service-categories';
+
+interface Props {
+  cat: ServiceCategory;
+  projects: Project[];
+  heroImages: string[];
+}
+
+const { cat, projects, heroImages } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<div class="signature-home">
+  <SigHero
+    images={heroImages}
+    title={cat.title}
+    subtitle={cat.subtitle}
+    ctaPrimary={{ label: 'Demander un devis', href: `${base}contact/` }}
+    ctaSecondary={{ label: 'Toutes les réalisations', href: `${base}realisations/` }}
+  />
+
+  <section class="sig-cat">
+    <div class="container">
+      <h2 class="sig-title">Réalisations</h2>
+      {
+        projects.length ? (
+          <div class="sig-cat__grid">
+            {projects.map((p) => (
+              <ProjectCard project={p} />
+            ))}
+          </div>
+        ) : (
+          <p class="sig-cat__empty">
+            Nos réalisations de cette catégorie arrivent bientôt — en attendant,
+            décrivez-nous votre projet.
+          </p>
+        )
+      }
+      <div class="sig-cat__cta">
+        <a href={`${base}contact/`} class="sig-btn sig-btn--primary">
+          <span>Demander un devis</span><Icon name="move-right" size={16} class="cta-arrow" />
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .sig-cat {
+    padding-block: clamp(2.5rem, 5vw, 4rem) clamp(3rem, 6vw, 5rem);
+  }
+
+  .sig-cat__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    margin-top: 2.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .sig-cat__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .sig-cat__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .sig-cat__empty {
+    margin: 2.5rem auto 0;
+    max-width: 32rem;
+    text-align: center;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  .sig-cat__cta {
+    margin-top: 2rem;
+    text-align: center;
+  }
+</style>

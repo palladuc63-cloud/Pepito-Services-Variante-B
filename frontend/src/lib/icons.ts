@@ -9,6 +9,9 @@ export const ICONS: Record<string, string> = {
     '<path d="M3 21V5"/><path d="M21 21V5"/><path d="M5 21V9h6v12"/><path d="M13 21V9h6v12"/><path d="m5 9 6 12"/><path d="m19 9-6 12"/>',
   digger:
     '<rect x="3" y="17" width="8" height="4" rx="2"/><path d="M5 17v-4h4v4"/><path d="M5 13V9h3v4"/><path d="m10 11.5 5-3.5 4 3.5"/><path d="m19 11.5 1 3.5h-3"/><path d="M13.5 21h7.5"/>',
+  // Grillage souple : mailles losange (simple torsion) entre deux poteaux
+  grillage:
+    '<path d="M3 21V4"/><path d="M21 21V4"/><path d="m3 9 4.5 3 4.5-3 4.5 3 4.5-3"/><path d="m3 15 4.5-3 4.5 3 4.5-3 4.5 3"/>',
   // Palissade : lames verticales jointives entre deux poteaux
   palissade:
     '<path d="M3 21V4"/><path d="M21 21V4"/><path d="M5.5 21V7h3.5v14"/><path d="M11.5 21V7H15v14"/><path d="M17.5 21V7H21"/><path d="M5.5 10.5H21"/><path d="M5.5 16H21"/>',

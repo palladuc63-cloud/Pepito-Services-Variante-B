@@ -106,16 +106,6 @@ const navLinks = settings.nav.map((link) => {
                   </button>
                   <div class="nav-dd" id={`nav-dd-${i}`} role="menu" aria-label={`Sous-menu ${link.label}`}>
                     <div class="nav-dd__grid">
-                      <div class="nav-dd__item" role="none">
-                        <a href={link.href} class="nav-dd__link" role="menuitem">
-                          <span class="nav-dd__media">
-                            <Icon name="grid" size={18} class="nav-dd__icon" />
-                          </span>
-                          <span class="nav-dd__label">
-                            {link.label === 'Réalisations' ? 'Toutes les réalisations' : 'Tout voir'}
-                          </span>
-                        </a>
-                      </div>
                       <div class="nav-dd__main">
                         <div class="nav-dd__sections">
                           {(link.childGroups ?? [{ label: '', items: link.children }]).map((g) => (
@@ -241,12 +231,6 @@ const navLinks = settings.nav.map((link) => {
                 <Icon name="chevron-down" size={18} class="mobile-sub-caret" />
               </button>
               <ul class="mobile-sub-list" id={`mobile-sub-${i}`} role="menu">
-                <li class="mobile-sub-item" role="none">
-                  <a href={link.href} class="mobile-sub-link" role="menuitem">
-                    <Icon name="grid" size={16} class="mobile-nav-icon" />
-                    {link.label === 'Réalisations' ? 'Toutes les réalisations' : 'Tout voir'}
-                  </a>
-                </li>
                 {link.children.map((child) => (
                   <li class="mobile-sub-item" role="none">
                     <a href={child.href} class="mobile-sub-link" role="menuitem">
