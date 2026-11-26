@@ -110,85 +110,62 @@ a.sig-topbar__item:hover {
   }
 }
 
-/* ═══ Navigation « blueprint » : repères numérotés + segment de mesure ═══ */
+/* ═══ Navigation « floating pill » (réf. AlignUI) ═══
+   Barre compacte centrée qui flotte au-dessus du contenu : logo,
+   liens et CTA dans une seule capsule ; liens sobres, hover/actif en
+   pastille douce. */
 
 .nav-rep {
   display: none;
 }
 
-:root[data-theme='signature'] .nav-rep {
-  display: inline-block;
-  margin-right: 0.4rem;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--stone-light);
-  font-variant-numeric: tabular-nums;
-  vertical-align: 0.08em;
+:root[data-theme='signature'] .site-header {
+  top: 0.9rem;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-bottom: 0;
 }
 
-/* Liens desktop en épure : capitales espacées, sans pastille ni icône. */
+:root[data-theme='signature'] .main-nav {
+  width: fit-content;
+  max-width: calc(100vw - 2rem);
+  min-height: 0;
+  margin-inline: auto;
+  gap: 0.35rem;
+  padding: 0.45rem 0.55rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 6px 24px rgb(22 26 23 / 0.08);
+}
+
+:root[data-theme='signature'] .site-logo {
+  width: auto;
+  height: 2.3rem;
+}
+
+:root[data-theme='signature'] .brand-area {
+  margin-right: 0.4rem;
+}
+
+/* Liens compacts : texte sobre, rayon moyen, état doux (Tailwind gère
+   déjà hover forest-soft / actif --nav-active-bg). */
 :root[data-theme='signature'] .desktop-nav .nav-icon {
   display: none;
 }
 
 :root[data-theme='signature'] .desktop-nav .nav-link {
-  position: relative;
-  margin: 0 0.7rem;
-  padding: 0.55rem 0.15rem;
-  border-radius: 0;
-  font-size: 0.8rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-:root[data-theme='signature'] .desktop-nav .nav-link:hover,
-:root[data-theme='signature'] .desktop-nav .nav-link:focus-visible,
-:root[data-theme='signature'] .desktop-nav .nav-link.nav-link--active {
-  background: transparent;
-  color: var(--ink);
-}
-
-/* Segment de mesure « |____| » tracé sous le lien actif / survolé. */
-:root[data-theme='signature'] .desktop-nav .nav-link::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0.05rem;
-  height: 0.35rem;
-  border-left: 1.5px solid var(--forest);
-  border-right: 1.5px solid var(--forest);
-  border-bottom: 2px solid var(--forest);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.22s ease;
-  pointer-events: none;
-}
-
-:root[data-theme='signature'] .desktop-nav .nav-link:hover::after,
-:root[data-theme='signature'] .desktop-nav .nav-link:focus-visible::after,
-:root[data-theme='signature'] .desktop-nav .nav-link.nav-link--active::after {
-  transform: scaleX(1);
-}
-
-/* Dropdown « fiche technique » : angles vifs, liseré forest, grille de plan. */
-:root[data-theme='signature'] .nav-dd {
-  border-radius: 2px;
-  border: 1px solid var(--line);
-  border-top: 2px solid var(--forest);
-  box-shadow: 0 10px 30px rgb(22 26 23 / 0.08);
-  background-color: var(--panel);
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--forest) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--forest) 5%, transparent) 1px, transparent 1px);
-  background-size: 22px 22px;
-}
-
-/* Menu mobile : repères lisibles sur fond basalt. */
-:root[data-theme='signature'] .mobile-menu .nav-rep {
+  padding: 0.45rem 0.8rem;
+  border-radius: 0.6rem;
   font-size: 0.85rem;
-  color: var(--copper-light);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* Dropdown AlignUI : panneau doux à rayon moyen. */
+:root[data-theme='signature'] .nav-dd {
+  border-radius: 0.9rem;
 }
 
 /* ═══ Hero landing ═══ */
@@ -290,41 +267,43 @@ a.sig-topbar__item:hover {
   gap: 0.9rem;
 }
 
+/* Boutons façon AlignUI : compacts, rayon moyen (pas plein pill),
+   primaire plein forest, ghost en « stroke » léger. */
 .sig-btn {
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 0.8rem 1.6rem;
-  border-radius: 999px;
+  padding: 0.65rem 1.15rem;
+  border-radius: 0.65rem;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   line-height: 1;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .sig-btn--primary {
-  border: 2px solid var(--cta-text);
+  border: 1px solid var(--cta);
   background: var(--cta);
   color: var(--cta-text);
-  --cta-frame-mask: var(--cta);
 }
 
 .sig-btn--primary:hover,
 .sig-btn--primary:focus-visible {
   background: var(--cta-dark);
-  --cta-frame-mask: var(--cta-dark);
+  border-color: var(--cta-dark);
 }
 
 .sig-btn--ghost {
-  border: 2px solid var(--ink);
+  border: 1px solid var(--line);
   color: var(--ink);
-  --cta-frame-mask: var(--paper);
+  background: transparent;
 }
 
 .sig-btn--ghost:hover,
 .sig-btn--ghost:focus-visible {
-  border-color: var(--forest);
-  color: var(--forest);
+  border-color: var(--forest-soft);
+  background: var(--forest-soft);
+  color: var(--forest-dark);
 }
 
 /* Flèche Lucide « move-right » dans les CTA : présente au repos,
@@ -342,70 +321,12 @@ a.sig-topbar__item:hover {
   transform: translateX(3px);
 }
 
-/* From Uiverse.io by TISEPSE - https://uiverse.io/TISEPSE/perfect-pig-59
-   MIT License, Copyright (c) https://www.youtube.com/watch?v=B7Z6qERVTvM
-   Adapté au thème Signature : la bordure du bouton est masquée au repos
-   par deux bandes couleur fond ; au survol elles s'effondrent en deux
-   temps — haut d'abord, bas en décalé — et le cadre complet se dessine.
-   Sur les pills, les bandes restent dans le segment plat du haut/bas
-   (jamais sur les arrondis) : les caps latéraux restent donc dessinés
-   au repos, comme les « côtés » de la version d'origine. La couleur de
-   masque suit chaque variante via --cta-frame-mask. */
+/* Pill devis AlignUI : compacte, rayon moyen, bord teinté. */
 :root[data-theme='signature'] .nav-quote {
-  border: 2px solid var(--cta-text);
-  --cta-frame-mask: var(--cta);
-}
-
-.sig-btn::before,
-:root[data-theme='signature'] .nav-quote::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: 1.6rem;
-  right: 1.6rem;
-  height: 4px;
-  background: var(--cta-frame-mask, var(--cta));
-  transform: scaleX(1);
-  transition: transform 0.3s ease-in-out;
-  pointer-events: none;
-}
-
-.sig-btn::after,
-:root[data-theme='signature'] .nav-quote::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 1.6rem;
-  right: 1.6rem;
-  height: 4px;
-  background: var(--cta-frame-mask, var(--cta));
-  transform: scaleX(1);
-  transition: transform 0.3s ease-in-out;
-  transition-delay: 0.5s;
-  pointer-events: none;
-}
-
-.sig-btn:hover::before,
-.sig-btn:focus-visible::before,
-:root[data-theme='signature'] .nav-quote:hover::before,
-:root[data-theme='signature'] .nav-quote:focus-visible::before {
-  transform: scaleX(0);
-}
-
-.sig-btn:hover::after,
-.sig-btn:focus-visible::after,
-:root[data-theme='signature'] .nav-quote:hover::after,
-:root[data-theme='signature'] .nav-quote:focus-visible::after {
-  transform: scaleX(0);
-}
-
-/* Libellé et flèche au-dessus des bandes de masque. */
-.sig-btn > span,
-.sig-btn > svg,
-:root[data-theme='signature'] .nav-quote > span,
-:root[data-theme='signature'] .nav-quote > svg {
-  position: relative;
-  z-index: 1;
+  border: 1px solid var(--cta);
+  border-radius: 0.65rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.82rem;
 }
 
 /* Visuel : la photo remplit tout le pan diagonal, bord d'écran à diagonale */
