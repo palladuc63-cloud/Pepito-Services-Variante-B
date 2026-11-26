@@ -215,6 +215,7 @@ const navLinks = settings.nav.map((link) => ({
       ))
     }
   </ul>
+  <a href={`${base}contact/`} class="mobile-menu__cta"><span>Demander un devis</span><Icon name="move-right" size={16} class="cta-arrow" /></a>
 </div>
 
 <script>
@@ -523,6 +524,21 @@ const navLinks = settings.nav.map((link) => ({
 
   .mobile-menu__link[aria-current='page'] {
     color: var(--color-primary-light);
+  }
+
+  .mobile-menu__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0.85rem 1.6rem;
+    border-radius: 999px;
+    background: var(--cta, var(--color-primary));
+    color: var(--cta-text, var(--color-warm-white));
+    font-weight: 600;
+    text-decoration: none;
+    align-self: center;
   }
 
   /* ─── Dropdown « Réalisations » ───

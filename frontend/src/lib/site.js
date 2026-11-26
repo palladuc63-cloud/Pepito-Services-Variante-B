@@ -15,11 +15,11 @@ export async function getSite() {
   if (s.instagram_url) socials.push({ name: 'Instagram', url: s.instagram_url });
   if (s.google_profile_url) socials.push({ name: 'Google', url: s.google_profile_url });
 
-  // Menu calqué sur la maquette : 4 liens + bouton « Demander un devis ».
+  // Menu : 3 liens + bouton « Demander un devis ».
   const nav = [
     { label: 'Accueil', href: '/', icon: 'home' },
     {
-      label: 'Nos services',
+      label: 'Services',
       href: '/services/',
       icon: 'fence',
       children: [
@@ -55,12 +55,7 @@ export async function getSite() {
         },
       ],
     },
-    {
-      label: 'Terrassement & Maçonnerie',
-      href: '/realisations/?categorie=terrassements',
-      icon: 'digger',
-    },
-    { label: 'Contact', href: '/contact/', icon: 'mail' },
+    { label: 'Réalisations', href: '/realisations/', icon: 'grid' },
   ];
 
   return {
