@@ -25,6 +25,33 @@ const navLinks = settings.nav.map((link) => ({
 }));
 ---
 
+{(settings.contact.phone || settings.contact.hours || settings.contact.serviceArea) && (
+  <div class="sig-topbar">
+    <div class="sig-topbar__inner container mx-auto px-4">
+      <div class="sig-topbar__group">
+        {settings.contact.phone && (
+          <a href={`tel:${settings.contact.phone.replace(/\s/g, '')}`} class="sig-topbar__item">
+            <Icon name="phone" size={12} />{settings.contact.phone}
+          </a>
+        )}
+        {settings.contact.email && (
+          <a href={`mailto:${settings.contact.email}`} class="sig-topbar__item sig-topbar__item--wide">
+            <Icon name="mail" size={12} />{settings.contact.email}
+          </a>
+        )}
+      </div>
+      <div class="sig-topbar__group">
+        {settings.contact.serviceArea && (
+          <span class="sig-topbar__item"><Icon name="pin" size={12} />Rayon : {settings.contact.serviceArea}</span>
+        )}
+        {settings.contact.hours && (
+          <span class="sig-topbar__item"><Icon name="clock" size={12} />{settings.contact.hours}</span>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
 <header class="site-header sticky top-0 z-50 bg-[color:var(--paper)]/92 backdrop-blur-md border-b border-[color:var(--line)]">
   <div class="container mx-auto px-4">
     <nav class="main-nav flex items-center justify-between min-h-20" aria-label="Navigation principale">
@@ -58,6 +85,7 @@ const navLinks = settings.nav.map((link) => ({
                     aria-haspopup="menu"
                     aria-controls={`nav-dd-${i}`}
                   >
+                    <span class="nav-rep" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                     {link.icon && <Icon name={link.icon} size={15} class="nav-icon" />}
                     {link.label}
                     <Icon name="chevron-down" size={13} class="nav-dd-caret" />
@@ -113,6 +141,7 @@ const navLinks = settings.nav.map((link) => ({
                   aria-current={link.isActive ? 'page' : undefined}
                   role="menuitem"
                 >
+                  <span class="nav-rep" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                   {link.icon && <Icon name={link.icon} size={15} class="nav-icon" />}
                   {link.label}
                 </a>
@@ -168,6 +197,7 @@ const navLinks = settings.nav.map((link) => ({
                 aria-expanded="false"
                 aria-controls={`mobile-sub-${i}`}
               >
+                <span class="nav-rep" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                 {link.icon && <Icon name={link.icon} size={20} class="mobile-nav-icon" />}
                 {link.label}
                 <Icon name="chevron-down" size={18} class="mobile-sub-caret" />
@@ -207,6 +237,7 @@ const navLinks = settings.nav.map((link) => ({
               aria-current={link.isActive ? 'page' : undefined}
               role="menuitem"
             >
+              <span class="nav-rep" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               {link.icon && <Icon name={link.icon} size={20} class="mobile-nav-icon" />}
               {link.label}
             </a>
