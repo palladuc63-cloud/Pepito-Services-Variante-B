@@ -48,10 +48,11 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
   .gate-scene {
     position: relative;
     height: 320vh;
-    /* Remonte sous le header sticky (~81px) : la section touche le haut
-       de la fenêtre dès le chargement → la vidéo est épinglée
+    /* Remonte sous le header sticky (~69px) — mais PAS sous le bandeau
+       utilitaire .sig-topbar au-dessus : la section touche le haut de la
+       zone sous le header dès le chargement → la vidéo est épinglée
        immédiatement, sans le petit scroll libre préalable. */
-    margin-top: -5.06rem;
+    margin-top: -4.32rem;
     /* Fond uni (sans le grain du body) : la zone entre la courbe du
        hero et le haut de la vidéo reste propre et plane. */
     background: var(--paper, #eeece6);
