@@ -12,6 +12,8 @@ export interface NavLink {
     href: string;
     image?: string;
     icon?: string;
+    group?: string;
+    desc?: string;
     subs?: { label: string; href: string }[];
   }[];
 }
