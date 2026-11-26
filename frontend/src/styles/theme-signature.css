@@ -136,7 +136,7 @@ a.sig-topbar__item:hover {
   padding: 0.45rem 0.55rem;
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 0;
   box-shadow: 0 6px 24px rgb(22 26 23 / 0.08);
 }
 
@@ -149,23 +149,28 @@ a.sig-topbar__item:hover {
   margin-right: 0.4rem;
 }
 
-/* Liens compacts : texte sobre, rayon moyen, état doux (Tailwind gère
-   déjà hover forest-soft / actif --nav-active-bg). */
+/* Liens compacts carrés : état doux en bloc net (Tailwind gère déjà
+   hover forest-soft / actif --nav-active-bg). */
 :root[data-theme='signature'] .desktop-nav .nav-icon {
   display: none;
 }
 
 :root[data-theme='signature'] .desktop-nav .nav-link {
   padding: 0.45rem 0.8rem;
-  border-radius: 0.6rem;
+  border-radius: 0;
   font-size: 0.85rem;
   font-weight: 500;
   letter-spacing: 0;
 }
 
-/* Dropdown AlignUI : panneau doux à rayon moyen. */
+/* Dropdown : panneau carré. */
 :root[data-theme='signature'] .nav-dd {
-  border-radius: 0.9rem;
+  border-radius: 0;
+}
+
+:root[data-theme='signature'] .nav-dd__media,
+:root[data-theme='signature'] .nav-dd__link {
+  border-radius: 0;
 }
 
 /* Panel « Duna » : sections en colonnes, titre de groupe + gloss. */
@@ -197,6 +202,15 @@ a.sig-topbar__item:hover {
   font-size: 0.75rem;
   font-weight: 400;
   color: var(--stone);
+}
+
+/* Hamburger et CTA mobile : mêmes angles carrés. */
+:root[data-theme='signature'] .mobile-menu-toggle {
+  border-radius: 0;
+}
+
+:root[data-theme='signature'] .mobile-menu__cta {
+  border-radius: 0;
 }
 
 /* ═══ Hero landing ═══ */
@@ -298,14 +312,13 @@ a.sig-topbar__item:hover {
   gap: 0.9rem;
 }
 
-/* Boutons façon AlignUI : compacts, rayon moyen (pas plein pill),
-   primaire plein forest, ghost en « stroke » léger. */
+/* Boutons carrés : primaire plein forest, ghost en « stroke » léger. */
 .sig-btn {
   position: relative;
   display: inline-flex;
   align-items: center;
   padding: 0.65rem 1.15rem;
-  border-radius: 0.65rem;
+  border-radius: 0;
   font-weight: 600;
   font-size: 0.88rem;
   line-height: 1;
@@ -352,10 +365,10 @@ a.sig-topbar__item:hover {
   transform: translateX(3px);
 }
 
-/* Pill devis AlignUI : compacte, rayon moyen, bord teinté. */
+/* Bouton devis carré : compact, bord teinté. */
 :root[data-theme='signature'] .nav-quote {
   border: 1px solid var(--cta);
-  border-radius: 0.65rem;
+  border-radius: 0;
   padding: 0.5rem 1rem;
   font-size: 0.82rem;
 }
