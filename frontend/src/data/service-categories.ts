@@ -17,7 +17,7 @@ export interface ServiceCategory {
   subtitle: string;
   icon: string;
   image: string;
-  group: 'Clôtures' | 'Portails & extérieur';
+  group: 'Clôtures' | 'Portails & extérieur' | 'Terrassement';
   desc: string;
   catSlug: string;
   tag?: string;
@@ -94,7 +94,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
       'Préparation de terrain, fondations et tranchées — le sol prêt pour vos projets d’extérieur.',
     icon: 'digger',
     image: isoMinipelle.src,
-    group: 'Portails & extérieur',
+    group: 'Terrassement',
     desc: 'Préparation de terrain et fondations',
     catSlug: 'terrassements',
   },

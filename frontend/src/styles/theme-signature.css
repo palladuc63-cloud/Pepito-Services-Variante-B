@@ -179,8 +179,11 @@ a.sig-topbar__item:hover {
   gap: 0 0.4rem;
 }
 
+/* Une colonne par groupe (2, 3, N…) — grid-auto-flow plutôt qu'un
+   template figé. */
 .nav-dd__sections:has(> .nav-dd__section:nth-child(2)) {
-  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
 }
 
 .nav-dd:has(.nav-dd__section-title) {
@@ -240,7 +243,7 @@ a.sig-topbar__item:hover {
   left: 50%;
   right: auto;
   translate: -50% 0;
-  min-width: 48rem;
+  min-width: 52rem;
   max-width: calc(100vw - 2rem);
 }
 
