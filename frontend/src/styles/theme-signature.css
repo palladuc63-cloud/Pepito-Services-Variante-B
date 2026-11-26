@@ -140,7 +140,7 @@ a.sig-topbar__item:hover {
 
 :root[data-theme='signature'] .site-logo {
   width: auto;
-  height: 2.5rem;
+  height: 3.75rem;
 }
 
 /* Liens alignés à droite, juste avant le CTA. */
