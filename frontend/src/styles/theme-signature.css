@@ -187,7 +187,9 @@ a.sig-topbar__item:hover {
   min-width: 32rem;
 }
 
-/* La page s'estompe quand un dropdown est ouvert (panel seul éclairé). */
+/* La page s'estompe quand un dropdown est ouvert (panel seul éclairé).
+   Même grâce de 0.35s que le panel — sinon l'assombrissement clignote
+   pendant le trajet de la souris. */
 .nav-dim {
   position: fixed;
   inset: 0;
@@ -198,12 +200,26 @@ a.sig-topbar__item:hover {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
+  transition: opacity 0.2s ease, visibility 0s linear 0.35s;
 }
 
 :root:has(.nav-item--has-dd:is(:hover, :focus-within, .is-open)) .nav-dim {
   opacity: 1;
   visibility: visible;
+  transition: opacity 0.2s ease, visibility 0s;
+}
+
+/* Couloir invisible entre le lien « Services » (à droite) et le bord
+   droit du mega-panel (centré) : le :hover survit au trajet diagonal
+   de la souris. Placé sous le niveau des liens pour ne jamais couvrir
+   « Réalisations ». */
+:root[data-theme='signature'] .nav-item--has-dd:has(.nav-dd__promo)::after {
+  content: '';
+  position: absolute;
+  bottom: -1.4rem;
+  right: -1rem;
+  width: 13rem;
+  height: 2.6rem;
 }
 
 /* Panel élargi + centré quand la carte promo est présente. */

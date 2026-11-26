@@ -639,7 +639,13 @@ const navLinks = settings.nav.map((link) => {
     visibility: hidden;
     pointer-events: none;
     transform: translateY(6px);
-    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    /* Délai de fermeture 0.35s : le panel reste visible/interactif le
+       temps que la souris le rejoigne depuis le lien (trajet diagonal). */
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease,
+      visibility 0s linear 0.35s,
+      pointer-events 0s linear 0.35s;
     z-index: 60;
   }
 
@@ -648,6 +654,11 @@ const navLinks = settings.nav.map((link) => {
     visibility: visible;
     pointer-events: auto;
     transform: translateY(0);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease,
+      visibility 0s,
+      pointer-events 0s;
   }
 
   .nav-dd__grid {
