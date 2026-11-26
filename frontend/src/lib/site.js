@@ -22,6 +22,12 @@ export async function getSite() {
       label: 'Services',
       href: '/services/',
       icon: 'fence',
+      promo: {
+        title: 'Devis gratuit',
+        desc: 'Réponse sous 48 h — visite technique sur site incluse.',
+        cta: 'Demander un devis',
+        href: '/contact/',
+      },
       children: [
         {
           label: 'Clôtures rigides',

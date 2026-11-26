@@ -173,7 +173,8 @@ a.sig-topbar__item:hover {
   border-radius: 0;
 }
 
-/* Panel « Duna » : sections en colonnes, titre de groupe + gloss. */
+/* Mega-panel « Tiquo » : sections en colonnes + carte promo, page
+   estompée derrière le panel. */
 .nav-dd__sections {
   display: grid;
   gap: 0 0.4rem;
@@ -185,6 +186,42 @@ a.sig-topbar__item:hover {
 
 .nav-dd:has(.nav-dd__section-title) {
   min-width: 32rem;
+}
+
+/* La page s'estompe quand un dropdown est ouvert (panel seul éclairé). */
+.nav-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgb(15 20 15 / 0.32);
+  -webkit-backdrop-filter: blur(1.5px);
+  backdrop-filter: blur(1.5px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+:root:has(.nav-item--has-dd:is(:hover, :focus-within, .is-open)) .nav-dim {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Panel élargi + centré quand la carte promo est présente. */
+.nav-dd__main {
+  display: grid;
+  gap: 0 0.4rem;
+}
+
+.nav-dd__main:has(.nav-dd__promo) {
+  grid-template-columns: 2fr 1fr;
+}
+
+.nav-dd:has(.nav-dd__promo) {
+  left: 50%;
+  translate: -50% 0;
+  min-width: 42rem;
+  max-width: calc(100vw - 2rem);
 }
 
 .nav-dd__section-title {
@@ -202,6 +239,44 @@ a.sig-topbar__item:hover {
   font-size: 0.75rem;
   font-weight: 400;
   color: var(--stone);
+}
+
+/* Carte promo du mega-panel (façon « update card » de Tiquo). */
+.nav-dd__promo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.45rem;
+  padding: 1rem 1.1rem;
+  background: var(--forest);
+  color: var(--on-dark);
+  text-decoration: none;
+}
+
+.nav-dd__promo-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.nav-dd__promo-desc {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  opacity: 0.85;
+}
+
+.nav-dd__promo-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.nav-dd__promo:hover,
+.nav-dd__promo:focus-visible {
+  background: var(--forest-dark);
 }
 
 /* Hamburger et CTA mobile : mêmes angles carrés. */

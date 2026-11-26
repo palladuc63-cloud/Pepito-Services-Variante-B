@@ -25,6 +25,9 @@ const navLinks = settings.nav.map((link) => {
       ? currentPath === base || currentPath === `${base}`
       : currentPath.startsWith(`${base}${link.href.replace(/^\//, '')}`),
     children,
+    promo: link.promo
+      ? { ...link.promo, href: `${base}${link.promo.href.replace(/^\//, '')}` }
+      : null,
     childGroups:
       children?.length && groupLabels.some((g) => g !== '')
         ? groupLabels.map((g) => ({
@@ -113,8 +116,9 @@ const navLinks = settings.nav.map((link) => {
                           </span>
                         </a>
                       </div>
-                      <div class="nav-dd__sections">
-                        {(link.childGroups ?? [{ label: '', items: link.children }]).map((g) => (
+                      <div class="nav-dd__main">
+                        <div class="nav-dd__sections">
+                          {(link.childGroups ?? [{ label: '', items: link.children }]).map((g) => (
                           <div class="nav-dd__section">
                             {g.label && <div class="nav-dd__section-title">{g.label}</div>}
                             {g.items.map((child) => (
@@ -146,6 +150,17 @@ const navLinks = settings.nav.map((link) => {
                             ))}
                           </div>
                         ))}
+                        </div>
+                        {link.promo && (
+                          <a href={link.promo.href} class="nav-dd__promo" role="menuitem">
+                            <span class="nav-dd__promo-title">{link.promo.title}</span>
+                            <span class="nav-dd__promo-desc">{link.promo.desc}</span>
+                            <span class="nav-dd__promo-cta">
+                              {link.promo.cta}
+                              <Icon name="move-right" size={14} />
+                            </span>
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -191,6 +206,8 @@ const navLinks = settings.nav.map((link) => {
     </nav>
   </div>
 </header>
+
+<span class="nav-dim" aria-hidden="true"></span>
 
 <div id="mobile-menu" class="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu principal" hidden>
   <div class="mobile-menu__header">

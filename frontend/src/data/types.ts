@@ -7,6 +7,12 @@ export interface NavLink {
   label: string;
   href: string;
   icon?: string;
+  promo?: {
+    title: string;
+    desc: string;
+    cta: string;
+    href: string;
+  };
   children?: {
     label: string;
     href: string;
