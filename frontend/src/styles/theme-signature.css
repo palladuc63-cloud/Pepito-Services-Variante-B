@@ -232,7 +232,7 @@ a.sig-topbar__item:hover {
 }
 
 .nav-dd__main:has(.nav-dd__promo) {
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 3fr 1fr;
 }
 
 /* Mega-panel centré sur l'écran, juste sous la barre (position:fixed —
@@ -243,7 +243,7 @@ a.sig-topbar__item:hover {
   left: 50%;
   right: auto;
   translate: -50% 0;
-  min-width: 52rem;
+  min-width: 56rem;
   max-width: calc(100vw - 2rem);
 }
 
