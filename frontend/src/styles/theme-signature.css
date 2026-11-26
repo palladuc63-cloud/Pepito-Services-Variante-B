@@ -216,9 +216,14 @@ a.sig-topbar__item:hover {
   grid-template-columns: 2fr 1fr;
 }
 
-.nav-dd:has(.nav-dd__promo) {
-  left: auto;
-  right: 0;
+/* Mega-panel centré sur l'écran, juste sous la barre (position:fixed —
+   aucun ancêtre transformé ne le contraint). */
+:root[data-theme='signature'] .nav-dd:has(.nav-dd__promo) {
+  position: fixed;
+  top: 4.45rem;
+  left: 50%;
+  right: auto;
+  translate: -50% 0;
   min-width: 48rem;
   max-width: calc(100vw - 2rem);
 }
