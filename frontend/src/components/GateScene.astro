@@ -31,6 +31,11 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
       </p>
     </div>
     <div class="gate-scene__hint" aria-hidden="true">
+      <svg class="gate-scene__hint-chevs gate-scene__hint-chevs--up" viewBox="0 0 20 24" aria-hidden="true">
+        <path d="M3 3l7 6 7-6" />
+        <path d="M3 10l7 6 7-6" />
+        <path d="M3 17l7 6 7-6" />
+      </svg>
       <span class="gate-scene__hint-mouse">
         <span class="gate-scene__hint-dot"></span>
       </span>
@@ -179,6 +184,11 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     width: 1.3rem;
     height: auto;
     display: block;
+  }
+  /* Chevrons vers le haut : le même tracé retourné — la cascade
+     s'inverse avec la forme (mobile : le scroll peut remonter). */
+  .gate-scene__hint-chevs--up {
+    transform: scaleY(-1);
   }
   .gate-scene__hint-chevs path {
     fill: none;
