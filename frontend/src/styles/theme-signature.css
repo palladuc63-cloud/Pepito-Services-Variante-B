@@ -110,43 +110,43 @@ a.sig-topbar__item:hover {
   }
 }
 
-/* ═══ Navigation « floating pill » (réf. AlignUI) ═══
-   Barre compacte centrée qui flotte au-dessus du contenu : logo,
-   liens et CTA dans une seule capsule ; liens sobres, hover/actif en
-   pastille douce. */
+/* ═══ Navigation « Tiquo » : barre pleine largeur ═══
+   Logo à gauche, liens collés à gauche, CTA à droite — barre
+   classique ; le mega-panel avec carte promo porte l'identité. */
 
 .nav-rep {
   display: none;
 }
 
 :root[data-theme='signature'] .site-header {
-  top: 0.9rem;
-  background: transparent;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  border-bottom: 0;
+  top: 0;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
 }
 
 :root[data-theme='signature'] .main-nav {
-  width: fit-content;
-  max-width: calc(100vw - 2rem);
-  min-height: 0;
-  margin-inline: auto;
-  gap: 0.35rem;
-  padding: 0.45rem 0.55rem;
-  background: var(--panel);
-  border: 1px solid var(--line);
+  width: 100%;
+  max-width: none;
+  min-height: 4.25rem;
+  gap: 0.75rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
   border-radius: 0;
-  box-shadow: 0 6px 24px rgb(22 26 23 / 0.08);
+  box-shadow: none;
 }
 
 :root[data-theme='signature'] .site-logo {
   width: auto;
-  height: 2.3rem;
+  height: 2.5rem;
 }
 
-:root[data-theme='signature'] .brand-area {
-  margin-right: 0.4rem;
+/* Liens collés à gauche après le logo ; le CTA reste à droite. */
+:root[data-theme='signature'] .desktop-nav {
+  margin-right: auto;
+  margin-left: 1.75rem;
 }
 
 /* Liens compacts carrés : état doux en bloc net (Tailwind gère déjà
