@@ -35,7 +35,7 @@ export const signature = {
     { img: isoMotorisation, label: 'Motorisation' },
     { img: isoMinipelle, label: 'Terrassement mini-pelle' },
   ],
-  benefitsTitle: 'Pourquoi choisir notre clôture avec sous-bassement béton ?',
+  benefitsTitle: 'Pourquoi choisir nos clôtures et portails ?',
   benefits: [
     {
       icon: 'shield',

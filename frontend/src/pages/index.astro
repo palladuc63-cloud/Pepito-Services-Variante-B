@@ -155,34 +155,49 @@ const jsonLd = [{
   <div class="signature-home">
     <GateScene />
 
-    <div class="sig-scrollpath">
-      <div class="sig-scrollpath__sticky">
-        <div class="sig-scrollpath__inner">
-          <section class="sig-benefits">
-      <div class="container">
-        <h2 class="sig-title">{signature.benefitsTitle}</h2>
-        <p class="sig-benefits__lead">
-          Clôtures rigides, portails et portillons sur mesure, murets et
-          aménagements extérieurs&nbsp;: votre artisan local pour sécuriser et
-          embellir votre propriété.
-        </p>
-        <div class="sig-benefits__grid">
-          {signature.benefits.map((b) => (
-            <div class="sig-benefit">
-              <span class="sig-benefit__icon" aria-hidden="true">
-                {b.icon === 'shield' && <img src={`${base}icons/benefit-shield.png`} alt="" loading="lazy" />}
-                {b.icon === 'finish' && <img src={`${base}icons/benefit-finish.png`} alt="" loading="lazy" />}
-                {b.icon === 'clock' && <img src={`${base}icons/benefit-clock.png`} alt="" loading="lazy" />}
-              </span>
-              <h3>{b.title}</h3>
-              <p>{b.text}</p>
-            </div>
-          ))}
+    <section class="sig-about container" id="entreprise">
+      <div class="sig-about__grid">
+        <div class="sig-about__photo" aria-hidden="true">
+          <Icon name="building" size={30} />
+          <span>Photo de nos ateliers — à venir</span>
+        </div>
+        <div class="sig-about__body">
+          <h2 class="sig-title sig-about__title">
+            Pépito Services, artisan installateur à Thiers
+          </h2>
+          <p>
+            Pépito Services est l'entreprise individuelle de Sylvain
+            Palladuc, artisan installateur basé à Thiers, au cœur du
+            Livradois-Forez. Nous préparons et posons clôtures rigides et
+            souples, palissades occultantes, portails et portillons,
+            motorisations et petits terrassements à la mini-pelle — un seul
+            interlocuteur, de l'étude du terrain à la réception du chantier.
+          </p>
+          <p>
+            Installés dans nos ateliers thiernois, nous intervenons dans
+            tout le Puy-de-Dôme dans un rayon d'environ 50&nbsp;km. Chaque
+            ouvrage est pensé pour durer&nbsp;: matériaux résistants,
+            sous-bassement béton contre l'humidité et finitions propres.
+            Devis gratuit et personnalisé.
+          </p>
+          <ul class="sig-about__facts">
+            <li>Entreprise individuelle</li>
+            <li>Thiers · Livradois-Forez</li>
+            <li>Rayon d'intervention ~50&nbsp;km</li>
+            <li>Devis gratuit</li>
+          </ul>
         </div>
       </div>
     </section>
 
-    <section class="sig-process">
+    <header class="sig-process-head container">
+      <h2 class="sig-title">{signature.processTitle}</h2>
+    </header>
+
+    <div class="sig-scrollpath">
+      <div class="sig-scrollpath__sticky">
+        <div class="sig-scrollpath__inner">
+          <section class="sig-process">
       <div class="sig-band" aria-hidden="true"></div>
       <div class="container">
         <ol class="sig-steps">
@@ -217,20 +232,27 @@ const jsonLd = [{
       </div>
     </div>
 
-    <section class="sig-activities container" id="activites">
-      <h2 class="sig-title">{signature.activitiesTitle}</h2>
-      <div class="sig-benefits__grid">
-        {signature.benefits.map((b) => (
-          <div class="sig-benefit">
-            <span class="sig-benefit__icon" aria-hidden="true">
-              {b.icon === 'shield' && <img src={`${base}icons/benefit-shield.png`} alt="" loading="lazy" />}
-              {b.icon === 'finish' && <img src={`${base}icons/benefit-finish.png`} alt="" loading="lazy" />}
-              {b.icon === 'clock' && <img src={`${base}icons/benefit-clock.png`} alt="" loading="lazy" />}
-            </span>
-            <h3>{b.title}</h3>
-            <p>{b.text}</p>
-          </div>
-        ))}
+    <section class="sig-benefits">
+      <div class="container">
+        <h2 class="sig-title">{signature.benefitsTitle}</h2>
+        <p class="sig-benefits__lead">
+          Clôtures rigides, portails et portillons sur mesure, murets et
+          aménagements extérieurs&nbsp;: votre artisan local pour sécuriser et
+          embellir votre propriété.
+        </p>
+        <div class="sig-benefits__grid">
+          {signature.benefits.map((b) => (
+            <div class="sig-benefit">
+              <span class="sig-benefit__icon" aria-hidden="true">
+                {b.icon === 'shield' && <img src={`${base}icons/benefit-shield.png`} alt="" loading="lazy" />}
+                {b.icon === 'finish' && <img src={`${base}icons/benefit-finish.png`} alt="" loading="lazy" />}
+                {b.icon === 'clock' && <img src={`${base}icons/benefit-clock.png`} alt="" loading="lazy" />}
+              </span>
+              <h3>{b.title}</h3>
+              <p>{b.text}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
 

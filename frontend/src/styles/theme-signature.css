@@ -652,6 +652,75 @@ a.sig-topbar__item:hover {
   color: var(--ink);
 }
 
+/* ═══ Présentation entreprise ═══
+   Photo des ateliers à gauche (placeholder en attendant le cliché),
+   texte de présentation à droite. */
+
+.sig-about {
+  padding-block: clamp(2.5rem, 5vw, 4rem);
+}
+
+.sig-about__grid {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 900px) {
+  .sig-about__grid {
+    grid-template-columns: 2fr 3fr;
+    gap: 3.5rem;
+    align-items: center;
+  }
+}
+
+.sig-about__photo {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--r-card, 1rem);
+  border: 2px dashed color-mix(in srgb, var(--forest) 30%, transparent);
+  background: color-mix(in srgb, var(--paper) 72%, var(--forest) 7%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: var(--stone);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.sig-about__title {
+  text-align: left;
+}
+
+.sig-about__body p {
+  margin: 0 0 1rem;
+  line-height: 1.65;
+  color: var(--stone);
+}
+
+.sig-about__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sig-about__facts li {
+  border: 1px solid color-mix(in srgb, var(--forest) 28%, transparent);
+  border-radius: 999px;
+  padding: 0.28rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--forest);
+}
+
+/* Titre du processus, en flux normal avant la piste épinglée. */
+.sig-process-head {
+  padding-block: clamp(1.5rem, 3vw, 2.5rem) 0;
+}
+
 /* ═══ Section « Pourquoi choisir » ═══ */
 
 .sig-benefits {
@@ -975,6 +1044,16 @@ a.sig-topbar__item:hover {
     height: 100vh;
     height: 100svh;
     overflow: hidden;
+  }
+
+  /* Composition du cadre figé : espace papier au-dessus, ruban dans le
+     tiers inférieur (les marqueurs en escalier chevauchent son bord). */
+  .sig-scrollpath.is-pinned .sig-scrollpath__inner {
+    padding-top: 38vh;
+  }
+
+  .sig-scrollpath.is-pinned .sig-process {
+    padding-bottom: 12rem;
   }
 }
 
