@@ -655,7 +655,16 @@ a.sig-topbar__item:hover {
 /* ═══ Section « Pourquoi choisir » ═══ */
 
 .sig-benefits {
-  padding-block: clamp(2.5rem, 5vw, 4rem);
+  padding-block: calc(clamp(2.5rem, 5vw, 4rem) + 10vh);
+}
+
+.sig-benefits__lead {
+  max-width: 52rem;
+  margin: 0.9rem auto 0;
+  text-align: center;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--stone);
 }
 
 .sig-benefits__grid {
@@ -719,6 +728,7 @@ a.sig-topbar__item:hover {
   background: var(--forest);
 }
 
+
 .sig-process::before {
   content: '';
   position: absolute;
@@ -726,8 +736,9 @@ a.sig-topbar__item:hover {
   left: 0;
   right: 0;
   height: 4.5rem;
-  background: var(--paper);
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  background-color: var(--color-cream);
+  background-image: var(--grain-img);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
 /* Texte et marqueurs en clair sur le bloc forest. */
@@ -780,6 +791,20 @@ a.sig-topbar__item:hover {
     flex-direction: column;
     gap: 0;
   }
+}
+
+/* Escalier diagonal : chaque étape descend légèrement vers la gauche,
+   parallèle au bord incliné du bloc (--slope-y = décalage vertical). */
+@media (min-width: 900px) {
+  .sig-steps { margin-top: 0; transform: translateY(-20vh); }
+  /* Marqueurs cales sur l arete diagonale (4.5rem de pente sur la
+     largeur) : chaque etape remonte de ~0.9rem en allant a droite. */
+  .sig-step:nth-child(1) { --slope-y: -3.5rem; }
+  .sig-step:nth-child(2) { --slope-y: -4.4rem; }
+  .sig-step:nth-child(3) { --slope-y: -5.3rem; }
+  .sig-step:nth-child(4) { --slope-y: -6.2rem; }
+  .sig-step:nth-child(5) { --slope-y: -7.1rem; }
+  .sig-step { transform: translateY(var(--slope-y)); }
 }
 
 /* Marqueur : photo de chantier libre (sans anneau ni fond) + numéro
@@ -878,7 +903,7 @@ a.sig-topbar__item:hover {
 
 .sig-scrollpath.is-anim .sig-step {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translate(-14px, calc(14px + var(--slope-y, 0px)));
   transition:
     opacity 0.45s ease,
     transform 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
@@ -890,7 +915,7 @@ a.sig-topbar__item:hover {
 
 .sig-scrollpath.is-anim .sig-step.is-on {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0) translateY(var(--slope-y, 0));
 }
 
 .sig-scrollpath.is-anim .sig-step.is-on .sig-step__marker {
@@ -904,7 +929,8 @@ a.sig-topbar__item:hover {
 @media (min-width: 900px) {
   .sig-step__body {
     margin-top: 0.9rem;
-    padding-right: 1.1rem;
+    padding-inline: 0.6rem;
+    text-align: center;
   }
 }
 
@@ -985,4 +1011,23 @@ a.sig-topbar__item:hover {
 
 :root[data-theme='signature'] .card {
   border-radius: var(--r-card);
+}
+
+/* ── Zone d'intervention (carte + SEO local) ─────────────────── */
+.sig-zone { padding-block: clamp(2.5rem, 5vw, 4rem); }
+.sig-zone__intro { max-width: 62ch; margin-inline: auto; text-align: center; }
+.sig-zone__lead { margin-block: 1rem; line-height: 1.7; }
+.sig-zone__map { margin-block: 2.5rem 1.5rem; }
+.sig-zone__map .city-map-wrap { border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,.35); }
+.sig-zone__nap { text-align: center; margin-top: 1.25rem; font-size: .95rem; opacity: .85; }
+.sig-zone__nap a { color: inherit; text-decoration: none; border-bottom: 1px solid currentColor; }
+.sig-zone__nap a:hover { border-bottom-color: transparent; }
+
+/* Icônes benefits : tuiles images (rendu 3D) */
+.sig-benefit__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 22%;
+  box-shadow: 0 4px 14px rgba(0,0,0,.28);
 }

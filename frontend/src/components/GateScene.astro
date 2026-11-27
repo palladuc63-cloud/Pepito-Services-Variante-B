@@ -24,10 +24,12 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     />
     <div class="gate-scene__welcome">
       <img src={logo.src} alt="Pépito Services" />
+      <p class="gate-scene__welcome-kicker">Bienvenue chez Pépito Services</p>
       <p>
-        Clôtures rigides, portails et portillons sur mesure, murets et
-        aménagements extérieurs&nbsp;: votre artisan local pour sécuriser et
-        embellir votre propriété.
+        Artisan clôturier à Thiers : clôtures rigides, portails et
+        portillons sur mesure, murets avec sous-bassement béton et
+        aménagements extérieurs — de la fabrication à la pose, chez vous
+        dans un rayon de 50&nbsp;km.
       </p>
     </div>
     <div class="gate-scene__hint" aria-hidden="true">
@@ -124,6 +126,14 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     margin: 0;
     max-width: 34rem;
     text-shadow: 0 1px 14px rgb(255 255 255 / 0.7);
+  }
+  .gate-scene__welcome .gate-scene__welcome-kicker {
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 1.7vw, 1.25rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #2c3b25;
   }
   /* Indication de scroll en bas de l'écran épinglé : souris dont le
      point descend en s'estompant (opacité + position), chevrons en

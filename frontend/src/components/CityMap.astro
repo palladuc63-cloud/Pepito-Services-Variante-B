@@ -43,12 +43,7 @@ const home = markers.find((m) => m.city?.toLowerCase() === 'thiers') || { lat: 4
 const zone = radiusKm ? { lat: home.lat, lng: home.lng, radius: radiusKm * 1000 } : null;
 ---
 
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-  crossorigin=""
-/>
+<link rel="stylesheet" href={`${base}leaflet/leaflet.css`} />
 <div class="city-map-wrap">
   <div
     id="city-map"
@@ -57,7 +52,7 @@ const zone = radiusKm ? { lat: home.lat, lng: home.lng, radius: radiusKm * 1000 
     data-zone={zone ? JSON.stringify(zone) : ''}
   ></div>
 </div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" is:inline></script>
+<script src={`${base}leaflet/leaflet.js`} is:inline></script>
 <script is:inline>
   (function () {
     function initCityMap() {

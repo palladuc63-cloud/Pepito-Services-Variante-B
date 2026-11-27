@@ -12,6 +12,7 @@ import { ICONS } from '../lib/icons';
 import GateScene from '../components/GateScene.astro';
 import { getSite } from '../lib/site.js';
 import { getProjects } from '../lib/api.js';
+import CityMap from '../components/CityMap.astro';
 import type { Project, Service } from '../data/types';
 
 const { settings, services, slides } = await getSite();
@@ -38,13 +39,26 @@ const jsonLd = [{
   ...(settings.contact.address && {
     address: { '@type': 'PostalAddress', streetAddress: settings.contact.address, addressCountry: 'FR' },
   }),
-  ...(settings.contact.serviceArea && { areaServed: settings.contact.serviceArea }),
+  geo: { '@type': 'GeoCoordinates', latitude: 45.8567, longitude: 3.5489 },
+  ...(settings.contact.serviceArea && {
+    areaServed: {
+      '@type': 'GeoCircle',
+      geoMidpoint: { '@type': 'GeoCoordinates', latitude: 45.8567, longitude: 3.5489 },
+      geoRadius: '50000',
+    },
+  }),
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    opens: '08:00',
+    closes: '17:00',
+  },
   ...(settings.sameAs?.length && { sameAs: settings.sameAs }),
 }];
 ---
 
 <MainLayout
-  title={settings.name}
+  title="Clôtures & portails à Thiers (63)"
   description={settings.description}
   canonicalPath="/"
   jsonLd={jsonLd}
@@ -147,29 +161,18 @@ const jsonLd = [{
           <section class="sig-benefits">
       <div class="container">
         <h2 class="sig-title">{signature.benefitsTitle}</h2>
+        <p class="sig-benefits__lead">
+          Clôtures rigides, portails et portillons sur mesure, murets et
+          aménagements extérieurs&nbsp;: votre artisan local pour sécuriser et
+          embellir votre propriété.
+        </p>
         <div class="sig-benefits__grid">
           {signature.benefits.map((b) => (
             <div class="sig-benefit">
               <span class="sig-benefit__icon" aria-hidden="true">
-                {b.icon === 'shield' && (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z" />
-                    <path d="M9 12l2 2 4-4" />
-                  </svg>
-                )}
-                {b.icon === 'finish' && (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 20l4-1 11-11a2.1 2.1 0 0 0-3-3L5 16l-1 4z" />
-                    <path d="M13.5 6.5l3 3" />
-                  </svg>
-                )}
-                {b.icon === 'clock' && (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="13" r="8" />
-                    <path d="M12 9v4l2.5 2.5" />
-                    <path d="M9 2h6" />
-                  </svg>
-                )}
+                {b.icon === 'shield' && <img src={`${base}icons/benefit-shield.png`} alt="" loading="lazy" />}
+                {b.icon === 'finish' && <img src={`${base}icons/benefit-finish.png`} alt="" loading="lazy" />}
+                {b.icon === 'clock' && <img src={`${base}icons/benefit-clock.png`} alt="" loading="lazy" />}
               </span>
               <h3>{b.title}</h3>
               <p>{b.text}</p>
@@ -181,7 +184,6 @@ const jsonLd = [{
 
     <section class="sig-process">
       <div class="container">
-        <h2 class="sig-title">{signature.processTitle}</h2>
         <ol class="sig-steps">
           {signature.steps.map((s, i) => (
             <li class="sig-step">
@@ -200,7 +202,6 @@ const jsonLd = [{
                     set:html={ICONS[s.icon] ?? ICONS.check}
                   />
                 )}
-                <span class="sig-step__num">{i + 1}</span>
               </span>
               <div class="sig-step__body">
                 <h3>{s.title}</h3>
@@ -235,6 +236,22 @@ const jsonLd = [{
       <div class="sig-installs__more">
         <a href={`${base}realisations/`} class="sig-btn sig-btn--primary"><span>Voir toutes les réalisations</span><Icon name="move-right" size={16} class="cta-arrow" /></a>
       </div>
+    </section>
+
+    <section class="sig-zone container" id="zone-intervention">
+      <div class="sig-zone__intro">
+        <h2 class="sig-title">Artisan clôturier à Thiers — interventions dans un rayon de 50&nbsp;km</h2>
+        <p class="sig-zone__lead">
+          Basée à Thiers dans le Puy-de-Dôme (63), <strong>Pépito Services</strong> se déplace dans un rayon de 50&nbsp;km pour la pose de clôtures rigides, portails et portillons sur mesure, palissades, murets avec sous-bassement béton et petits travaux de terrassement.
+        </p>
+        <p class="sig-zone__lead">
+          Nous intervenons à Courpière, Billom, Lezoux, Pont-du-Château, Ambert, Cunlhat, Clermont-Ferrand, Riom, Vichy et Montbrison, ainsi que dans toutes les communes du Livradois-Forez et de la plaine de la Dore. Le chiffrage est gratuit et sans engagement — nous nous déplaçons chez vous pour étudier votre terrain.
+        </p>
+      </div>
+      <div class="sig-zone__map"><CityMap height="440px" /></div>
+      <p class="sig-zone__nap">
+        <strong>{settings.name}</strong> — {settings.contact.address} — <a href={`tel:${String(settings.contact.phone).replace(/\s/g, '')}`}>{settings.contact.phone}</a>
+      </p>
     </section>
   </div>
 
