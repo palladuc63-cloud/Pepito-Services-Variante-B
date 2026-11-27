@@ -755,31 +755,18 @@ a.sig-topbar__item:hover {
   padding-bottom: 1rem;
 }
 
-/* Séparateur sobre entre présentation et processus : filets inclinés
-   à la pente du bandeau (~3°) + petit losange central. */
+/* Séparateur sobre : filet pleine largeur à extrémités estompées,
+   petit V au centre (tracé SVG). */
 .sig-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.9rem;
+  width: min(92%, 1140px);
+  margin-inline: auto;
   padding-block: clamp(1rem, 3vw, 2.5rem);
 }
 
-.sig-divider::before,
-.sig-divider::after {
-  content: '';
-  width: min(9rem, 20vw);
-  height: 1px;
-  background: color-mix(in srgb, var(--forest) 32%, transparent);
-  transform: rotate(-3deg);
-}
-
-.sig-divider i {
-  width: 6px;
-  height: 6px;
-  background: var(--forest);
-  opacity: 0.5;
-  transform: rotate(45deg);
+.sig-divider svg {
+  display: block;
+  width: 100%;
+  height: 10px;
 }
 
 /* Révélation à l'entrée dans le viewport (.rv posée par le JS). */
