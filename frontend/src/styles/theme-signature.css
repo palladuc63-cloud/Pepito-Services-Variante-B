@@ -1112,28 +1112,25 @@ a.sig-topbar__item:hover {
 
 @media (min-width: 900px) {
   .sig-scrollpath.is-pinned {
-    height: calc(100vh + 260vh);
+    height: calc(100vh + 180vh);
   }
 
   .sig-scrollpath.is-pinned .sig-scrollpath__sticky {
     position: sticky;
-    /* Le gel s'enclenche quand le haut du bloc atteint 35vh : le bloc
-       séparateur + titre + ruban est figé à mi-page — l'animation
-       « commence à ce niveau ». */
-    top: 35vh;
+    top: 0;
     height: 100vh;
     height: 100svh;
-    /* x : clippe la bande garée hors écran ; y : visible — le pan peut
-       faire remonter le contenu au-dessus du point d'accroche. */
-    overflow-x: clip;
+    overflow: hidden;
   }
 
+  /* Composition du cadre figé : séparateur + titre vers ~35-40vh,
+     ruban dessous — le bloc est centré dans la moitié basse du cadre. */
   .sig-scrollpath.is-pinned .sig-scrollpath__inner {
-    padding-top: 5vh;
+    padding-top: 28vh;
   }
 
   .sig-scrollpath.is-pinned .sig-process {
-    margin: 16vh 4vw 0;
+    margin: 18vh 4vw 0;
     padding-bottom: 2rem;
   }
 
