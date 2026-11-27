@@ -752,6 +752,7 @@ a.sig-topbar__item:hover {
    pendant la séquence puis repart avec le scroll (jamais par-dessus
    les icônes). */
 .sig-process-head {
+  padding-top: 5rem;
   padding-bottom: 1rem;
 }
 
