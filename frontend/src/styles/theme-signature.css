@@ -1117,20 +1117,22 @@ a.sig-topbar__item:hover {
 
   .sig-scrollpath.is-pinned .sig-scrollpath__sticky {
     position: sticky;
-    top: 0;
+    /* Le gel s'enclenche quand le haut du bloc atteint 45vh : le titre
+       est alors à mi-page — l'animation « commence à ce niveau ». */
+    top: 45vh;
     height: 100vh;
     height: 100svh;
-    overflow: hidden;
+    /* x : clippe la bande garée hors écran ; y : visible — le pan peut
+       faire remonter le contenu au-dessus du point d'accroche. */
+    overflow-x: clip;
   }
 
-  /* Composition du cadre figé : titre en haut du cadre, puis le ruban
-     en dessous — margé à droite et à gauche (bandeau moins large). */
   .sig-scrollpath.is-pinned .sig-scrollpath__inner {
-    padding-top: 50vh;
+    padding-top: 5vh;
   }
 
   .sig-scrollpath.is-pinned .sig-process {
-    margin: 16vh 4vw 0;
+    margin: 18vh 4vw 0;
     padding-bottom: 4rem;
   }
 

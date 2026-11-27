@@ -345,9 +345,9 @@ const jsonLd = [{
       const measure = () => {
         if (mqNarrow.matches) return;
         const vh = window.innerHeight;
-        // Pan : composition déjà à mi-page via le padding de __inner —
-        // léger relevage de finition seulement (cible ~90 %).
-        panT = Math.max(0, Math.min(naturalTop() - vh * 0.9, innerEl.scrollHeight - vh));
+        // Pan : remonte le contenu en début de gel — les étapes finissent
+        // à ~60 % de l'écran (45vh d'accroche + position inner − panT).
+        panT = Math.max(0, naturalTop() - vh * 0.15);
         // Paliers du bandeau : à chaque q de pop, sa progression bp
         // place son bord droit juste après le bord droit de l'étape
         // (tout son texte est couvert). Bord écran = 106·bp − 6 % de
@@ -389,7 +389,9 @@ const jsonLd = [{
       const draw = () => {
         const r = scrollPath.getBoundingClientRect();
         const vh = window.innerHeight;
-        const q = Math.min(1, Math.max(0, -r.top / (r.height - vh)));
+        // Le sticky accroche à 45vh : q progresse sur toute la durée
+        // du gel (de r.top=45vh à la libération).
+        const q = Math.min(1, Math.max(0, (vh * 0.45 - r.top) / (r.height - vh)));
         // Le bandeau glisse depuis la gauche pendant tout le gel, le
         // long de sa propre pente : la compensation verticale (4.3rem
         // = pente du bord ~4.05rem × 1.06 de course) annule la dérive
