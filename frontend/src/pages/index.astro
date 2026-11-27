@@ -455,7 +455,7 @@ const jsonLd = [{
     // titre du process (une fois ; reduced-motion → pas de masquage).
     const mqReducedRv = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (!mqReducedRv.matches) {
-      const rvEls = ['.sig-about', '.sig-process-head', '.sig-benefits']
+      const rvEls = ['.sig-about', '.sig-process-head']
         .map((sel) => document.querySelector<HTMLElement>(sel))
         .filter((el): el is HTMLElement => el !== null);
       if (rvEls.length > 0) {
@@ -491,6 +491,23 @@ const jsonLd = [{
           { threshold: 0, rootMargin: '0px 0px -20% 0px' }
         );
         ioDiv.observe(divEl);
+      }
+
+      // Benefits : marge négative — la section doit être bien remontée
+      // dans le viewport avant que les icônes ne poppent.
+      const benEl = document.querySelector<HTMLElement>('.sig-benefits');
+      if (benEl) {
+        benEl.classList.add('rv');
+        const ioBen = new IntersectionObserver(
+          (entries) => {
+            if (entries.some((e) => e.isIntersecting)) {
+              benEl.classList.add('is-in');
+              ioBen.disconnect();
+            }
+          },
+          { threshold: 0, rootMargin: '0px 0px -25% 0px' }
+        );
+        ioBen.observe(benEl);
       }
     }
   </script>
