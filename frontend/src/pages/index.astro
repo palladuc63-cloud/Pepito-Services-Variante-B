@@ -455,7 +455,7 @@ const jsonLd = [{
     // titre du process (une fois ; reduced-motion → pas de masquage).
     const mqReducedRv = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (!mqReducedRv.matches) {
-      const rvEls = ['.sig-about', '.sig-process-head']
+      const rvEls = ['.sig-about', '.sig-process-head', '.sig-benefits']
         .map((sel) => document.querySelector<HTMLElement>(sel))
         .filter((el): el is HTMLElement => el !== null);
       if (rvEls.length > 0) {

@@ -831,6 +831,42 @@ a.sig-topbar__item:hover {
   text-align: center;
 }
 
+/* Apparition au scroll : pop élastique en cascade (une tuile après
+   l'autre) — .rv posée par le JS, sans JS tout est visible. */
+@keyframes sig-benefit-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(26px) scale(0.55);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1.06);
+  }
+  75% {
+    transform: translateY(3px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.sig-benefits.rv .sig-benefit {
+  opacity: 0;
+}
+
+.sig-benefits.is-in .sig-benefit {
+  animation: sig-benefit-pop 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.sig-benefits.is-in .sig-benefit:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.sig-benefits.is-in .sig-benefit:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
 .sig-benefit__icon {
   display: inline-flex;
   align-items: center;
