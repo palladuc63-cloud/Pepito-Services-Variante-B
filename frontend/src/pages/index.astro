@@ -477,8 +477,8 @@ const jsonLd = [{
         }
       }
 
-      // Séparateur : léger head start (~8 % de viewport) pour que le
-      // dépliage commence juste avant l'entrée — animation visible.
+      // Séparateur : marge négative — il doit être déjà ~10 % dans le
+      // viewport pour se déployer (animation entièrement visible).
       const divEl = document.querySelector<HTMLElement>('.sig-divider');
       if (divEl) {
         divEl.classList.add('rv');
@@ -489,7 +489,7 @@ const jsonLd = [{
               ioDiv.disconnect();
             }
           },
-          { threshold: 0, rootMargin: '0px 0px 8% 0px' }
+          { threshold: 0, rootMargin: '0px 0px -10% 0px' }
         );
         ioDiv.observe(divEl);
       }
