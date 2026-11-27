@@ -278,6 +278,7 @@ const jsonLd = [{
         stepsEl.querySelectorAll<HTMLElement>('.sig-step')
       );
       const bandEl = scrollPath.querySelector<HTMLElement>('.sig-band');
+      const procEl = scrollPath.querySelector<HTMLElement>('.sig-process');
       // Phases de la vue épinglée : pan du contenu quasi immédiat et
       // court, puis les pops démarrent PENDANT que le bloc finit de se
       // caler — pas de temps mort entre le gel et la 1re étape.
@@ -285,6 +286,9 @@ const jsonLd = [{
       const PAN_END = 0.25;
       const H_START = 0.12;
       let panT = 0;
+      // Paliers de glisse du bandeau : [q de pop, progression] — le
+      // bord vert arrive sur chaque étape au moment où elle pop.
+      let bandKnots: Array<[number, number]> = [];
 
       // Position de mise en page du ruban dans le bloc inner (offsetTop)
       // : constante, insensible au translateY du pan.
@@ -304,6 +308,36 @@ const jsonLd = [{
         // Pan : remonte le contenu pour placer le haut du ruban à ~60 %
         // de l'écran — le cadre figé montre toute la rangée d'étapes.
         panT = Math.max(0, Math.min(naturalTop() - vh * 0.6, innerEl.scrollHeight - vh));
+        // Paliers du bandeau : à chaque q de pop, sa progression bp
+        // place son bord droit juste après le centre de l'étape. Bord
+        // écran = 106·bp − 6 % de la largeur de la section.
+        if (bandEl && procEl && stepEls.length) {
+          const pr = procEl.getBoundingClientRect();
+          const len = stepEls.length;
+          bandKnots = [[0, 6 / 106]];
+          stepEls.forEach((el, i) => {
+            const qi = H_START + (i * (1 - H_START)) / len;
+            const sr = el.getBoundingClientRect();
+            const tx = (sr.left + sr.width / 2 - pr.left) / pr.width + 0.05;
+            bandKnots.push([qi, Math.min(1, (tx * 100 + 6) / 106)]);
+          });
+          bandKnots.push([H_START + ((len - 1) * (1 - H_START)) / len + 0.09, 1]);
+        }
+      };
+
+      // Progression bp(q) interpolée linéairement entre les paliers.
+      const bandAt = (qq: number) => {
+        const k = bandKnots;
+        if (!k.length) return Math.min(1, qq);
+        if (qq <= k[0][0]) return k[0][1];
+        for (let i = 1; i < k.length; i++) {
+          if (qq <= k[i][0]) {
+            const [q0, b0] = k[i - 1];
+            const [q1, b1] = k[i];
+            return b0 + ((qq - q0) / (q1 - q0)) * (b1 - b0);
+          }
+        }
+        return k[k.length - 1][1];
       };
 
       const smooth01 = (t: number) => {
@@ -325,7 +359,7 @@ const jsonLd = [{
           if (mqNarrow.matches || mqReducedPath.matches) {
             bandEl.style.transform = '';
           } else {
-            const bp = Math.min(1, (q + 0.03) / 0.83);
+            const bp = bandAt(q);
             const bx = (-106 * (1 - bp)).toFixed(1);
             const by = (4.3 * (1 - bp)).toFixed(2);
             bandEl.style.transform = `translate3d(${bx}%, ${by}rem, 0)`;
