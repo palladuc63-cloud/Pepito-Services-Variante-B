@@ -708,6 +708,9 @@ a.sig-topbar__item:hover {
 }
 
 .sig-about__facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   border: 1px solid color-mix(in srgb, var(--forest) 28%, transparent);
   border-radius: 999px;
   padding: 0.28rem 0.8rem;
