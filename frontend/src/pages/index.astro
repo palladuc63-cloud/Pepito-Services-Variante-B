@@ -345,9 +345,9 @@ const jsonLd = [{
       const measure = () => {
         if (mqNarrow.matches) return;
         const vh = window.innerHeight;
-        // Pan : remonte le contenu pour placer le haut du ruban à ~60 %
-        // de l'écran — le cadre figé montre toute la rangée d'étapes.
-        panT = Math.max(0, Math.min(naturalTop() - vh * 0.6, innerEl.scrollHeight - vh));
+        // Pan : composition déjà à mi-page via le padding de __inner —
+        // léger relevage de finition seulement (cible ~90 %).
+        panT = Math.max(0, Math.min(naturalTop() - vh * 0.9, innerEl.scrollHeight - vh));
         // Paliers du bandeau : à chaque q de pop, sa progression bp
         // place son bord droit juste après le bord droit de l'étape
         // (tout son texte est couvert). Bord écran = 106·bp − 6 % de
