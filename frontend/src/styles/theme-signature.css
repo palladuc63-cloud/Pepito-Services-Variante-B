@@ -725,7 +725,8 @@ a.sig-topbar__item:hover {
   position: sticky;
   top: 5.6rem;
   z-index: 6;
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image: var(--grain-img);
   padding-block: clamp(1.2rem, 2.5vw, 2rem) 1rem;
 }
 
@@ -1063,6 +1064,17 @@ a.sig-topbar__item:hover {
   .sig-scrollpath.is-pinned .sig-process {
     margin-inline: 4vw;
     padding-bottom: 8rem;
+  }
+
+  /* Bouts coupés en biais (même fil que le bord haut) — plaque
+     diagonale posée au lieu de coupes verticales franches. */
+  .sig-scrollpath.is-pinned .sig-band {
+    clip-path: polygon(
+      0 4.5rem,
+      calc(100% - 2rem) 0.45rem,
+      100% calc(100% - 4.5rem),
+      2rem 100%
+    );
   }
 }
 
