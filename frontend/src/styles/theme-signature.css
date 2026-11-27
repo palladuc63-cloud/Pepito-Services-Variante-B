@@ -769,18 +769,20 @@ a.sig-topbar__item:hover {
   height: 10px;
 }
 
-/* Révélation à l'entrée dans le viewport (.rv posée par le JS). */
+/* Révélation à l'entrée dans le viewport (.rv posée par le JS) :
+   le filet se déplie depuis le centre vers les deux bouts, le V
+   apparaît en premier. */
 .sig-divider.rv {
   opacity: 0;
-  transform: scaleX(0.6);
+  clip-path: inset(0 50%);
   transition:
-    opacity 0.5s ease,
-    transform 0.6s cubic-bezier(0.2, 0.8, 0.3, 1);
+    opacity 0.4s ease,
+    clip-path 0.9s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
 
 .sig-divider.is-in {
   opacity: 1;
-  transform: none;
+  clip-path: inset(0 0);
 }
 
 .sig-process-head.rv .sig-title {
