@@ -717,42 +717,29 @@ a.sig-topbar__item:hover {
 }
 
 /* ═══ Processus en chevrons ═══
-   Bloc forest sombre détaché du fond crème par un bord supérieur
-   biaisé : une cale « papier » (::before) mord le haut du bloc — la
-   jointure descend de gauche à droite comme un talus. Le haut est
-   paddé en conséquence pour que le titre reste sous la diagonale. */
+   Bloc forest sombre en forme de flèche : un seul élément (.sig-band)
+   découpé en clip-path — bord haut biaisé (monte à droite), bord bas
+   parallèle, et sur desktop une pointe intégrée à droite. Le JS le
+   fait glisser depuis la gauche quand la section entre dans le
+   viewport. */
 
 .sig-process {
   position: relative;
   padding-block: calc(clamp(2.5rem, 5vw, 4rem) + 4rem) 6rem;
+}
+
+.sig-band {
+  position: absolute;
+  inset: 0;
   background: var(--forest);
+  clip-path: polygon(0 4.5rem, 100% 0.45rem, 100% calc(100% - 4.5rem), 0 100%);
+  pointer-events: none;
+  will-change: transform;
 }
 
-
-.sig-process::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: 0;
-  right: 0;
-  height: 4.5rem;
-  background-color: var(--color-cream);
-  background-image: var(--grain-img);
-  clip-path: polygon(0 0, 100% 0, 0 100%);
-}
-
-/* Bord inférieur parallèle au bord haut : même pente, la cale papier
-   mord le coin bas droit — le bloc forme un bandeau biaisé. */
-.sig-process::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 4.5rem;
-  background-color: var(--color-cream);
-  background-image: var(--grain-img);
-  clip-path: polygon(0 100%, 100% 100%, 100% 0);
+/* Le contenu passe au-dessus du bandeau (positionné aussi, ordre DOM). */
+.sig-process .container {
+  position: relative;
 }
 
 /* Texte et marqueurs en clair sur le bloc forest. */
@@ -810,59 +797,16 @@ a.sig-topbar__item:hover {
 /* Escalier diagonal : chaque étape descend légèrement vers la gauche,
    parallèle au bord incliné du bloc (--slope-y = décalage vertical). */
 @media (min-width: 900px) {
-  /* Le forest s'arrête 8rem avant le bord droit : la pointe du bandeau
-     (.sig-arrow) se détache alors sur le papier — la bande devient une
-     flèche qui pointe vers la suite. */
-  .sig-process {
-    background-color: transparent;
-    background-image: linear-gradient(var(--forest), var(--forest));
-    background-size: calc(100% - 8rem) 100%;
-    background-repeat: no-repeat;
-  }
-
-  .sig-arrow {
-    display: block;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 8rem;
-    background-color: var(--forest);
-    background-image: var(--grain-img);
-    /* Base calée sur les bords biaisés du bloc à la jonction (~14 % en
-       haut, ~98 % en bas), la pointe atteint le bord de l'écran. */
-    clip-path: polygon(0 8%, 0 98%, 100% 54%);
-    pointer-events: none;
-    transition:
-      transform 0.85s cubic-bezier(0.22, 0.9, 0.3, 1.1),
-      opacity 0.45s ease 0.3s;
-  }
-
-  /* Rentrée dans le bandeau : la pointe glisse depuis la gauche et
-     « sort » du bloc. opacity 0 au repos — sinon le grain la rend
-     visible en silhouette dans le vert du bandeau. */
-  .sig-scrollpath.is-anim .sig-arrow {
-    transform: translateX(-130%);
-    opacity: 0;
-  }
-
-  .sig-scrollpath.is-anim .sig-arrow.is-on {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
-  /* À-coup de lancement : quand la pointe part, le bandeau encaisse —
-     recul à gauche, léger rebond, retour (le fond vert seul bouge,
-     les cales papier et les étapes restent fixes). */
-  .sig-scrollpath.is-anim .sig-process:has(.sig-arrow.is-on) {
-    animation: sig-band-recoil 0.7s cubic-bezier(0.3, 0.8, 0.4, 1);
-  }
-
-  @keyframes sig-band-recoil {
-    0% { background-position-x: 0; }
-    22% { background-position-x: -1.4rem; }
-    58% { background-position-x: 0.25rem; }
-    100% { background-position-x: 0; }
+  /* Pointe intégrée : la bande se prolonge en triangle forest jusqu'au
+     bord de l'écran — le bloc entier est la flèche. */
+  .sig-band {
+    clip-path: polygon(
+      0 4.5rem,
+      calc(100% - 8rem) 0.45rem,
+      100% 50%,
+      calc(100% - 8rem) calc(100% - 4rem),
+      0 100%
+    );
   }
 
   .sig-steps {
