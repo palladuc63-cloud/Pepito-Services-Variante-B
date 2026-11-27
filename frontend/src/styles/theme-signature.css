@@ -1144,6 +1144,12 @@ a.sig-topbar__item:hover {
       0 100%
     );
   }
+
+  /* Le bas du cadre sticky (100vh) est vide après la fin du ruban :
+     remonte « Pourquoi choisir » pour coller sous le bandeau. */
+  .sig-scrollpath.is-pinned + .sig-benefits {
+    margin-top: -22vh;
+  }
 }
 
 .sig-scrollpath__inner {
