@@ -431,6 +431,24 @@ const jsonLd = [{
       mqReducedPath.addEventListener('change', sync);
       sync();
     }
+
+    // Révélation en cascade de la section présentation à l'entrée dans
+    // le viewport (une fois ; reduced-motion → pas de masquage).
+    const aboutEl = document.querySelector<HTMLElement>('.sig-about');
+    const mqReducedAbout = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (aboutEl && !mqReducedAbout.matches) {
+      aboutEl.classList.add('rv');
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            aboutEl.classList.add('is-in');
+            io.disconnect();
+          }
+        },
+        { threshold: 0.2 }
+      );
+      io.observe(aboutEl);
+    }
   </script>
 </MainLayout>
 

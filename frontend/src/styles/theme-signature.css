@@ -719,6 +719,35 @@ a.sig-topbar__item:hover {
   color: var(--forest);
 }
 
+/* Révélation au scroll (classe .rv posée par le JS — sans JS tout est
+   visible normalement ; reduced-motion pas de .rv non plus). */
+.sig-about.rv .sig-about__photo,
+.sig-about.rv .sig-about__title,
+.sig-about.rv .sig-about__body p,
+.sig-about.rv .sig-about__facts li {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.sig-about.is-in .sig-about__photo,
+.sig-about.is-in .sig-about__title,
+.sig-about.is-in .sig-about__body p,
+.sig-about.is-in .sig-about__facts li {
+  opacity: 1;
+  transform: none;
+}
+
+/* Cascade : photo, titre, paragraphes, badges. */
+.sig-about.rv .sig-about__title { transition-delay: 0.07s; }
+.sig-about.rv .sig-about__body p:nth-of-type(1) { transition-delay: 0.14s; }
+.sig-about.rv .sig-about__body p:nth-of-type(2) { transition-delay: 0.21s; }
+.sig-about.rv .sig-about__facts li:nth-child(1) { transition-delay: 0.28s; }
+.sig-about.rv .sig-about__facts li:nth-child(2) { transition-delay: 0.34s; }
+.sig-about.rv .sig-about__facts li:nth-child(3) { transition-delay: 0.4s; }
+
 /* Titre du processus : dans le contenu épinglé — il reste affiché
    pendant la séquence puis repart avec le scroll (jamais par-dessus
    les icônes). */
