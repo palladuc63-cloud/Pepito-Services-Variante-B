@@ -1126,7 +1126,7 @@ a.sig-topbar__item:hover {
   /* Composition du cadre figé : séparateur + titre vers ~35-40vh,
      ruban dessous — le bloc est centré dans la moitié basse du cadre. */
   .sig-scrollpath.is-pinned .sig-scrollpath__inner {
-    padding-top: 28vh;
+    padding-top: 26vh;
   }
 
   .sig-scrollpath.is-pinned .sig-process {
