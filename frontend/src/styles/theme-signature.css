@@ -667,7 +667,7 @@ a.sig-topbar__item:hover {
 
 @media (min-width: 900px) {
   .sig-about__grid {
-    grid-template-columns: 2fr 3fr;
+    grid-template-columns: 3fr 2fr;
     gap: 3.5rem;
     align-items: center;
   }
@@ -716,15 +716,20 @@ a.sig-topbar__item:hover {
   color: var(--forest);
 }
 
-/* Titre du processus, en flux normal avant la piste épinglée. */
+/* Titre du processus : sticky sous la navbar pendant toute la piste
+   épinglée — l'animation se déroule juste en dessous. */
 .sig-process-head {
-  padding-block: clamp(1.5rem, 3vw, 2.5rem) 0;
+  position: sticky;
+  top: 5.6rem;
+  z-index: 6;
+  background: var(--paper);
+  padding-block: clamp(1.2rem, 2.5vw, 2rem) 1rem;
 }
 
 /* ═══ Section « Pourquoi choisir » ═══ */
 
 .sig-benefits {
-  padding-block: calc(clamp(2.5rem, 5vw, 4rem) + 10vh);
+  padding-block: clamp(2rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
 }
 
 .sig-benefits__lead {
@@ -1046,14 +1051,15 @@ a.sig-topbar__item:hover {
     overflow: hidden;
   }
 
-  /* Composition du cadre figé : espace papier au-dessus, ruban dans le
-     tiers inférieur (les marqueurs en escalier chevauchent son bord). */
+  /* Composition du cadre figé : ruban dans le tiers inférieur sous le
+     titre sticky, margé à droite et à gauche (bandeau moins large). */
   .sig-scrollpath.is-pinned .sig-scrollpath__inner {
-    padding-top: 38vh;
+    padding-top: 34vh;
   }
 
   .sig-scrollpath.is-pinned .sig-process {
-    padding-bottom: 12rem;
+    margin-inline: 4vw;
+    padding-bottom: 8rem;
   }
 }
 

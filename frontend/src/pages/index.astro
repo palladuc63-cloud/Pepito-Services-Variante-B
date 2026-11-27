@@ -157,10 +157,6 @@ const jsonLd = [{
 
     <section class="sig-about container" id="entreprise">
       <div class="sig-about__grid">
-        <div class="sig-about__photo" aria-hidden="true">
-          <Icon name="building" size={30} />
-          <span>Photo de nos ateliers — à venir</span>
-        </div>
         <div class="sig-about__body">
           <h2 class="sig-title sig-about__title">
             Pépito Services, artisan installateur à Thiers
@@ -187,14 +183,21 @@ const jsonLd = [{
             <li>Devis gratuit</li>
           </ul>
         </div>
+        <div class="sig-about__photo" aria-hidden="true">
+          <Icon name="building" size={30} />
+          <span>Photo de nos ateliers — à venir</span>
+        </div>
       </div>
     </section>
 
-    <header class="sig-process-head container">
-      <h2 class="sig-title">{signature.processTitle}</h2>
-    </header>
+    <div class="sig-process-block">
+      <header class="sig-process-head">
+        <div class="container">
+          <h2 class="sig-title">{signature.processTitle}</h2>
+        </div>
+      </header>
 
-    <div class="sig-scrollpath">
+      <div class="sig-scrollpath">
       <div class="sig-scrollpath__sticky">
         <div class="sig-scrollpath__inner">
           <section class="sig-process">
@@ -229,6 +232,7 @@ const jsonLd = [{
       </div>
     </section>
         </div>
+      </div>
       </div>
     </div>
 
