@@ -810,12 +810,48 @@ a.sig-topbar__item:hover {
 /* Escalier diagonal : chaque étape descend légèrement vers la gauche,
    parallèle au bord incliné du bloc (--slope-y = décalage vertical). */
 @media (min-width: 900px) {
+  /* Le forest s'arrête 8rem avant le bord droit : la pointe du bandeau
+     (.sig-arrow) se détache alors sur le papier — la bande devient une
+     flèche qui pointe vers la suite. */
+  .sig-process {
+    background-color: transparent;
+    background-image: linear-gradient(var(--forest), var(--forest));
+    background-size: calc(100% - 8rem) 100%;
+    background-repeat: no-repeat;
+  }
+
+  .sig-arrow {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 8rem;
+    background-color: var(--forest);
+    background-image: var(--grain-img);
+    /* Base calée sur les bords biaisés du bloc à la jonction (~14 % en
+       haut, ~98 % en bas), la pointe atteint le bord de l'écran. */
+    clip-path: polygon(0 14%, 0 98%, 100% 56%);
+    pointer-events: none;
+    transition: transform 0.85s cubic-bezier(0.22, 0.9, 0.3, 1.1);
+  }
+
+  /* Rentrée dans le bandeau : la pointe glisse depuis la gauche et
+     « sort » du bloc — invisible tant qu'elle est sur le forest. */
+  .sig-scrollpath.is-anim .sig-arrow {
+    transform: translateX(-130%);
+  }
+
+  .sig-scrollpath.is-anim .sig-arrow.is-on {
+    transform: translateX(0);
+  }
+
   .sig-steps {
     margin-top: 0;
     transform: translateY(-20vh);
     /* La translation n'est que visuelle : on rend l'espace réservé en
        bas pour resserrer le bloc (plus de vide vert sous les étapes). */
-    margin-bottom: calc(-20vh - 3.5rem);
+    margin-bottom: calc(-25vh - 3.5rem);
   }
   /* Marqueurs cales sur l arete diagonale (4.5rem de pente sur la
      largeur) : chaque etape remonte de ~0.9rem en allant a droite. */

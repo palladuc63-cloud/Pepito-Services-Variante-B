@@ -183,6 +183,7 @@ const jsonLd = [{
     </section>
 
     <section class="sig-process">
+      <div class="sig-arrow" aria-hidden="true"></div>
       <div class="container">
         <ol class="sig-steps">
           {signature.steps.map((s, i) => (
@@ -276,6 +277,7 @@ const jsonLd = [{
       const stepEls = Array.from(
         stepsEl.querySelectorAll<HTMLElement>('.sig-step')
       );
+      const arrowEl = scrollPath.querySelector<HTMLElement>('.sig-arrow');
       // Phases de la vue épinglée : pan du contenu quasi immédiat et
       // court, puis les pops démarrent PENDANT que le bloc finit de se
       // caler — pas de temps mort entre le gel et la 1re étape.
@@ -319,6 +321,7 @@ const jsonLd = [{
           stepEls.forEach((el, i) =>
             el.classList.toggle('is-on', p > i / stepEls.length + 0.02)
           );
+          arrowEl?.classList.toggle('is-on', p > 0.9);
         } else {
           const q = Math.min(1, Math.max(0, -r.top / (r.height - vh)));
           const panE = smooth01((q - HOLD) / (PAN_END - HOLD));
@@ -332,6 +335,8 @@ const jsonLd = [{
               q >= H_START + (i * (1 - H_START)) / stepEls.length
             )
           );
+          // La pointe du bandeau part après la dernière étape.
+          arrowEl?.classList.toggle('is-on', q >= 0.88);
         }
       };
 
@@ -344,6 +349,7 @@ const jsonLd = [{
         if (mqReducedPath.matches) {
           innerEl.style.transform = '';
           stepEls.forEach((el) => el.classList.remove('is-on'));
+          arrowEl?.classList.remove('is-on');
           return;
         }
         if (!pinned) innerEl.style.transform = '';
