@@ -851,6 +851,20 @@ a.sig-topbar__item:hover {
     opacity: 1;
   }
 
+  /* À-coup de lancement : quand la pointe part, le bandeau encaisse —
+     recul à gauche, léger rebond, retour (le fond vert seul bouge,
+     les cales papier et les étapes restent fixes). */
+  .sig-scrollpath.is-anim .sig-process:has(.sig-arrow.is-on) {
+    animation: sig-band-recoil 0.7s cubic-bezier(0.3, 0.8, 0.4, 1);
+  }
+
+  @keyframes sig-band-recoil {
+    0% { background-position-x: 0; }
+    22% { background-position-x: -1.4rem; }
+    58% { background-position-x: 0.25rem; }
+    100% { background-position-x: 0; }
+  }
+
   .sig-steps {
     margin-top: 0;
     transform: translateY(-20vh);
