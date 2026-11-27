@@ -189,29 +189,28 @@ const jsonLd = [{
       </div>
     </section>
 
-    <div class="sig-divider" aria-hidden="true">
-      <svg viewBox="0 0 1200 10" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="sig-div-fade" x1="0" x2="1">
-            <stop offset="0" style="stop-color: var(--forest); stop-opacity: 0" />
-            <stop offset="0.06" style="stop-color: var(--forest); stop-opacity: 0.38" />
-            <stop offset="0.94" style="stop-color: var(--forest); stop-opacity: 0.38" />
-            <stop offset="1" style="stop-color: var(--forest); stop-opacity: 0" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M0 3 H596 L600 8 L604 3 H1200"
-          fill="none"
-          stroke="url(#sig-div-fade)"
-          stroke-width="1"
-          vector-effect="non-scaling-stroke"
-        />
-      </svg>
-    </div>
-
     <div class="sig-scrollpath">
       <div class="sig-scrollpath__sticky">
         <div class="sig-scrollpath__inner">
+          <div class="sig-divider" aria-hidden="true">
+            <svg viewBox="0 0 1200 10" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="sig-div-fade" x1="0" x2="1">
+                  <stop offset="0" style="stop-color: var(--forest); stop-opacity: 0" />
+                  <stop offset="0.06" style="stop-color: var(--forest); stop-opacity: 0.38" />
+                  <stop offset="0.94" style="stop-color: var(--forest); stop-opacity: 0.38" />
+                  <stop offset="1" style="stop-color: var(--forest); stop-opacity: 0" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M0 3 H596 L600 8 L604 3 H1200"
+                fill="none"
+                stroke="url(#sig-div-fade)"
+                stroke-width="1"
+                vector-effect="non-scaling-stroke"
+              />
+            </svg>
+          </div>
           <header class="sig-process-head container">
             <h2 class="sig-title">{signature.processTitle}</h2>
           </header>
@@ -389,9 +388,9 @@ const jsonLd = [{
       const draw = () => {
         const r = scrollPath.getBoundingClientRect();
         const vh = window.innerHeight;
-        // Le sticky accroche à 45vh : q progresse sur toute la durée
-        // du gel (de r.top=45vh à la libération).
-        const q = Math.min(1, Math.max(0, (vh * 0.45 - r.top) / (r.height - vh)));
+        // Le sticky accroche à 35vh : q progresse sur toute la durée
+        // du gel (de r.top=35vh à la libération).
+        const q = Math.min(1, Math.max(0, (vh * 0.35 - r.top) / (r.height - vh)));
         // Le bandeau glisse depuis la gauche pendant tout le gel, le
         // long de sa propre pente : la compensation verticale (4.3rem
         // = pente du bord ~4.05rem × 1.06 de course) annule la dérive

@@ -1117,9 +1117,10 @@ a.sig-topbar__item:hover {
 
   .sig-scrollpath.is-pinned .sig-scrollpath__sticky {
     position: sticky;
-    /* Le gel s'enclenche quand le haut du bloc atteint 45vh : le titre
-       est alors à mi-page — l'animation « commence à ce niveau ». */
-    top: 45vh;
+    /* Le gel s'enclenche quand le haut du bloc atteint 35vh : le bloc
+       séparateur + titre + ruban est figé à mi-page — l'animation
+       « commence à ce niveau ». */
+    top: 35vh;
     height: 100vh;
     height: 100svh;
     /* x : clippe la bande garée hors écran ; y : visible — le pan peut
@@ -1132,8 +1133,8 @@ a.sig-topbar__item:hover {
   }
 
   .sig-scrollpath.is-pinned .sig-process {
-    margin: 18vh 4vw 0;
-    padding-bottom: 4rem;
+    margin: 16vh 4vw 0;
+    padding-bottom: 2rem;
   }
 
   /* Bouts coupés en biais (même fil que le bord haut) — plaque
