@@ -218,14 +218,19 @@ const jsonLd = [{
 
     <section class="sig-activities container" id="activites">
       <h2 class="sig-title">{signature.activitiesTitle}</h2>
-      <ul class="sig-activities__row">
-        {signature.activities.map((a) => (
-          <li class="sig-activity">
-            <img src={a.img.src} alt="" aria-hidden="true" loading="lazy" />
-            <span>{a.label}</span>
-          </li>
+      <div class="sig-benefits__grid">
+        {signature.benefits.map((b) => (
+          <div class="sig-benefit">
+            <span class="sig-benefit__icon" aria-hidden="true">
+              {b.icon === 'shield' && <img src={`${base}icons/benefit-shield.png`} alt="" loading="lazy" />}
+              {b.icon === 'finish' && <img src={`${base}icons/benefit-finish.png`} alt="" loading="lazy" />}
+              {b.icon === 'clock' && <img src={`${base}icons/benefit-clock.png`} alt="" loading="lazy" />}
+            </span>
+            <h3>{b.title}</h3>
+            <p>{b.text}</p>
+          </div>
         ))}
-      </ul>
+      </div>
     </section>
 
     <section class="sig-installs container">
