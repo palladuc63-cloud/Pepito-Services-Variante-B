@@ -432,22 +432,30 @@ const jsonLd = [{
       sync();
     }
 
-    // Révélation en cascade de la section présentation à l'entrée dans
-    // le viewport (une fois ; reduced-motion → pas de masquage).
-    const aboutEl = document.querySelector<HTMLElement>('.sig-about');
-    const mqReducedAbout = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (aboutEl && !mqReducedAbout.matches) {
-      aboutEl.classList.add('rv');
-      const io = new IntersectionObserver(
-        (entries) => {
-          if (entries.some((e) => e.isIntersecting)) {
-            aboutEl.classList.add('is-in');
-            io.disconnect();
-          }
-        },
-        { threshold: 0.2 }
-      );
-      io.observe(aboutEl);
+    // Révélation à l'entrée dans le viewport : présentation en cascade,
+    // titre du process (une fois ; reduced-motion → pas de masquage).
+    const mqReducedRv = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!mqReducedRv.matches) {
+      const rvEls = ['.sig-about', '.sig-process-head']
+        .map((sel) => document.querySelector<HTMLElement>(sel))
+        .filter((el): el is HTMLElement => el !== null);
+      if (rvEls.length > 0) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-in');
+                io.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.2 }
+        );
+        for (const el of rvEls) {
+          el.classList.add('rv');
+          io.observe(el);
+        }
+      }
     }
   </script>
 </MainLayout>
