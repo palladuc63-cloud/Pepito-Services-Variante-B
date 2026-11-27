@@ -1126,12 +1126,12 @@ a.sig-topbar__item:hover {
   /* Composition du cadre figé : titre en haut du cadre, puis le ruban
      en dessous — margé à droite et à gauche (bandeau moins large). */
   .sig-scrollpath.is-pinned .sig-scrollpath__inner {
-    padding-top: 5vh;
+    padding-top: 50vh;
   }
 
   .sig-scrollpath.is-pinned .sig-process {
-    margin: 10vh 4vw 0;
-    padding-bottom: 8rem;
+    margin: 16vh 4vw 0;
+    padding-bottom: 4rem;
   }
 
   /* Bouts coupés en biais (même fil que le bord haut) — plaque
