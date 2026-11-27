@@ -717,11 +717,11 @@ a.sig-topbar__item:hover {
 }
 
 /* ═══ Processus en chevrons ═══
-   Bloc forest sombre en forme de flèche : un seul élément (.sig-band)
-   découpé en clip-path — bord haut biaisé (monte à droite), bord bas
-   parallèle, et sur desktop une pointe intégrée à droite. Le JS le
-   fait glisser depuis la gauche quand la section entre dans le
-   viewport. */
+   Bandeau forest sombre en parallélogramme : un seul élément
+   (.sig-band) découpé en clip-path — bord haut biaisé (monte à
+   droite), bord bas parallèle. Le JS le fait glisser depuis la
+   gauche le long de sa propre pente (compensation verticale) pour
+   que le bord reste à niveau pendant le mouvement. */
 
 .sig-process {
   position: relative;
@@ -797,18 +797,6 @@ a.sig-topbar__item:hover {
 /* Escalier diagonal : chaque étape descend légèrement vers la gauche,
    parallèle au bord incliné du bloc (--slope-y = décalage vertical). */
 @media (min-width: 900px) {
-  /* Pointe intégrée : la bande se prolonge en triangle forest jusqu'au
-     bord de l'écran — le bloc entier est la flèche. */
-  .sig-band {
-    clip-path: polygon(
-      0 4.5rem,
-      calc(100% - 8rem) 0.45rem,
-      100% 50%,
-      calc(100% - 8rem) calc(100% - 4rem),
-      0 100%
-    );
-  }
-
   .sig-steps {
     margin-top: 0;
     transform: translateY(-20vh);
