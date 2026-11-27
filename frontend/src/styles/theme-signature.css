@@ -834,8 +834,8 @@ a.sig-topbar__item:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 10.5rem;
+  height: 10.5rem;
   margin-bottom: 1.1rem;
   color: var(--ink);
 }
@@ -1204,11 +1204,10 @@ a.sig-topbar__item:hover {
 .sig-zone__nap a { color: inherit; text-decoration: none; border-bottom: 1px solid currentColor; }
 .sig-zone__nap a:hover { border-bottom-color: transparent; }
 
-/* Icônes benefits : tuiles images (rendu 3D) */
+/* Icônes benefits : picto 3D libre sur fond transparent (pas de
+   carte — ni bord arrondi ni ombre portée). */
 .sig-benefit__icon img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  border-radius: 22%;
-  box-shadow: 0 4px 14px rgba(0,0,0,.28);
+  object-fit: contain;
 }
