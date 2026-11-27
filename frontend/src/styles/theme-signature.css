@@ -719,15 +719,11 @@ a.sig-topbar__item:hover {
   color: var(--forest);
 }
 
-/* Titre du processus : sticky sous la navbar pendant toute la piste
-   épinglée — l'animation se déroule juste en dessous. */
+/* Titre du processus : dans le contenu épinglé — il reste affiché
+   pendant la séquence puis repart avec le scroll (jamais par-dessus
+   les icônes). */
 .sig-process-head {
-  position: sticky;
-  top: 5.6rem;
-  z-index: 6;
-  background-color: var(--paper);
-  background-image: var(--grain-img);
-  padding-block: clamp(1.2rem, 2.5vw, 2rem) 1rem;
+  padding-bottom: 1rem;
 }
 
 /* ═══ Section « Pourquoi choisir » ═══ */
@@ -1055,14 +1051,14 @@ a.sig-topbar__item:hover {
     overflow: hidden;
   }
 
-  /* Composition du cadre figé : ruban dans le tiers inférieur sous le
-     titre sticky, margé à droite et à gauche (bandeau moins large). */
+  /* Composition du cadre figé : titre en haut du cadre, puis le ruban
+     en dessous — margé à droite et à gauche (bandeau moins large). */
   .sig-scrollpath.is-pinned .sig-scrollpath__inner {
-    padding-top: 32vh;
+    padding-top: 13vh;
   }
 
   .sig-scrollpath.is-pinned .sig-process {
-    margin-inline: 4vw;
+    margin: 20vh 4vw 0;
     padding-bottom: 8rem;
   }
 
