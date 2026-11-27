@@ -477,7 +477,7 @@ const jsonLd = [{
         }
       }
 
-      // Séparateur : marge négative — il doit être déjà ~30 % dans le
+      // Séparateur : marge négative — il doit être déjà ~20 % dans le
       // viewport pour se déployer (animation entièrement visible).
       const divEl = document.querySelector<HTMLElement>('.sig-divider');
       if (divEl) {
@@ -489,7 +489,7 @@ const jsonLd = [{
               ioDiv.disconnect();
             }
           },
-          { threshold: 0, rootMargin: '0px 0px -30% 0px' }
+          { threshold: 0, rootMargin: '0px 0px -20% 0px' }
         );
         ioDiv.observe(divEl);
       }
