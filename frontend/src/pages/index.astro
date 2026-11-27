@@ -456,7 +456,7 @@ const jsonLd = [{
     // titre du process (une fois ; reduced-motion → pas de masquage).
     const mqReducedRv = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (!mqReducedRv.matches) {
-      const rvEls = ['.sig-about', '.sig-divider', '.sig-process-head']
+      const rvEls = ['.sig-about', '.sig-process-head']
         .map((sel) => document.querySelector<HTMLElement>(sel))
         .filter((el): el is HTMLElement => el !== null);
       if (rvEls.length > 0) {
@@ -475,6 +475,23 @@ const jsonLd = [{
           el.classList.add('rv');
           io.observe(el);
         }
+      }
+
+      // Séparateur : déclenché en avance — le dépliage démarre ~25 %
+      // de viewport avant que la ligne n'entre à l'écran.
+      const divEl = document.querySelector<HTMLElement>('.sig-divider');
+      if (divEl) {
+        divEl.classList.add('rv');
+        const ioDiv = new IntersectionObserver(
+          (entries) => {
+            if (entries.some((e) => e.isIntersecting)) {
+              divEl.classList.add('is-in');
+              ioDiv.disconnect();
+            }
+          },
+          { threshold: 0, rootMargin: '0px 0px 25% 0px' }
+        );
+        ioDiv.observe(divEl);
       }
     }
   </script>
