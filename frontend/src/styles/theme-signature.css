@@ -1130,18 +1130,18 @@ a.sig-topbar__item:hover {
   }
 
   .sig-scrollpath.is-pinned .sig-process {
-    margin: 18vh 4vw 0;
+    margin: 18vh 0 0;
     padding-bottom: 2rem;
   }
 
-  /* Bouts coupés en biais (même fil que le bord haut) — plaque
-     diagonale posée au lieu de coupes verticales franches. */
+  /* Parallélogramme pleine largeur : bords haut/bas inclinés en fil
+     continu jusqu'aux bords d'écran (pas de blanc avant/après). */
   .sig-scrollpath.is-pinned .sig-band {
     clip-path: polygon(
       0 4.5rem,
-      calc(100% - 2rem) 0.45rem,
-      100% calc(100% - 4.5rem),
-      2rem 100%
+      100% 0.45rem,
+      100% calc(100% - 4.05rem),
+      0 100%
     );
   }
 }
