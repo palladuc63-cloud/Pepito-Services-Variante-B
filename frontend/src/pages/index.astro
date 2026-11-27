@@ -189,6 +189,8 @@ const jsonLd = [{
       </div>
     </section>
 
+    <div class="sig-divider" aria-hidden="true"><i></i></div>
+
     <div class="sig-scrollpath">
       <div class="sig-scrollpath__sticky">
         <div class="sig-scrollpath__inner">
@@ -436,7 +438,7 @@ const jsonLd = [{
     // titre du process (une fois ; reduced-motion → pas de masquage).
     const mqReducedRv = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (!mqReducedRv.matches) {
-      const rvEls = ['.sig-about', '.sig-process-head']
+      const rvEls = ['.sig-about', '.sig-divider', '.sig-process-head']
         .map((sel) => document.querySelector<HTMLElement>(sel))
         .filter((el): el is HTMLElement => el !== null);
       if (rvEls.length > 0) {

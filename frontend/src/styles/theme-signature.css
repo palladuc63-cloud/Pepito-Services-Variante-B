@@ -755,7 +755,47 @@ a.sig-topbar__item:hover {
   padding-bottom: 1rem;
 }
 
+/* Séparateur sobre entre présentation et processus : filets inclinés
+   à la pente du bandeau (~3°) + petit losange central. */
+.sig-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding-block: clamp(1rem, 3vw, 2.5rem);
+}
+
+.sig-divider::before,
+.sig-divider::after {
+  content: '';
+  width: min(9rem, 20vw);
+  height: 1px;
+  background: color-mix(in srgb, var(--forest) 32%, transparent);
+  transform: rotate(-3deg);
+}
+
+.sig-divider i {
+  width: 6px;
+  height: 6px;
+  background: var(--forest);
+  opacity: 0.5;
+  transform: rotate(45deg);
+}
+
 /* Révélation à l'entrée dans le viewport (.rv posée par le JS). */
+.sig-divider.rv {
+  opacity: 0;
+  transform: scaleX(0.6);
+  transition:
+    opacity 0.5s ease,
+    transform 0.6s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.sig-divider.is-in {
+  opacity: 1;
+  transform: none;
+}
+
 .sig-process-head.rv .sig-title {
   opacity: 0;
   transform: translateY(14px);
