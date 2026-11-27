@@ -729,18 +729,12 @@ a.sig-topbar__item:hover {
 }
 
 .sig-band {
-  --gx: 100%;
   position: absolute;
   inset: 0;
   background: var(--forest);
   clip-path: polygon(0 4.5rem, 100% 0.45rem, 100% calc(100% - 4.5rem), 0 100%);
-  /* Dévoilement gauche → droite piloté par --gx (JS, progression de la
-     piste épinglée) : la flèche se dessine au rythme des étapes.
-     Bord du dévoilement légèrement estompé. */
-  -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--gx) - 1.5%), transparent var(--gx));
-  mask-image: linear-gradient(90deg, #000 calc(var(--gx) - 1.5%), transparent var(--gx));
   pointer-events: none;
-  will-change: mask-image;
+  will-change: transform;
 }
 
 /* Le contenu passe au-dessus du bandeau (positionné aussi, ordre DOM). */
