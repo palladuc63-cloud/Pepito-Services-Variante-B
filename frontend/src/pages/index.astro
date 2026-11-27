@@ -309,7 +309,7 @@ const jsonLd = [{
       // caler — pas de temps mort entre le gel et la 1re étape.
       const HOLD = 0.02;
       const PAN_END = 0.25;
-      const H_START = 0.12;
+      const H_START = 0.04;
       let panT = 0;
       // Paliers de glisse du bandeau : [q de pop, progression] — le
       // bord vert arrive sur chaque étape au moment où elle pop.
@@ -340,7 +340,7 @@ const jsonLd = [{
         if (bandEl && procEl && stepEls.length) {
           const pr = procEl.getBoundingClientRect();
           const len = stepEls.length;
-          bandKnots = [[0, 6 / 106]];
+          bandKnots = [[0, 0]];
           stepEls.forEach((el, i) => {
             const qi = H_START + (i * (1 - H_START)) / len;
             const sr = el.getBoundingClientRect();
