@@ -1124,7 +1124,7 @@ a.sig-topbar__item:hover {
   /* Composition du cadre figé : titre en haut du cadre, puis le ruban
      en dessous — margé à droite et à gauche (bandeau moins large). */
   .sig-scrollpath.is-pinned .sig-scrollpath__inner {
-    padding-top: 13vh;
+    padding-top: 5vh;
   }
 
   .sig-scrollpath.is-pinned .sig-process {
