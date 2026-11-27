@@ -309,8 +309,9 @@ const jsonLd = [{
         // de l'écran — le cadre figé montre toute la rangée d'étapes.
         panT = Math.max(0, Math.min(naturalTop() - vh * 0.6, innerEl.scrollHeight - vh));
         // Paliers du bandeau : à chaque q de pop, sa progression bp
-        // place son bord droit juste après le centre de l'étape. Bord
-        // écran = 106·bp − 6 % de la largeur de la section.
+        // place son bord droit juste après le bord droit de l'étape
+        // (tout son texte est couvert). Bord écran = 106·bp − 6 % de
+        // la largeur de la section.
         if (bandEl && procEl && stepEls.length) {
           const pr = procEl.getBoundingClientRect();
           const len = stepEls.length;
@@ -318,7 +319,7 @@ const jsonLd = [{
           stepEls.forEach((el, i) => {
             const qi = H_START + (i * (1 - H_START)) / len;
             const sr = el.getBoundingClientRect();
-            const tx = (sr.left + sr.width / 2 - pr.left) / pr.width + 0.05;
+            const tx = (sr.right - pr.left) / pr.width + 0.02;
             bandKnots.push([qi, Math.min(1, (tx * 100 + 6) / 106)]);
           });
           bandKnots.push([H_START + ((len - 1) * (1 - H_START)) / len + 0.09, 1]);
