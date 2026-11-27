@@ -345,9 +345,9 @@ const jsonLd = [{
       const measure = () => {
         if (mqNarrow.matches) return;
         const vh = window.innerHeight;
-        // Pan : remonte le contenu en début de gel — les étapes finissent
-        // à ~60 % de l'écran (45vh d'accroche + position inner − panT).
-        panT = Math.max(0, naturalTop() - vh * 0.15);
+        // Pas de pan : la composition reste figée telle quelle au
+        // moment de l'accroche (titre ~mi-page, rien ne se déplace).
+        panT = 0;
         // Paliers du bandeau : à chaque q de pop, sa progression bp
         // place son bord droit juste après le bord droit de l'étape
         // (tout son texte est couvert). Bord écran = 106·bp − 6 % de
