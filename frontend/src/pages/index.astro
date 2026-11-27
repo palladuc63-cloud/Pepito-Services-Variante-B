@@ -314,14 +314,16 @@ const jsonLd = [{
       const draw = () => {
         const r = scrollPath.getBoundingClientRect();
         const vh = window.innerHeight;
-        // La flèche-bandeau glisse depuis la gauche pendant que la
-        // section monte dans le viewport — terminée avant le gel.
+        const q = Math.min(1, Math.max(0, -r.top / (r.height - vh)));
+        // La flèche-bandeau se dévoile de gauche à droite au rythme des
+        // pops : masque progressif --gx (0 → 100 % sur q ∈ [0.02, 0.82],
+        // la pointe se complète avec la dernière étape).
         if (bandEl) {
           if (mqNarrow.matches || mqReducedPath.matches) {
-            bandEl.style.transform = '';
+            bandEl.style.removeProperty('--gx');
           } else {
-            const bp = smooth01((vh - r.top) / (vh * 0.45));
-            bandEl.style.transform = `translate3d(${(-106 * (1 - bp)).toFixed(1)}%, 0, 0)`;
+            const gx = Math.min(1, Math.max(0, (q - 0.02) / 0.8));
+            bandEl.style.setProperty('--gx', `${(gx * 100).toFixed(1)}%`);
           }
         }
         if (mqNarrow.matches) {
@@ -332,7 +334,6 @@ const jsonLd = [{
             el.classList.toggle('is-on', p > i / stepEls.length + 0.02)
           );
         } else {
-          const q = Math.min(1, Math.max(0, -r.top / (r.height - vh)));
           const panE = smooth01((q - HOLD) / (PAN_END - HOLD));
           innerEl.style.transform = `translate3d(0, ${(-panT * panE).toFixed(1)}px, 0)`;
           // Une étape pop à intervalle régulier pendant le gel — la
@@ -356,7 +357,7 @@ const jsonLd = [{
         if (mqReducedPath.matches) {
           innerEl.style.transform = '';
           stepEls.forEach((el) => el.classList.remove('is-on'));
-          if (bandEl) bandEl.style.transform = '';
+          bandEl?.style.removeProperty('--gx');
           return;
         }
         if (!pinned) innerEl.style.transform = '';
