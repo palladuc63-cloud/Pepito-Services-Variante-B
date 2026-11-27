@@ -477,8 +477,8 @@ const jsonLd = [{
         }
       }
 
-      // Séparateur : déclenché en avance — le dépliage démarre ~25 %
-      // de viewport avant que la ligne n'entre à l'écran.
+      // Séparateur : léger head start (~8 % de viewport) pour que le
+      // dépliage commence juste avant l'entrée — animation visible.
       const divEl = document.querySelector<HTMLElement>('.sig-divider');
       if (divEl) {
         divEl.classList.add('rv');
@@ -489,7 +489,7 @@ const jsonLd = [{
               ioDiv.disconnect();
             }
           },
-          { threshold: 0, rootMargin: '0px 0px 25% 0px' }
+          { threshold: 0, rootMargin: '0px 0px 8% 0px' }
         );
         ioDiv.observe(divEl);
       }
