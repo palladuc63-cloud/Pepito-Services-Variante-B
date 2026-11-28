@@ -6,6 +6,7 @@ interface Props {
   images: string[];
   title?: string;
   subtitle?: string;
+  iconSrc?: string;
   ctaPrimary?: { label: string; href: string };
   ctaSecondary?: { label: string; href: string };
 }
@@ -14,6 +15,7 @@ const {
   images,
   title = signature.heroTitle,
   subtitle = signature.heroSubtitle,
+  iconSrc,
   ctaPrimary = signature.ctaPrimary,
   ctaSecondary = signature.ctaSecondary,
 } = Astro.props;
@@ -22,7 +24,10 @@ const {
 <section class="sig-hero">
   <div class="container sig-hero__grid">
     <div class="sig-hero__content">
-      <h1>{title}</h1>
+      <div class="sig-hero__head">
+        {iconSrc && <img class="sig-hero__cat" src={iconSrc} alt="" aria-hidden="true" />}
+        <h1>{title}</h1>
+      </div>
       <p class="sig-hero__sub">{subtitle}</p>
       <div class="sig-hero__actions">
         <a href={ctaPrimary.href} class="sig-btn sig-btn--primary">

@@ -472,6 +472,24 @@ a.sig-topbar__item:hover {
   color: var(--ink);
 }
 
+/* Pages catégories : vignette iso posée devant le titre. */
+.sig-hero__head {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 0 0 1.25rem;
+}
+
+.sig-hero__head h1 {
+  margin: 0;
+}
+
+.sig-hero__cat {
+  width: clamp(3.75rem, 7vw, 5.5rem);
+  height: auto;
+  flex: none;
+}
+
 .sig-hero__sub {
   margin: 0 0 1.75rem;
   max-width: 46ch;
