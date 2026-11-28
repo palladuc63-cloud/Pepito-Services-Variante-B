@@ -240,6 +240,9 @@ const jsonLd = [{
           <section class="sig-process">
       <div class="sig-band" aria-hidden="true"></div>
       <div class="container">
+        <div class="sig-arms" aria-hidden="true">
+          {sig.steps.map(() => <span class="sig-step__arm" />)}
+        </div>
         <ol class="sig-steps">
           {sig.steps.map((s, i) => (
             <li class="sig-step">
@@ -364,6 +367,10 @@ const jsonLd = [{
       );
       const bandEl = scrollPath.querySelector<HTMLElement>('.sig-band');
       const procEl = scrollPath.querySelector<HTMLElement>('.sig-process');
+      const armsEl = scrollPath.querySelector<HTMLElement>('.sig-arms');
+      const armEls = stepEls.map((_, i) =>
+        armsEl?.querySelectorAll<HTMLElement>('.sig-step__arm').item(i) ?? null
+      );
       // Phases de la vue épinglée : pan du contenu quasi immédiat et
       // court, puis les pops démarrent PENDANT que le bloc finit de se
       // caler — pas de temps mort entre le gel et la 1re étape.
@@ -374,6 +381,13 @@ const jsonLd = [{
       // Paliers de glisse du bandeau : [q de pop, progression] — le
       // bord vert arrive sur chaque étape au moment où elle pop.
       let bandKnots: Array<[number, number]> = [];
+      // Mobile : paliers [q où la pointe de la spine doit atteindre le
+      // centre de l'icône i, y de ce centre dans .sig-process] — la
+      // descente de la spine suit donc le scroll, icône après icône.
+      let tipKnots: Array<[number, number]> = [];
+      let iconYs: number[] = [];
+      let armLeads: number[] = [];
+      let procH = 0;
       // Jouée une seule fois : la séquence terminée reste figée à l'état
       // final même en remontant la piste (pas de lecture inversée), et
       // la piste est sautée au scroll (plus de traversée « morte »).
@@ -416,9 +430,8 @@ const jsonLd = [{
         }
       };
 
-      // Progression bp(q) interpolée linéairement entre les paliers.
-      const bandAt = (qq: number) => {
-        const k = bandKnots;
+      // Interpolation linéaire entre les paliers [q, valeur].
+      const interp = (k: Array<[number, number]>, qq: number) => {
         if (!k.length) return Math.min(1, qq);
         if (qq <= k[0][0]) return k[0][1];
         for (let i = 1; i < k.length; i++) {
@@ -429,6 +442,65 @@ const jsonLd = [{
           }
         }
         return k[k.length - 1][1];
+      };
+      const bandAt = (qq: number) => interp(bandKnots, qq);
+      const tipAt = (qq: number) => interp(tipKnots, qq);
+
+      // Position de mise en page (offsetTop/offsetLeft) : insensible
+      // aux transform des états masqués.
+      const layoutPos = (el: HTMLElement, stop: HTMLElement) => {
+        let x = 0;
+        let y = 0;
+        let cur: HTMLElement | null = el;
+        while (cur && cur !== stop) {
+          x += cur.offsetLeft;
+          y += cur.offsetTop;
+          cur = cur.offsetParent as HTMLElement | null;
+        }
+        return { x, y };
+      };
+
+      // Mobile : paliers de la spine et géométrie des bras — mesurés
+      // une fois (positions de mise en page, pas de rect viewport).
+      const measureMobile = () => {
+        const containerEl = procEl?.querySelector<HTMLElement>('.container');
+        if (!mqNarrow.matches || !bandEl || !procEl || !containerEl || !stepEls.length) return;
+        const vh = window.innerHeight;
+        const spr = scrollPath.getBoundingClientRect();
+        procH = procEl.offsetHeight;
+        tipKnots = [[0, 0]];
+        iconYs = [];
+        armLeads = [];
+        stepEls.forEach((el, i) => {
+          const marker = el.querySelector<HTMLElement>('.sig-step__marker');
+          const arm = armEls[i];
+          if (!marker || !arm) return;
+          const mProc = layoutPos(marker, procEl);
+          const y = mProc.y + marker.offsetHeight / 2;
+          iconYs[i] = y;
+          armLeads[i] = marker.offsetHeight;
+          // q où le haut de l'icône franchit 60 % du viewport — la
+          // pointe doit alors être au centre de l'icône. Position de
+          // l'icône dans la piste : yTop − q·(H−vh) = 0.6·vh.
+          const mPath = layoutPos(marker, scrollPath);
+          const qi = (mPath.y - vh * 0.6) / (spr.height - vh);
+          if (qi <= 0) {
+            // Déjà dans le champ à l'entrée de la piste.
+            tipKnots[0][1] = Math.max(tipKnots[0][1], y);
+          } else {
+            tipKnots.push([Math.min(1, qi), y]);
+          }
+          // Bras : de -3rem (hors-champ gauche, aligné sur la spine)
+          // jusqu'au bord droit de l'icône + léger dépassement ;
+          // hauteur ~72 % de l'icône pour un rendu « ruban ». Le
+          // container sert de repère : .sig-arms le couvre en inset:0.
+          const mCont = layoutPos(marker, containerEl);
+          arm.style.setProperty('--arm-y', `${Math.round(mCont.y + marker.offsetHeight / 2)}px`);
+          arm.style.setProperty('--arm-w', `${Math.round(48 + mCont.x + marker.offsetWidth + 6)}px`);
+          arm.style.setProperty('--arm-h', `${Math.round(marker.offsetHeight * 0.72)}px`);
+        });
+        // La spine s'arrête à la dernière icône.
+        tipKnots.push([1, tipKnots[tipKnots.length - 1][1]]);
       };
 
       const smooth01 = (t: number) => {
@@ -465,8 +537,13 @@ const jsonLd = [{
         // un peu en avance sur l'étape qui pop (le texte clair
         // atterrit toujours sur le vert) — posée à la dernière étape.
         if (bandEl) {
-          if (mqNarrow.matches || mqReducedPath.matches) {
+          if (mqReducedPath.matches) {
             bandEl.style.transform = '';
+          } else if (mqNarrow.matches) {
+            // Spine verticale : scaleY ancré en haut — sa pointe
+            // descend de palier en palier vers chaque icône.
+            const tip = tipAt(q);
+            bandEl.style.transform = `scaleY(${(tip / (procH || 1)).toFixed(4)})`;
           } else {
             const bp = doneP ? 1 : bandAt(q);
             const bx = (-106 * (1 - bp)).toFixed(1);
@@ -475,18 +552,26 @@ const jsonLd = [{
           }
         }
         if (mqNarrow.matches) {
-          // Étapes révélées une à une pendant la descente mobile :
-          // chacune pop quand son sommet franchit ~60 % du viewport —
-          // l'animation se joue dans le champ visible, pas hors écran
-          // dès l'entrée de la piste (le scrollpath démarre au
-          // séparateur, loin au-dessus des étapes). Révélée = gardée.
-          const line = vh * 0.6;
-          stepEls.forEach((el) =>
+          // Le bras de chaque étape se déploie (scaleX) pendant que la
+          // pointe de la spine traverse la hauteur de son icône ;
+          // l'étape pop quand la bande est entièrement déployée
+          // derrière la vignette (« collée »). Révélée = gardée.
+          const tip = tipAt(q);
+          stepEls.forEach((el, i) => {
+            const lead = armLeads[i] || 1;
+            const iy = iconYs[i];
+            const p =
+              iy === undefined
+                ? 1
+                : Math.min(1, Math.max(0, (tip - (iy - lead)) / lead));
+            if (!mqReducedPath.matches) {
+              armEls[i]?.style.setProperty('--arm-p', p.toFixed(3));
+            }
             el.classList.toggle(
               'is-on',
-              el.classList.contains('is-on') || el.getBoundingClientRect().top < line
-            )
-          );
+              el.classList.contains('is-on') || p >= 1
+            );
+          });
         } else {
           const panE = smooth01((q - HOLD) / (PAN_END - HOLD));
           innerEl.style.transform = `translate3d(0, ${(-panT * panE).toFixed(1)}px, 0)`;
@@ -517,6 +602,7 @@ const jsonLd = [{
         }
         if (!pinned) innerEl.style.transform = '';
         measure();
+        measureMobile();
         draw();
       };
 
