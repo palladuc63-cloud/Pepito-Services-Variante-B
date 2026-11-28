@@ -1464,11 +1464,16 @@ a.sig-topbar__item:hover {
     overflow: hidden;
   }
 
-  /* Composition du cadre figé : titre en haut, bandeau + cards dans le
-     cadre, CTA visible avant la libération. */
+  /* Composition du cadre figé calquée sur le process : titre à ~20vh,
+     écart avant les cards, ruban traversant leur milieu, CTA visible
+     avant la libération. */
   .sig-installpath.is-pinned .sig-installs {
-    padding-top: 8vh;
+    padding-top: 18vh;
     padding-bottom: 2vh;
+  }
+
+  .sig-installpath.is-pinned .sig-carousel {
+    margin-top: 5vh;
   }
 }
 
