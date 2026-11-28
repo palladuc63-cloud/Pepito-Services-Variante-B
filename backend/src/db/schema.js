@@ -1,4 +1,4 @@
-import { mysqlTable, serial, varchar, text, timestamp, int, boolean, mysqlEnum, json, double } from 'drizzle-orm/mysql-core';
+import { mysqlTable, serial, varchar, text, longtext, timestamp, int, boolean, mysqlEnum, json, double, uniqueIndex, index } from 'drizzle-orm/mysql-core';
 
 // Comptes admin du back-office
 export const users = mysqlTable('users', {
@@ -125,6 +125,22 @@ export const settings = mysqlTable('settings', {
   key: varchar('key', { length: 80 }).primaryKey(),
   value: text('value'),
 });
+
+// Blocs de contenu éditables (BO → Contenu). Un bloc = une zone d'une page
+// (section html, texte simple, image). page_key = page du site, zone =
+// emplacement dans le gabarit (main|head|tail|_), block_key = clé unique
+// globale (référencée par les tokens {{block_key}} / lookups front).
+export const contentBlocks = mysqlTable('content_blocks', {
+  id: int('id', { unsigned: true }).autoincrement().primaryKey(),
+  pageKey: varchar('page_key', { length: 100 }).notNull(),
+  zone: varchar('zone', { length: 50 }).default('main'),
+  blockKey: varchar('block_key', { length: 150 }).notNull(),
+  label: varchar('label', { length: 255 }).default(''),
+  type: varchar('type', { length: 20 }).default('html'), // text|html|image
+  value: longtext('value'),
+  sortOrder: int('sort_order').default(0),
+}, (t) => [uniqueIndex('uq_block_key').on(t.blockKey),
+  index('idx_page').on(t.pageKey, t.zone)]);
 
 // Pages SEO local « service + ville » → /<service>/<ville>/
 export const cityPages = mysqlTable('city_pages', {

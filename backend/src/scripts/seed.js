@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sql, eq } from 'drizzle-orm';
 import { db } from '../db.js';
-import { users, categories, services, projects, settings } from '../db/schema.js';
+import { users, categories, services, projects, settings, contentBlocks } from '../db/schema.js';
 import { hashPassword } from '../utils/auth.js';
 import { slugify } from '../utils/slug.js';
 
@@ -160,6 +160,18 @@ const DDL = [
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     published_at TIMESTAMP NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS content_blocks (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    page_key VARCHAR(100) NOT NULL,
+    zone VARCHAR(50) DEFAULT 'main',
+    block_key VARCHAR(150) NOT NULL,
+    label VARCHAR(255) DEFAULT '',
+    type VARCHAR(20) DEFAULT 'html',
+    value LONGTEXT,
+    sort_order INT DEFAULT 0,
+    UNIQUE KEY uq_block_key (block_key),
+    KEY idx_page (page_key, zone)
+  )`,
 ];
 
 async function ensureTables() {
@@ -305,6 +317,51 @@ async function main() {
     if (!found) await db.insert(settings).values({ key, value });
   }
   console.log('Settings OK.');
+
+  // ── Blocs de contenu éditables (page d'accueil, thème Signature) ──
+  // Blocs « text » référencés par lookup côté frontend (fallback sur les
+  // valeurs du code si la clé est absente). Idempotent par block_key.
+  const homeBlocks = [
+    ['home.about.title', 'Titre de la présentation', 'Pépito Services, artisan installateur à Thiers'],
+    ['home.about.p1', 'Présentation — paragraphe 1', "Pépito Services est l'entreprise individuelle de Sylvain Palladuc, artisan installateur basé à Thiers, au cœur du Livradois-Forez. Nous préparons et posons clôtures rigides et souples, palissades occultantes, portails et portillons, motorisations et petits terrassements à la mini-pelle — un seul interlocuteur, de l'étude du terrain à la réception du chantier."],
+    ['home.about.p2', 'Présentation — paragraphe 2', 'Installés dans nos ateliers thiernois, nous intervenons dans tout le Puy-de-Dôme dans un rayon d\u2019environ 50 km. Chaque ouvrage est pensé pour durer\u00a0: matériaux résistants, sous-bassement béton contre l\u2019humidité et finitions propres. Devis gratuit et personnalisé.'],
+    ['home.about.badge1', 'Présentation — badge 1', 'Thiers · Livradois-Forez'],
+    ['home.about.badge2', 'Présentation — badge 2', "Rayon d'intervention ~50 km"],
+    ['home.about.badge3', 'Présentation — badge 3', 'Devis gratuit'],
+    ['home.process.title', 'Processus — titre', 'Notre processus de pose en 5 étapes'],
+    ['home.process.sub', 'Processus — sous-titre', 'De la préparation du terrain à la réception du chantier — notre méthode de pose, étape par étape.'],
+    ['home.process.step1.title', 'Étape 1 — titre', 'Étude & traçage'],
+    ['home.process.step1.text', 'Étape 1 — texte', 'Analyse du terrain, alignement, repères.'],
+    ['home.process.step2.title', 'Étape 2 — titre', 'Terrassement'],
+    ['home.process.step2.text', 'Étape 2 — texte', 'Petites excavations pour les poteaux à la mini-pelle.'],
+    ['home.process.step3.title', 'Étape 3 — titre', 'Scellement & sous-bassement'],
+    ['home.process.step3.text', 'Étape 3 — texte', 'Mise en place des poteaux et glissement des plaques de sous-bassement béton.'],
+    ['home.process.step4.title', 'Étape 4 — titre', 'Pose des panneaux'],
+    ['home.process.step4.text', 'Étape 4 — texte', 'Installation et fixation des grilles en acier rigide.'],
+    ['home.process.step5.title', 'Étape 5 — titre', 'Réception'],
+    ['home.process.step5.text', 'Étape 5 — texte', 'Ajustements finaux — chantier livré clé en main.'],
+    ['home.benefits.title', 'Pourquoi choisir — titre', 'Pourquoi choisir nos clôtures et portails ?'],
+    ['home.benefits.lead', 'Pourquoi choisir — sous-titre', 'Clôtures rigides, portails et portillons sur mesure, murets et aménagements extérieurs : votre artisan local pour sécuriser et embellir votre propriété.'],
+    ['home.benefits.1.title', 'Argument 1 — titre', 'Robustesse maximale'],
+    ['home.benefits.1.text', 'Argument 1 — texte', 'Sécurité, rigidité — les plaques béton stabilisent la clôture et retiennent la terre.'],
+    ['home.benefits.2.title', 'Argument 2 — titre', 'Finition parfaite et propre'],
+    ['home.benefits.2.text', 'Argument 2 — texte', "Pas d'entretien de coupe en lisière de grillage — propreté et délimitation claire."],
+    ['home.benefits.3.title', 'Argument 3 — titre', 'Longévité exceptionnelle'],
+    ['home.benefits.3.text', 'Argument 3 — texte', 'Anti-humidité : pas de contact du métal avec le sol humide, résistant aux intempéries.'],
+    ['home.installs.title', 'Réalisations — titre', 'Nos dernières installations'],
+    ['home.zone.title', 'Zone intervention — titre', 'Artisan clôturier à Thiers — interventions dans un rayon de 50 km'],
+    ['home.zone.p1', 'Zone intervention — paragraphe 1', 'Basée à Thiers dans le Puy-de-Dôme (63), <strong>Pépito Services</strong> se déplace dans un rayon de 50 km pour la pose de clôtures rigides, portails et portillons sur mesure, palissades, murets avec sous-bassement béton et petits travaux de terrassement.'],
+    ['home.zone.p2', 'Zone intervention — paragraphe 2', 'Nous intervenons à Courpière, Billom, Lezoux, Pont-du-Château, Ambert, Cunlhat, Clermont-Ferrand, Riom, Vichy et Montbrison, ainsi que dans toutes les communes du Livradois-Forez et de la plaine de la Dore. Le chiffrage est gratuit et sans engagement — nous nous déplaçons chez vous pour étudier votre terrain.'],
+  ];
+  for (const [blockKey, label, value] of homeBlocks) {
+    const [found] = await db.select().from(contentBlocks).where(eq(contentBlocks.blockKey, blockKey));
+    if (!found) {
+      await db.insert(contentBlocks).values({
+        pageKey: 'home', zone: '_', blockKey, label, type: 'text', value,
+      });
+    }
+  }
+  console.log('Blocs de contenu OK.');
 
   console.log('Seed terminé.');
   process.exit(0);

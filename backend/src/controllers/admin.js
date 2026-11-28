@@ -3,6 +3,7 @@ import { db } from '../db.js';
 import {
   categories, services, projects, articles, messages, settings,
   projectImages, cityPages, seoMeta, redirects, prospects, slides,
+  contentBlocks,
 } from '../db/schema.js';
 import { slugify } from '../utils/slug.js';
 import { ensureCityPage, fetchCityInfo } from '../utils/citygen.js';
@@ -563,4 +564,107 @@ export async function updateSettings(req, res) {
     }
   }
   res.json({ status: 'ok' });
+}
+
+// ─── Blocs de contenu éditables (page → zone → blocs text/html/image) ───
+// Calqué sur AL-Metallerie : les valeurs sont du texte ou du HTML brut,
+// référencées côté site par leur block_key. Modèle générique réutilisable
+// sur les autres sites artisans.
+
+// Normalise les séquences échappées (\n littéraux) saisies dans le BO.
+function unescapeBlockValue(s) {
+  s = String(s ?? '');
+  const escN = (s.match(/\\n/g) || []).length;
+  const realLf = (s.match(/\n/g) || []).length;
+  if (escN === 0 || realLf > 2) return s;
+  return s.replace(/\\r\\n|\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\"/g, '"');
+}
+
+export async function listContentBlocks(req, res) {
+  try {
+    const q = req.query.page
+      ? db.select().from(contentBlocks).where(eq(contentBlocks.pageKey, String(req.query.page)))
+      : db.select().from(contentBlocks);
+    const rows = await q;
+    rows.sort((a, b) =>
+      (a.pageKey || '').localeCompare(b.pageKey || '') ||
+      (a.zone || '').localeCompare(b.zone || '') ||
+      (a.sortOrder || 0) - (b.sortOrder || 0));
+    res.json(rows);
+  } catch (err) {
+    console.error('GET /admin/content-blocks:', err.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+export async function createContentBlock(req, res) {
+  try {
+    const { page_key, zone, label, type, value } = req.body ?? {};
+    if (!page_key) return res.status(400).json({ error: 'page_key requis.' });
+    const page = String(page_key).slice(0, 100);
+    const zn = String(zone || 'main').slice(0, 50);
+    // clé unique auto : page.zone.slug(-n)
+    const base = slugify(label || 'bloc').slice(0, 60) || 'bloc';
+    let key = `${page}.${zn}.${base}`;
+    let n = 1;
+    while ((await db.select({ id: contentBlocks.id }).from(contentBlocks)
+      .where(eq(contentBlocks.blockKey, key)).limit(1)).length) {
+      key = `${page}.${zn}.${base}-${++n}`;
+    }
+    const [mx] = await db.select({ m: sql`max(sort_order)` }).from(contentBlocks)
+      .where(eq(contentBlocks.pageKey, page));
+    const [row] = await db.insert(contentBlocks).values({
+      pageKey: page,
+      zone: zn,
+      blockKey: key,
+      label: String(label || 'Nouveau bloc').slice(0, 255),
+      type: ['text', 'html', 'image'].includes(type) ? type : 'html',
+      value: unescapeBlockValue(value || ''),
+      sortOrder: Number(mx?.m || 0) + 1,
+    });
+    res.status(201).json({ id: row.insertId, blockKey: key });
+  } catch (err) {
+    console.error('POST /admin/content-blocks:', err.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+export async function reorderContentBlocks(req, res) {
+  try {
+    const ids = Array.isArray(req.body?.ids) ? req.body.ids.map(Number).filter(Boolean) : [];
+    for (let i = 0; i < ids.length; i++) {
+      await db.update(contentBlocks).set({ sortOrder: i + 1 })
+        .where(eq(contentBlocks.id, ids[i]));
+    }
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('PUT /admin/content-blocks/reorder:', err.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+export async function updateContentBlock(req, res) {
+  try {
+    const { label, value, type } = req.body ?? {};
+    const set = {};
+    if (label !== undefined) set.label = String(label).slice(0, 255);
+    if (value !== undefined) set.value = unescapeBlockValue(value);
+    if (type && ['text', 'html', 'image'].includes(type)) set.type = type;
+    await db.update(contentBlocks).set(set)
+      .where(eq(contentBlocks.id, Number(req.params.id)));
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('PUT /admin/content-blocks/:id:', err.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+export async function deleteContentBlock(req, res) {
+  try {
+    await db.delete(contentBlocks).where(eq(contentBlocks.id, Number(req.params.id)));
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('DELETE /admin/content-blocks/:id:', err.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
 }

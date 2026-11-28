@@ -26,6 +26,11 @@ export async function getContent() {
   return fetchJson('/api/public/content');
 }
 
+// Blocs de contenu éditables (BO → Contenu, table content_blocks)
+export async function getBlocks() {
+  return fetchJson('/api/public/blocks');
+}
+
 /**
  * @param {{ preview?: boolean, headers?: Record<string, string> }} [opts]
  */

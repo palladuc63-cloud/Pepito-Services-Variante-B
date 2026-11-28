@@ -22,6 +22,7 @@ const base = import.meta.env.BASE_URL;
         </a>
         <button class="admin-nav-link active" data-tab="overview">📊 Vue d'ensemble</button>
         <button class="admin-nav-link" data-tab="home">🏠 Accueil</button>
+        <button class="admin-nav-link" data-tab="pages">📝 Contenu</button>
         <button class="admin-nav-link" data-tab="messages">📩 Messages</button>
         <button class="admin-nav-link" data-tab="prospects">📇 Prospects</button>
         <button class="admin-nav-link" data-tab="projects">🚧 Réalisations</button>
@@ -111,6 +112,45 @@ const base = import.meta.env.BASE_URL;
             <h2 style="margin:0 0 4px">Aperçu du diaporama</h2>
             <p class="form-hint" style="margin-top:0">Rendu des slides visibles, dans l'ordre — telles qu'elles apparaîtront sur le site.</p>
             <div class="slides-preview" id="slides-preview"></div>
+          </div>
+        </section>
+
+        <!-- CONTENU — blocs éditables des pages (textes, sections HTML, images) -->
+        <section id="tab-pages" hidden>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap">
+              <h2 style="margin:0">Contenu des pages</h2>
+              <div style="display:flex;gap:8px;align-items:center">
+                <select class="form-input" id="pg-select" style="width:auto"></select>
+                <button class="btn btn-primary btn-sm" id="pg-add">+ Bloc</button>
+              </div>
+            </div>
+            <p class="form-hint" id="pg-hint" style="margin-top:0"></p>
+            <div class="form-row" id="pg-newrow" hidden>
+              <div class="form-row cols-3" style="align-items:end">
+                <div><label class="form-label">Nom du bloc</label><input class="form-input" id="pg-newlabel" placeholder="Ex. Bandeau promo" /></div>
+                <div><label class="form-label">Zone</label>
+                  <select class="form-input" id="pg-newzone">
+                    <option value="main">Contenu</option>
+                    <option value="head">Haut de page</option>
+                    <option value="tail">Bas de page</option>
+                    <option value="_">Valeur référencée ({{token}})</option>
+                  </select>
+                </div>
+                <div><label class="form-label">Type</label>
+                  <select class="form-input" id="pg-newtype">
+                    <option value="text">Texte simple</option>
+                    <option value="html">HTML (section)</option>
+                    <option value="image">Image</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn btn-primary btn-sm" id="pg-newok">Créer</button>
+                <button class="btn btn-sm" id="pg-newcancel">Annuler</button>
+              </div>
+            </div>
+            <div id="pg-blocks"></div>
           </div>
         </section>
 
@@ -444,6 +484,7 @@ const base = import.meta.env.BASE_URL;
     assistant: ['Assistant', 'Connaissances de l\u2019assistant vocal et du chatbot'],
     overview: ["Vue d'ensemble", "L'essentiel du site en un coup d'œil"],
     home: ['Accueil', 'Slides du diaporama de la page d\u2019accueil'],
+    pages: ['Contenu', 'Textes et blocs éditables des pages du site'],
     seo: ['SEO / Redirections', 'Overrides meta et redirections 301/302'],
     settings: ['Paramètres', 'Coordonnées et contenus du site'],
   };
@@ -1918,6 +1959,127 @@ const base = import.meta.env.BASE_URL;
     const body = Object.fromEntries(new FormData(e.target).entries());
     await api.put('/api/admin/settings', body);
     showAlert('Paramètres enregistrés.');
+  });
+
+  // ── Contenu : éditeur de blocs (content_blocks, calqué AL-Metallerie) ──
+  const PAGE_LABELS = { home: 'Accueil', site: '★ Infos site (header, footer…)' };
+  const ZONE_LABELS = {
+    main: '📄 Contenu', head: '⬆️ Haut de page', mid: '➡️ Milieu',
+    tail: '⬇️ Bas de page', header: '🧢 En-tête', footer: '👣 Pied de page',
+    _: '🖼 Valeurs référencées ({{tokens}})',
+  };
+  const TYPE_ICONS = { html: '📝', text: '🔤', image: '🖼' };
+  let allBlocks = [], blocksPage = '';
+  const pageLabel = (k) => PAGE_LABELS[k] || k;
+
+  const blockField = (b) => {
+    if (b.type === 'text') {
+      return `<input class="form-input" value="${esc(b.value || '')}" />`;
+    }
+    if (b.type === 'image') {
+      const src = ((String(b.value || '').match(/src="([^"]*)"/) || [])[1]) || '';
+      return `<div style="display:flex;gap:12px;align-items:flex-start">
+        ${src ? `<img src="${esc(src)}" style="width:90px;height:60px;object-fit:cover;border-radius:8px" />` : ''}
+        <textarea class="form-textarea" rows="2" style="flex:1">${esc(b.value || '')}</textarea>
+      </div>`;
+    }
+    return `<textarea class="form-textarea" rows="${Math.min(16, Math.max(4, String(b.value || '').split('\n').length))}">${esc(b.value || '')}</textarea>`;
+  };
+
+  const renderBlocksEditor = (pageKey) => {
+    blocksPage = pageKey;
+    const rows = allBlocks.filter((b) => b.pageKey === pageKey);
+    $('#pg-hint').textContent = rows.length
+      ? `${rows.length} bloc(s) — les blocs « texte » et « image » servent de valeurs référencées par {{clé}} dans les blocs HTML.`
+      : 'Aucun bloc pour cette page.';
+    const zoneOrder = ['main', 'head', 'mid', 'tail', 'header', 'footer', '_'];
+    const zones = [...new Set(rows.map((b) => b.zone || 'main'))]
+      .sort((a, b) => zoneOrder.indexOf(a) - zoneOrder.indexOf(b));
+    $('#pg-blocks').innerHTML = zones.map((z) => {
+      const zr = rows.filter((b) => (b.zone || 'main') === z)
+        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      return `<div class="blk-zone">${esc(ZONE_LABELS[z] || z)}</div>` + zr.map((b, i) => `
+        <div class="blk" data-bid="${b.id}">
+          <div class="blk-head">
+            <span title="Type ${b.type}">${TYPE_ICONS[b.type] || '📦'}</span>
+            <span class="blk-label">${esc(b.label || b.blockKey)}</span>
+            <code class="blk-key">{{${esc(b.blockKey)}}}</code>
+            <span style="margin-left:auto;display:flex;gap:6px">
+              ${b.type === 'html' ? `<button class="btn btn-sm" data-mv="-1" ${i === 0 ? 'disabled' : ''} title="Monter">↑</button><button class="btn btn-sm" data-mv="1" ${i === zr.length - 1 ? 'disabled' : ''} title="Descendre">↓</button>` : ''}
+              <button class="btn btn-primary btn-sm" data-save="${b.id}">Enregistrer</button>
+              <button class="btn btn-danger btn-sm" data-del="${b.id}" title="Supprimer">🗑</button>
+            </span>
+          </div>
+          <div class="blk-body">${blockField(b)}</div>
+        </div>`).join('');
+    }).join('');
+  };
+
+  loaders.pages = async () => {
+    allBlocks = await api.get('/api/admin/content-blocks');
+    const sel = $('#pg-select');
+    if (!sel.options.length) {
+      const keys = [...new Set(allBlocks.map((b) => b.pageKey))];
+      const main = keys.filter((k) => k !== 'site').sort();
+      const site = keys.filter((k) => k === 'site');
+      const opt = (k) => `<option value="${k}">${esc(pageLabel(k))}</option>`;
+      sel.innerHTML = site.map(opt).join('') + main.map(opt).join('');
+      sel.value = site.length ? 'site' : (main[0] || '');
+    }
+    sel.onchange = () => renderBlocksEditor(sel.value);
+    renderBlocksEditor(sel.value);
+  };
+
+  document.addEventListener('click', async (e) => {
+    const blk = e.target.closest('.blk');
+    if (!blk) return;
+    const id = blk.dataset.bid;
+    const b = allBlocks.find((x) => String(x.id) === String(id));
+    if (!b) return;
+    const field = blk.querySelector('textarea, input');
+    if (e.target.closest('[data-save]')) {
+      await api.put(`/api/admin/content-blocks/${id}`, { value: field.value });
+      b.value = field.value;
+      showAlert('Bloc enregistré.');
+    }
+    if (e.target.closest('[data-del]')) {
+      if (!confirm(`Supprimer le bloc « ${b.label || b.blockKey} » ?`)) return;
+      await api.del(`/api/admin/content-blocks/${id}`);
+      allBlocks = allBlocks.filter((x) => x !== b);
+      showAlert('Bloc supprimé.');
+      renderBlocksEditor(blocksPage);
+    }
+    const mv = e.target.closest('[data-mv]');
+    if (mv) {
+      const zr = allBlocks
+        .filter((x) => x.pageKey === blocksPage && (x.zone || 'main') === (b.zone || 'main') && x.type === 'html')
+        .sort((a, b2) => (a.sortOrder || 0) - (b2.sortOrder || 0));
+      const i = zr.indexOf(b), j = i + Number(mv.dataset.mv);
+      if (j < 0 || j >= zr.length) return;
+      [zr[i], zr[j]] = [zr[j], zr[i]];
+      await api.put('/api/admin/content-blocks/reorder', { ids: zr.map((x) => x.id) });
+      zr.forEach((x, k) => { x.sortOrder = k + 1; });
+      renderBlocksEditor(blocksPage);
+    }
+  });
+
+  $('#pg-add').addEventListener('click', () => { $('#pg-newrow').hidden = !$('#pg-newrow').hidden; });
+  $('#pg-newcancel').addEventListener('click', () => { $('#pg-newrow').hidden = true; });
+  $('#pg-newok').addEventListener('click', async () => {
+    const label = $('#pg-newlabel').value.trim();
+    if (!label) return showAlert('Nom du bloc requis.', false);
+    await api.post('/api/admin/content-blocks', {
+      page_key: blocksPage,
+      zone: $('#pg-newzone').value,
+      type: $('#pg-newtype').value,
+      label,
+      value: $('#pg-newtype').value === 'image' ? '<img src="" alt="" />' : '',
+    });
+    showAlert('Bloc créé.');
+    $('#pg-newrow').hidden = true;
+    $('#pg-newlabel').value = '';
+    allBlocks = await api.get('/api/admin/content-blocks');
+    renderBlocksEditor(blocksPage);
   });
 
   // Chargement initial — la vue d'ensemble charge tout et nourrit les gardes-fous

@@ -2,7 +2,7 @@ import { eq, asc, desc, and, or, isNull, isNotNull, lte } from 'drizzle-orm';
 import { db } from '../db.js';
 import {
   settings, categories, services, projects, articles, messages, projectImages,
-  cityPages, seoMeta, redirects, slides,
+  cityPages, seoMeta, redirects, slides, contentBlocks,
 } from '../db/schema.js';
 import { notify } from '../utils/notify.js';
 import { sendMail } from '../utils/mailer.js';
@@ -52,6 +52,17 @@ export async function getContent(_req, res) {
     res.json({ settings: settingsMap, categories: cats, services: srvcs, slides: slidesOut });
   } catch (err) {
     console.error('GET /public/content:', err.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+// GET /api/public/blocks — blocs de contenu éditables (petit volume,
+// mis en cache côté frontend ~30 s).
+export async function listBlocks(_req, res) {
+  try {
+    res.json(await db.select().from(contentBlocks));
+  } catch (err) {
+    console.error('GET /public/blocks:', err.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 }

@@ -5,6 +5,7 @@ import { rateLimit } from '../utils/rateLimit.js';
 const router = express.Router();
 
 router.get('/content', ctrl.getContent);
+router.get('/blocks', ctrl.listBlocks);
 router.get('/projects', ctrl.listProjects);
 router.get('/projects/:slug', ctrl.getProject);
 router.get('/articles', ctrl.listArticles);

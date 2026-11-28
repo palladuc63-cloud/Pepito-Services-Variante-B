@@ -51,6 +51,12 @@ router.delete('/prospects/:id', ctrl.deleteProspect);
 router.get('/settings', ctrl.getSettings);
 router.put('/settings', ctrl.updateSettings);
 
+router.get('/content-blocks', ctrl.listContentBlocks);
+router.post('/content-blocks', ctrl.createContentBlock);
+router.put('/content-blocks/reorder', ctrl.reorderContentBlocks);
+router.put('/content-blocks/:id', ctrl.updateContentBlock);
+router.delete('/content-blocks/:id', ctrl.deleteContentBlock);
+
 router.get('/city-pages', ctrl.listCityPages);
 router.post('/city-pages', ctrl.createCityPage);
 router.post('/city-pages/schedule-drafts', ctrl.scheduleCityDrafts);

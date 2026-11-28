@@ -10,6 +10,7 @@ import atelierImg from '../assets/atelier-thiers.jpg';
 import { Image } from 'astro:assets';
 import Icon from '../components/Icon.astro';
 import { signature } from '../data/signature';
+import { getBlocksMap, blockText } from '../lib/blocks.js';
 import { ICONS } from '../lib/icons';
 import GateScene from '../components/GateScene.astro';
 import { getSite } from '../lib/site.js';
@@ -24,6 +25,27 @@ const base = import.meta.env.BASE_URL;
 
 // Le contenu « Signature » (hero, activités, arguments, processus) est
 // dans src/data/signature.ts — partagé avec la page Nos services.
+
+// Textes éditables en BO (content_blocks) — fallback sur les valeurs du
+// code si le bloc est absent ou vide, la page ne casse jamais.
+const blk = await getBlocksMap();
+const T = (k: string, d: string) => blockText(blk, k, d);
+const sig = {
+  ...signature,
+  processTitle: T('home.process.title', signature.processTitle),
+  benefitsTitle: T('home.benefits.title', signature.benefitsTitle),
+  installsTitle: T('home.installs.title', signature.installsTitle),
+  steps: signature.steps.map((s, i) => ({
+    ...s,
+    title: T(`home.process.step${i + 1}.title`, s.title),
+    text: T(`home.process.step${i + 1}.text`, s.text),
+  })),
+  benefits: signature.benefits.map((b, i) => ({
+    ...b,
+    title: T(`home.benefits.${i + 1}.title`, b.title),
+    text: T(`home.benefits.${i + 1}.text`, b.text),
+  })),
+};
 
 // Entité locale canonique (@id #business, référencée par les pages villes
 // et réalisations). sameAs relie la fiche Google et les réseaux au site —
@@ -160,28 +182,16 @@ const jsonLd = [{
     <section class="sig-about container" id="entreprise">
       <div class="sig-about__grid">
         <div class="sig-about__body">
-          <h2 class="sig-title sig-about__title">
-            Pépito Services, artisan installateur à Thiers
-          </h2>
-          <p>
-            Pépito Services est l'entreprise individuelle de Sylvain
-            Palladuc, artisan installateur basé à Thiers, au cœur du
-            Livradois-Forez. Nous préparons et posons clôtures rigides et
-            souples, palissades occultantes, portails et portillons,
-            motorisations et petits terrassements à la mini-pelle — un seul
-            interlocuteur, de l'étude du terrain à la réception du chantier.
-          </p>
-          <p>
-            Installés dans nos ateliers thiernois, nous intervenons dans
-            tout le Puy-de-Dôme dans un rayon d'environ 50&nbsp;km. Chaque
-            ouvrage est pensé pour durer&nbsp;: matériaux résistants,
-            sous-bassement béton contre l'humidité et finitions propres.
-            Devis gratuit et personnalisé.
-          </p>
+          <h2
+            class="sig-title sig-about__title"
+            set:html={T('home.about.title', 'Pépito Services, artisan installateur à Thiers')}
+          />
+          <p set:html={T('home.about.p1', "Pépito Services est l'entreprise individuelle de Sylvain Palladuc, artisan installateur basé à Thiers, au cœur du Livradois-Forez. Nous préparons et posons clôtures rigides et souples, palissades occultantes, portails et portillons, motorisations et petits terrassements à la mini-pelle — un seul interlocuteur, de l'étude du terrain à la réception du chantier.")} />
+          <p set:html={T('home.about.p2', "Installés dans nos ateliers thiernois, nous intervenons dans tout le Puy-de-Dôme dans un rayon d'environ 50 km. Chaque ouvrage est pensé pour durer : matériaux résistants, sous-bassement béton contre l'humidité et finitions propres. Devis gratuit et personnalisé.")} />
           <ul class="sig-about__facts">
-            <li><Icon name="pin" size={13} />Thiers · Livradois-Forez</li>
-            <li><Icon name="ruler" size={13} />Rayon d'intervention ~50&nbsp;km</li>
-            <li><Icon name="check" size={13} />Devis gratuit</li>
+            <li><Icon name="pin" size={13} />{T('home.about.badge1', 'Thiers · Livradois-Forez')}</li>
+            <li><Icon name="ruler" size={13} />{T('home.about.badge2', "Rayon d'intervention ~50 km")}</li>
+            <li><Icon name="check" size={13} />{T('home.about.badge3', 'Devis gratuit')}</li>
           </ul>
         </div>
         <div class="sig-about__photo">
@@ -220,17 +230,17 @@ const jsonLd = [{
             </svg>
           </div>
           <header class="sig-process-head container">
-            <h2 class="sig-title">{signature.processTitle}</h2>
-            <p class="sig-process-head__sub">
-              De la préparation du terrain à la réception du chantier —
-              notre méthode de pose, étape par étape.
-            </p>
+            <h2 class="sig-title">{sig.processTitle}</h2>
+            <p
+              class="sig-process-head__sub"
+              set:html={T('home.process.sub', 'De la préparation du terrain à la réception du chantier — notre méthode de pose, étape par étape.')}
+            />
           </header>
           <section class="sig-process">
       <div class="sig-band" aria-hidden="true"></div>
       <div class="container">
         <ol class="sig-steps">
-          {signature.steps.map((s, i) => (
+          {sig.steps.map((s, i) => (
             <li class="sig-step">
               <span class:list={['sig-step__marker', { 'sig-step__marker--iso': s.img }]} aria-hidden="true">
                 {s.img ? (
@@ -249,8 +259,8 @@ const jsonLd = [{
                 )}
               </span>
               <div class="sig-step__body">
-                <h3>{s.title}</h3>
-                <p>{s.text}</p>
+                <h3 set:html={s.title} />
+                <p set:html={s.text} />
               </div>
             </li>
           ))}
@@ -263,22 +273,21 @@ const jsonLd = [{
 
     <section class="sig-benefits">
       <div class="container">
-        <h2 class="sig-title">{signature.benefitsTitle}</h2>
-        <p class="sig-benefits__lead">
-          Clôtures rigides, portails et portillons sur mesure, murets et
-          aménagements extérieurs&nbsp;: votre artisan local pour sécuriser et
-          embellir votre propriété.
-        </p>
+        <h2 class="sig-title">{sig.benefitsTitle}</h2>
+        <p
+          class="sig-benefits__lead"
+          set:html={T('home.benefits.lead', 'Clôtures rigides, portails et portillons sur mesure, murets et aménagements extérieurs : votre artisan local pour sécuriser et embellir votre propriété.')}
+        />
         <div class="sig-benefits__grid">
-          {signature.benefits.map((b) => (
+          {sig.benefits.map((b) => (
             <div class="sig-benefit">
               <span class="sig-benefit__icon" aria-hidden="true">
                 {b.icon === 'shield' && <img src={`${base}icons/benefit-shield.png`} alt="" loading="lazy" />}
                 {b.icon === 'finish' && <img src={`${base}icons/benefit-finish.png`} alt="" loading="lazy" />}
                 {b.icon === 'clock' && <img src={`${base}icons/benefit-clock.png`} alt="" loading="lazy" />}
               </span>
-              <h3>{b.title}</h3>
-              <p>{b.text}</p>
+              <h3 set:html={b.title} />
+              <p set:html={b.text} />
             </div>
           ))}
         </div>
@@ -286,7 +295,7 @@ const jsonLd = [{
     </section>
 
     <section class="sig-installs container">
-      <h2 class="sig-title">{signature.installsTitle}</h2>
+      <h2 class="sig-title">{sig.installsTitle}</h2>
       <div class="projects-grid-preview">
         {previewProjects.map((project: Project) => <ProjectCard project={project} />)}
       </div>
@@ -297,13 +306,18 @@ const jsonLd = [{
 
     <section class="sig-zone container" id="zone-intervention">
       <div class="sig-zone__intro">
-        <h2 class="sig-title">Artisan clôturier à Thiers — interventions dans un rayon de 50&nbsp;km</h2>
-        <p class="sig-zone__lead">
-          Basée à Thiers dans le Puy-de-Dôme (63), <strong>Pépito Services</strong> se déplace dans un rayon de 50&nbsp;km pour la pose de clôtures rigides, portails et portillons sur mesure, palissades, murets avec sous-bassement béton et petits travaux de terrassement.
-        </p>
-        <p class="sig-zone__lead">
-          Nous intervenons à Courpière, Billom, Lezoux, Pont-du-Château, Ambert, Cunlhat, Clermont-Ferrand, Riom, Vichy et Montbrison, ainsi que dans toutes les communes du Livradois-Forez et de la plaine de la Dore. Le chiffrage est gratuit et sans engagement — nous nous déplaçons chez vous pour étudier votre terrain.
-        </p>
+        <h2
+          class="sig-title"
+          set:html={T('home.zone.title', 'Artisan clôturier à Thiers — interventions dans un rayon de 50 km')}
+        />
+        <p
+          class="sig-zone__lead"
+          set:html={T('home.zone.p1', 'Basée à Thiers dans le Puy-de-Dôme (63), <strong>Pépito Services</strong> se déplace dans un rayon de 50 km pour la pose de clôtures rigides, portails et portillons sur mesure, palissades, murets avec sous-bassement béton et petits travaux de terrassement.')}
+        />
+        <p
+          class="sig-zone__lead"
+          set:html={T('home.zone.p2', 'Nous intervenons à Courpière, Billom, Lezoux, Pont-du-Château, Ambert, Cunlhat, Clermont-Ferrand, Riom, Vichy et Montbrison, ainsi que dans toutes les communes du Livradois-Forez et de la plaine de la Dore. Le chiffrage est gratuit et sans engagement — nous nous déplaçons chez vous pour étudier votre terrain.')}
+        />
       </div>
       <div class="sig-zone__map"><CityMap height="440px" /></div>
       <p class="sig-zone__nap">

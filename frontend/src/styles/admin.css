@@ -595,3 +595,37 @@ a.sp-btn { cursor: pointer; }
   .slides-preview { aspect-ratio: auto; min-height: 340px; }
   .sp-content { max-width: 100%; }
 }
+
+/* ── Éditeur de blocs de contenu (onglet Contenu) ── */
+.blk-zone {
+  margin: 20px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted, #6b756e);
+}
+.blk {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: var(--bg);
+}
+.blk-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.blk-label { font-weight: 600; font-size: 13px; }
+.blk-key {
+  font-size: 11px;
+  color: var(--muted, #6b756e);
+  background: var(--surface, #f4f6f4);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+.blk-body .form-input,
+.blk-body .form-textarea { width: 100%; }
