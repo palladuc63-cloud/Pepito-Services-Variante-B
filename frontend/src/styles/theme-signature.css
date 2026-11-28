@@ -785,7 +785,19 @@ a.sig-topbar__item:hover {
   clip-path: inset(0 0);
 }
 
-.sig-process-head.rv .sig-title {
+.sig-process-head__sub {
+  margin: 0.6rem auto 0;
+  max-width: 52ch;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--stone);
+}
+
+.sig-process-head.rv .sig-title,
+.sig-process-head.rv .sig-process-head__sub {
   opacity: 0;
   transform: translateY(14px);
   transition:
@@ -793,7 +805,12 @@ a.sig-topbar__item:hover {
     transform 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
 
-.sig-process-head.is-in .sig-title {
+.sig-process-head.rv .sig-process-head__sub {
+  transition-delay: 0.12s;
+}
+
+.sig-process-head.is-in .sig-title,
+.sig-process-head.is-in .sig-process-head__sub {
   opacity: 1;
   transform: none;
 }
