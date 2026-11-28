@@ -1043,16 +1043,6 @@ a.sig-topbar__item:hover {
     transform: scaleY(0);
     transform-origin: top;
   }
-  .sig-process .sig-title,
-  .sig-process .sig-step__body h3 {
-    color: var(--ink);
-  }
-  .sig-process .sig-step__marker {
-    color: var(--basalt);
-  }
-  .sig-process .sig-step__body p {
-    color: var(--stone);
-  }
 }
 
 /* Le contenu passe au-dessus du bandeau (positionné aussi, ordre DOM). */
@@ -1081,6 +1071,25 @@ a.sig-topbar__item:hover {
 
 .sig-process .sig-step__body p {
   color: rgb(247 249 247 / 0.72);
+}
+
+/* Mobile : la spine remplace le fond vert — les textes repassent en
+   foncé sur papier (placé après les règles claires pour l'emporter
+   à spécificité égale). */
+@media (max-width: 899px) {
+  .sig-process .sig-title,
+  .sig-process .sig-step__body h3 {
+    color: var(--ink);
+  }
+  .sig-process .sig-step__marker {
+    color: var(--basalt);
+  }
+  .sig-process .sig-step__num {
+    border-color: var(--basalt);
+  }
+  .sig-process .sig-step__body p {
+    color: var(--stone);
+  }
 }
 
 .sig-steps {
@@ -1353,7 +1362,7 @@ a.sig-topbar__item:hover {
   /* Le bas du cadre sticky (100vh) est vide après la fin du ruban :
      remonte « Pourquoi choisir » pour coller sous le bandeau. */
   .sig-scrollpath.is-pinned + .sig-benefits {
-    margin-top: -10vh;
+    margin-top: 0;
   }
 }
 
