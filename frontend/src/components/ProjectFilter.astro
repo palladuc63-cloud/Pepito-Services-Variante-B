@@ -3,6 +3,7 @@ import type { Project, Category } from '../data/types';
 import ProjectCard from './ProjectCard.astro';
 import Icon from './Icon.astro';
 import { categoryIcon } from '../lib/icons';
+import { SERVICE_CATEGORIES } from '../data/service-categories';
 
 export interface Props {
   projects: Project[];
@@ -11,6 +12,16 @@ export interface Props {
 }
 
 const { projects, categories, preview = false } = Astro.props;
+
+// Vignette iso par slug de catégorie API ; « clotures » (générique,
+// couvre souple+rigide) prend la vignette rigide, plus représentative.
+const isoByCat: Record<string, string> = {};
+SERVICE_CATEGORIES.forEach((c) => {
+  if (!(c.catSlug in isoByCat)) isoByCat[c.catSlug] = c.image;
+});
+isoByCat['clotures'] =
+  SERVICE_CATEGORIES.find((c) => c.slug === 'clotures-rigides')?.image ??
+  isoByCat['clotures'];
 ---
 
 <div class="project-filter">
@@ -21,8 +32,8 @@ const { projects, categories, preview = false } = Astro.props;
       data-filter="all"
       aria-pressed="true"
     >
-      <Icon name="grid" size={15} />
-      Toutes
+      <span class="filter-btn__tile"><Icon name="grid" size={18} /></span>
+      <span class="filter-btn__label">Toutes</span>
     </button>
     {
       categories.map((category) => (
@@ -32,8 +43,19 @@ const { projects, categories, preview = false } = Astro.props;
           data-filter={category.slug}
           aria-pressed="false"
         >
-          <Icon name={categoryIcon(category.slug)} size={15} />
-          {category.label}
+          {isoByCat[category.slug] ? (
+            <img
+              class="filter-btn__iso"
+              src={isoByCat[category.slug]}
+              alt=""
+              aria-hidden="true"
+            />
+          ) : (
+            <span class="filter-btn__tile">
+              <Icon name={categoryIcon(category.slug)} size={18} />
+            </span>
+          )}
+          <span class="filter-btn__label">{category.label}</span>
         </button>
       ))
     }
@@ -146,40 +168,81 @@ const { projects, categories, preview = false } = Astro.props;
   .filter-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    align-items: flex-end;
+    gap: var(--space-4) var(--space-8);
     margin-bottom: var(--space-8);
   }
 
+  /* Entrée « picto » : vignette iso + libellé dessous, comme les
+     pictos orbitaux du hero. L'actif est marqué par la couleur et un
+     filet sous le libellé (pas de souligné). */
   .filter-btn {
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.45rem;
-    padding: var(--space-2) var(--space-4);
+    gap: 0.4rem;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .filter-btn__iso,
+  .filter-btn__tile {
+    width: 3.6rem;
+    height: 3.6rem;
+    display: block;
+    object-fit: contain;
+    transition: transform var(--transition-fast);
+  }
+
+  .filter-btn__tile {
+    display: grid;
+    place-items: center;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    border-radius: 999px;
     color: var(--color-text);
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color var(--transition-fast),
-      border-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  .filter-btn__label {
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+    font-size: var(--text-sm);
   }
 
   .filter-btn:hover,
   .filter-btn:focus-visible {
-    border-color: var(--color-primary);
     color: var(--color-primary);
+  }
+
+  .filter-btn:hover .filter-btn__iso,
+  .filter-btn:focus-visible .filter-btn__iso {
+    transform: translateY(-3px) scale(1.06);
   }
 
   .filter-btn:focus-visible {
     outline: none;
+  }
+
+  .filter-btn:focus-visible .filter-btn__tile,
+  .filter-btn:focus-visible .filter-btn__iso {
     box-shadow: var(--focus-ring);
+    border-radius: 999px;
   }
 
   .filter-btn.is-active {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-    color: var(--cta-text);
+    color: var(--color-primary);
+  }
+
+  .filter-btn.is-active .filter-btn__iso {
+    transform: scale(1.12);
+  }
+
+  .filter-btn.is-active .filter-btn__label {
+    border-bottom-color: var(--color-primary);
   }
 
   .filter-chip {
