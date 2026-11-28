@@ -761,16 +761,17 @@ const jsonLd = [{
             installPath.classList.add('is-ready');
         } else {
           // Pop à seuil : la card apparaît quand la bande vient de la
-          // couvrir — CTA à 0.86, marge avant la libération. À partir de
-          // ready tout reste affiché (les cards hors champ du carrousel
-          // doivent pouvoir glisser visibles).
+          // couvrir — CTA à 0.86, marge avant la libération. Les flèches
+          // (is-ready) n'arrivent qu'une fois la séquence terminée
+          // (doneI) ; à partir de là tout reste affiché et le carrousel
+          // peut glisser ses cards hors champ déjà visibles.
           const ready =
-            doneI || installPath.classList.contains('is-ready') || q >= 0.86;
+            doneI || installPath.classList.contains('is-ready');
           if (ready) installPath.classList.add('is-ready');
           insCards.forEach((el, i) =>
             el.classList.toggle('is-on', ready || q >= 0.34 + i * 0.18)
           );
-          if (insMore) insMore.classList.toggle('is-on', ready);
+          if (insMore) insMore.classList.toggle('is-on', ready || q >= 0.86);
         }
       };
 
