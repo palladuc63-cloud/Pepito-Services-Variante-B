@@ -990,6 +990,24 @@ a.sig-topbar__item:hover {
   height: 100%;
 }
 
+/* Zoom léger au survol sur les pictos (icônes benefits, marqueurs et
+   photos des étapes) — appliqué sur les éléments internes pour ne pas
+   interférer avec les animations de pop. */
+.sig-benefit__icon img,
+.sig-benefit__icon svg,
+.sig-step__marker .sig-step__icon,
+.sig-step__marker .sig-step__photo {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1);
+  transform-origin: center;
+}
+
+.sig-benefit:hover .sig-benefit__icon img,
+.sig-benefit:hover .sig-benefit__icon svg,
+.sig-step:hover .sig-step__marker .sig-step__icon,
+.sig-step:hover .sig-step__marker .sig-step__photo {
+  transform: scale(1.12);
+}
+
 .sig-benefit h3 {
   margin: 0 0 0.6rem;
   font-family: var(--font-display);
