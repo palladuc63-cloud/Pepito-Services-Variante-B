@@ -481,7 +481,7 @@ const jsonLd = [{
     // titre du process (une fois ; reduced-motion → pas de masquage).
     const mqReducedRv = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (!mqReducedRv.matches) {
-      const rvEls = ['.sig-about', '.sig-process-head']
+      const rvEls = ['.sig-about']
         .map((sel) => document.querySelector<HTMLElement>(sel))
         .filter((el): el is HTMLElement => el !== null);
       if (rvEls.length > 0) {
@@ -534,6 +534,23 @@ const jsonLd = [{
           { threshold: 0, rootMargin: '0px 0px -40% 0px' }
         );
         ioBen.observe(benEl);
+      }
+
+      // Titre du process : marge négative — il doit être bien remonté
+      // dans le viewport avant de se révéler (juste avant le gel).
+      const headEl = document.querySelector<HTMLElement>('.sig-process-head');
+      if (headEl) {
+        headEl.classList.add('rv');
+        const ioHead = new IntersectionObserver(
+          (entries) => {
+            if (entries.some((e) => e.isIntersecting)) {
+              headEl.classList.add('is-in');
+              ioHead.disconnect();
+            }
+          },
+          { threshold: 0, rootMargin: '0px 0px -40% 0px' }
+        );
+        ioHead.observe(headEl);
       }
     }
   </script>

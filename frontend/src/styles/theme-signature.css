@@ -312,6 +312,85 @@ a.sig-topbar__item:hover {
   border-radius: 0;
 }
 
+/* ─── Burger menu « mega » : même identité que le panneau desktop —
+   papier clair, texte ink, vignettes iso, titres de groupes. ─── */
+:root[data-theme='signature'] .mobile-menu {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+:root[data-theme='signature'] .mobile-menu__header {
+  border-bottom-color: var(--line);
+}
+
+:root[data-theme='signature'] .mobile-menu__title {
+  color: var(--color-heading);
+}
+
+:root[data-theme='signature'] .mobile-menu__close {
+  background: var(--forest-soft);
+  color: var(--forest-dark);
+}
+
+:root[data-theme='signature'] .mobile-menu__close:hover,
+:root[data-theme='signature'] .mobile-menu__close:focus {
+  background: color-mix(in srgb, var(--forest) 16%, transparent);
+}
+
+:root[data-theme='signature'] .mobile-menu__item {
+  border-bottom-color: var(--line);
+}
+
+:root[data-theme='signature'] .mobile-menu__link {
+  color: var(--ink);
+}
+
+:root[data-theme='signature'] .mobile-menu__link:hover,
+:root[data-theme='signature'] .mobile-menu__link:focus {
+  color: var(--forest-dark);
+}
+
+:root[data-theme='signature'] .mobile-menu__link[aria-current='page'] {
+  color: var(--forest);
+}
+
+:root[data-theme='signature'] .mobile-sub-toggle:hover,
+:root[data-theme='signature'] .mobile-sub-toggle:focus-visible {
+  color: var(--forest-dark);
+}
+
+/* Titres de groupes : mêmes petites capitales que le mega menu. */
+:root[data-theme='signature'] .mobile-sub-group__title {
+  color: var(--stone-light);
+  opacity: 1;
+}
+
+/* Pastille icône carrée ; la vignette iso garde sa propre matière. */
+:root[data-theme='signature'] .mobile-sub-media {
+  border-radius: 0;
+  background: var(--forest-soft);
+  color: var(--forest);
+}
+
+:root[data-theme='signature'] .mobile-sub-media--img {
+  background: none;
+}
+
+:root[data-theme='signature'] .mobile-sub-link {
+  color: var(--ink);
+  opacity: 1;
+}
+
+:root[data-theme='signature'] .mobile-sub-link:hover,
+:root[data-theme='signature'] .mobile-sub-link:focus-visible {
+  color: var(--forest-dark);
+}
+
+:root[data-theme='signature'] .mobile-sub-link--mini {
+  color: var(--stone);
+  opacity: 0.85;
+}
+
 /* ═══ Hero landing ═══ */
 
 .sig-hero {

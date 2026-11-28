@@ -228,24 +228,38 @@ const navLinks = settings.nav.map((link) => {
                 <Icon name="chevron-down" size={18} class="mobile-sub-caret" />
               </button>
               <ul class="mobile-sub-list" id={`mobile-sub-${i}`} role="menu">
-                {link.children.map((child) => (
-                  <li class="mobile-sub-item" role="none">
-                    <a href={child.href} class="mobile-sub-link" role="menuitem">
-                      <Icon name={child.icon ?? 'grid'} size={16} class="mobile-nav-icon" />
-                      {child.label}
-                    </a>
-                    {child.subs?.length ? (
-                      <ul class="mobile-sub-sub" role="menu">
-                        {child.subs.map((sub) => (
-                          <li role="none">
-                            <a href={sub.href} class="mobile-sub-link mobile-sub-link--mini" role="menuitem">
-                              {sub.label}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </li>
+                {(link.childGroups ?? [{ label: '', items: link.children }]).map((g) => (
+                  <>
+                    {g.label && (
+                      <li class="mobile-sub-group" role="none">
+                        <span class="mobile-sub-group__title">{g.label}</span>
+                      </li>
+                    )}
+                    {g.items.map((child) => (
+                      <li class="mobile-sub-item" role="none">
+                        <a href={child.href} class="mobile-sub-link" role="menuitem">
+                          <span class:list={['mobile-sub-media', { 'mobile-sub-media--img': child.image }]}>
+                            {child.image && (
+                              <img src={child.image} alt="" loading="lazy" class="mobile-sub-thumb" />
+                            )}
+                            <Icon name={child.icon ?? 'grid'} size={18} class="mobile-sub-icon" />
+                          </span>
+                          {child.label}
+                        </a>
+                        {child.subs?.length ? (
+                          <ul class="mobile-sub-sub" role="menu">
+                            {child.subs.map((sub) => (
+                              <li role="none">
+                                <a href={sub.href} class="mobile-sub-link mobile-sub-link--mini" role="menuitem">
+                                  {sub.label}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
+                      </li>
+                    ))}
+                  </>
                 ))}
               </ul>
             </>
@@ -977,6 +991,53 @@ const navLinks = settings.nav.map((link) => {
     transform: rotate(180deg);
   }
 
+  /* Titre de groupe dans l'accordéon mobile — reprend les groupes du
+     mega menu desktop quand ils existent dans les données. */
+  .mobile-sub-group__title {
+    display: block;
+    padding: 0.9rem 0 0.3rem 1.75rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.55;
+  }
+
+  /* Pastille média : icône par défaut ; vignette isométrique quand
+     l'enfant a une image — miroir du mega menu desktop. */
+  .mobile-sub-media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .mobile-sub-media--img {
+    width: 3.6rem;
+    height: 3.3rem;
+    padding: 0.05rem;
+    background: none;
+  }
+
+  .mobile-sub-media--img :global(.mobile-sub-icon) {
+    display: none;
+  }
+
+  .mobile-sub-thumb {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .mobile-sub-media--img .mobile-sub-thumb {
+    display: block;
+  }
+
   .mobile-sub-list {
     margin: 0;
     padding: 0 0 0.5rem;
@@ -988,7 +1049,7 @@ const navLinks = settings.nav.map((link) => {
   }
 
   .mobile-menu__item--has-sub.is-open .mobile-sub-list {
-    max-height: 38rem;
+    max-height: 44rem;
     visibility: visible;
   }
 
@@ -1032,7 +1093,8 @@ const navLinks = settings.nav.map((link) => {
   }
 
   .mobile-sub-link--mini {
-    padding-left: 3.75rem;
+    /* Aligne le libellé sur celui du parent (retrait + vignette + gap). */
+    padding-left: calc(1.75rem + 3.6rem + 0.6rem);
     font-size: 0.9rem;
     font-weight: 500;
     opacity: 0.7;
