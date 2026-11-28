@@ -1323,7 +1323,7 @@ a.sig-topbar__item:hover {
    ruban du process (clip-path biaisé, pleine largeur). */
 .sig-installs__band {
   position: absolute;
-  inset: 26% 0 14%;
+  inset: 36% 0 30%;
   background: var(--forest);
   clip-path: polygon(0 3.5rem, 100% 0.4rem, 100% calc(100% - 3.5rem), 0 100%);
   pointer-events: none;
