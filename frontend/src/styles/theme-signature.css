@@ -323,10 +323,6 @@ a.sig-topbar__item:hover {
   border-bottom-color: var(--line);
 }
 
-:root[data-theme='signature'] .mobile-menu__title {
-  color: var(--color-heading);
-}
-
 :root[data-theme='signature'] .mobile-menu__close {
   background: var(--forest-soft);
   color: var(--forest-dark);
@@ -354,9 +350,9 @@ a.sig-topbar__item:hover {
   color: var(--forest);
 }
 
-:root[data-theme='signature'] .mobile-sub-toggle:hover,
-:root[data-theme='signature'] .mobile-sub-toggle:focus-visible {
-  color: var(--forest-dark);
+/* Séparateur fin entre les entrées — comme dans le mega menu. */
+:root[data-theme='signature'] .mobile-sub-item + .mobile-sub-item {
+  border-top-color: color-mix(in srgb, var(--line) 65%, transparent);
 }
 
 /* Titres de groupes : mêmes petites capitales que le mega menu. */
@@ -1289,7 +1285,7 @@ a.sig-topbar__item:hover {
   /* Le bas du cadre sticky (100vh) est vide après la fin du ruban :
      remonte « Pourquoi choisir » pour coller sous le bandeau. */
   .sig-scrollpath.is-pinned + .sig-benefits {
-    margin-top: -22vh;
+    margin-top: -10vh;
   }
 }
 

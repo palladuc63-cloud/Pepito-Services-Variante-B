@@ -432,11 +432,14 @@ const jsonLd = [{
           }
         }
         if (mqNarrow.matches) {
-          // Étapes révélées une à une pendant la descente mobile.
-          const d0 = vh * 0.3;
-          const p = Math.min(1, Math.max(0, (vh - r.top - d0) / (r.height - d0)));
-          stepEls.forEach((el, i) =>
-            el.classList.toggle('is-on', p > i / stepEls.length + 0.02)
+          // Étapes révélées une à une pendant la descente mobile :
+          // chacune pop quand son sommet franchit ~80 % du viewport —
+          // l'animation se joue dans le champ visible, pas hors écran
+          // dès l'entrée de la piste (le scrollpath démarre au
+          // séparateur, loin au-dessus des étapes).
+          const line = vh * 0.8;
+          stepEls.forEach((el) =>
+            el.classList.toggle('is-on', el.getBoundingClientRect().top < line)
           );
         } else {
           const panE = smooth01((q - HOLD) / (PAN_END - HOLD));

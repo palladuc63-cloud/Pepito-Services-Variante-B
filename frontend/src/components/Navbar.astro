@@ -198,7 +198,9 @@ const navLinks = settings.nav.map((link) => {
 
 <div id="mobile-menu" class="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu principal" hidden>
   <div class="mobile-menu__header">
-    <span class="mobile-menu__title">Menu</span>
+    <a href={base} class="mobile-menu__brand" aria-label={`Accueil ${settings.name}`}>
+      <img src={logo.src} alt="" class="mobile-menu__logo" />
+    </a>
     <button type="button" class="mobile-menu__close" aria-label="Fermer le menu">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -209,60 +211,48 @@ const navLinks = settings.nav.map((link) => {
 
   <ul class="mobile-menu__list" role="menubar">
     {
-      navLinks.map((link, i) => (
-        <li
-          class:list={['mobile-menu__item', { 'mobile-menu__item--has-sub': link.children?.length }]}
-          role="none"
-        >
+      navLinks
+        // Accueil retiré : le logo en tête renvoie déjà à l'accueil.
+        .filter((link) => link.href !== base)
+        .map((link, i) => (
+        <li class="mobile-menu__item" role="none">
           {link.children?.length ? (
-            <>
-              <button
-                type="button"
-                class="mobile-menu__link mobile-sub-toggle"
-                aria-expanded="false"
-                aria-controls={`mobile-sub-${i}`}
-              >
-                <span class="nav-rep" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                {link.icon && <Icon name={link.icon} size={20} class="mobile-nav-icon" />}
-                {link.label}
-                <Icon name="chevron-down" size={18} class="mobile-sub-caret" />
-              </button>
-              <ul class="mobile-sub-list" id={`mobile-sub-${i}`} role="menu">
-                {(link.childGroups ?? [{ label: '', items: link.children }]).map((g) => (
-                  <>
-                    {g.label && (
-                      <li class="mobile-sub-group" role="none">
-                        <span class="mobile-sub-group__title">{g.label}</span>
-                      </li>
-                    )}
-                    {g.items.map((child) => (
-                      <li class="mobile-sub-item" role="none">
-                        <a href={child.href} class="mobile-sub-link" role="menuitem">
-                          <span class:list={['mobile-sub-media', { 'mobile-sub-media--img': child.image }]}>
-                            {child.image && (
-                              <img src={child.image} alt="" loading="lazy" class="mobile-sub-thumb" />
-                            )}
-                            <Icon name={child.icon ?? 'grid'} size={18} class="mobile-sub-icon" />
-                          </span>
-                          {child.label}
-                        </a>
-                        {child.subs?.length ? (
-                          <ul class="mobile-sub-sub" role="menu">
-                            {child.subs.map((sub) => (
-                              <li role="none">
-                                <a href={sub.href} class="mobile-sub-link mobile-sub-link--mini" role="menuitem">
-                                  {sub.label}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : null}
-                      </li>
-                    ))}
-                  </>
-                ))}
-              </ul>
-            </>
+            // Services dépliés d'office — mis en avant, pas d'accordéon.
+            <ul class="mobile-sub-list" role="menu" aria-label={link.label}>
+              {(link.childGroups ?? [{ label: '', items: link.children }]).map((g) => (
+                <>
+                  {g.label && (
+                    <li class="mobile-sub-group" role="none">
+                      <span class="mobile-sub-group__title">{g.label}</span>
+                    </li>
+                  )}
+                  {g.items.map((child) => (
+                    <li class="mobile-sub-item" role="none">
+                      <a href={child.href} class="mobile-sub-link" role="menuitem">
+                        <span class:list={['mobile-sub-media', { 'mobile-sub-media--img': child.image }]}>
+                          {child.image && (
+                            <img src={child.image} alt="" loading="lazy" class="mobile-sub-thumb" />
+                          )}
+                          <Icon name={child.icon ?? 'grid'} size={18} class="mobile-sub-icon" />
+                        </span>
+                        {child.label}
+                      </a>
+                      {child.subs?.length ? (
+                        <ul class="mobile-sub-sub" role="menu">
+                          {child.subs.map((sub) => (
+                            <li role="none">
+                              <a href={sub.href} class="mobile-sub-link mobile-sub-link--mini" role="menuitem">
+                                {sub.label}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </li>
+                  ))}
+                </>
+              ))}
+            </ul>
           ) : (
             <a
               href={link.href}
@@ -336,17 +326,6 @@ const navLinks = settings.nav.map((link) => {
           item.classList.toggle('is-open', willOpen);
           ddParent.setAttribute('aria-expanded', String(willOpen));
         }
-        return;
-      }
-
-      const subToggle = el.closest('.mobile-sub-toggle');
-      if (subToggle) {
-        const item = subToggle.closest('.mobile-menu__item--has-sub');
-        item?.classList.toggle('is-open');
-        subToggle.setAttribute(
-          'aria-expanded',
-          String(item?.classList.contains('is-open') ?? false)
-        );
         return;
       }
 
@@ -529,20 +508,25 @@ const navLinks = settings.nav.map((link) => {
   }
 
   .mobile-menu__header {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   }
 
-  .mobile-menu__title {
-    font-size: 1.5rem;
-    font-weight: 700;
+  .mobile-menu__logo {
+    height: 3.25rem;
+    width: auto;
   }
 
   .mobile-menu__close {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -967,31 +951,12 @@ const navLinks = settings.nav.map((link) => {
     padding-left: 1.35rem;
   }
 
-  /* ─── Sous-menu mobile (accordéon) ─── */
-  .mobile-sub-toggle {
-    display: flex;
-    width: 100%;
-    text-align: left;
-    background: none;
-    border: none;
-    cursor: pointer;
+  /* ─── Sous-menu mobile : services dépliés d'office (mis en avant) ─── */
+  .mobile-menu__brand {
+    display: inline-flex;
   }
 
-  .mobile-sub-toggle:hover,
-  .mobile-sub-toggle:focus-visible {
-    color: var(--color-sand);
-  }
-
-  .mobile-sub-toggle :global(.mobile-sub-caret) {
-    margin-left: auto;
-    transition: transform 0.2s ease;
-  }
-
-  .mobile-menu__item--has-sub.is-open .mobile-sub-toggle :global(.mobile-sub-caret) {
-    transform: rotate(180deg);
-  }
-
-  /* Titre de groupe dans l'accordéon mobile — reprend les groupes du
+  /* Titre de groupe du sous-menu — reprend les groupes du
      mega menu desktop quand ils existent dans les données. */
   .mobile-sub-group__title {
     display: block;
@@ -1042,35 +1007,11 @@ const navLinks = settings.nav.map((link) => {
     margin: 0;
     padding: 0 0 0.5rem;
     list-style: none;
-    max-height: 0;
-    overflow: hidden;
-    visibility: hidden;
-    transition: max-height 0.28s ease, visibility 0.28s ease;
   }
 
-  .mobile-menu__item--has-sub.is-open .mobile-sub-list {
-    max-height: 44rem;
-    visibility: visible;
-  }
-
-  /* Hauteur intrinsèque quand le navigateur supporte interpolate-size
-     (Chrome/Edge 129+) ; le max-height ci-dessus reste le fallback. */
-  @supports (interpolate-size: allow-keywords) {
-    .mobile-menu {
-      interpolate-size: allow-keywords;
-    }
-
-    .mobile-sub-list {
-      max-height: none;
-      block-size: 0;
-      transition: block-size 0.28s ease, visibility 0.28s ease;
-    }
-
-    .mobile-menu__item--has-sub.is-open .mobile-sub-list {
-      max-height: none;
-      block-size: auto;
-      visibility: visible;
-    }
+  /* Séparateur fin entre les entrées — comme dans le mega menu. */
+  .mobile-sub-item + .mobile-sub-item {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .mobile-sub-link {
