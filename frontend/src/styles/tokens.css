@@ -317,4 +317,8 @@
   --signal-dark: var(--forest-dark);
   --signal-light: #5e9064;
   --signal-soft: var(--forest-soft);
+
+  /* Typo : titres/sous-titres en Poppins partout (comme les
+     .section-title) — écrase le --font-display Bricolage du :root. */
+  --font-display: var(--font-poppins), 'Poppins', system-ui, sans-serif;
 }
