@@ -581,9 +581,37 @@ const jsonLd = [{
         installPath.querySelectorAll<HTMLElement>('.project-card')
       );
       const insMore = installPath.querySelector<HTMLElement>('.sig-installs__more');
-      const sm01 = (t: number) => {
-        const c = Math.min(1, Math.max(0, t));
-        return c * c * (3 - 2 * c);
+      const insSection = installPath.querySelector<HTMLElement>('.sig-installs');
+      // Paliers de glisse du bandeau : [q de pop, progression] — le
+      // bord vert arrive sur chaque card au moment où elle pop, comme
+      // les étapes du process (pas de rectangle vide qui traverse).
+      let insKnots: Array<[number, number]> = [];
+
+      const measureI = () => {
+        if (mqNarrowI.matches || !insSection || !insCards.length) return;
+        const pr = insSection.getBoundingClientRect();
+        insKnots = [[0, 0]];
+        insCards.forEach((el, i) => {
+          const qi = 0.34 + i * 0.18;
+          const sr = el.getBoundingClientRect();
+          const tx = (sr.right - pr.left) / pr.width + 0.02;
+          insKnots.push([qi, Math.min(1, (tx * 100 + 6) / 106)]);
+        });
+        insKnots.push([0.86, 1]);
+      };
+
+      const bandAtI = (qq: number) => {
+        const k = insKnots;
+        if (!k.length) return Math.min(1, qq);
+        if (qq <= k[0][0]) return k[0][1];
+        for (let i = 1; i < k.length; i++) {
+          if (qq <= k[i][0]) {
+            const [q0, b0] = k[i - 1];
+            const [q1, b1] = k[i];
+            return b0 + ((qq - q0) / (q1 - q0)) * (b1 - b0);
+          }
+        }
+        return k[k.length - 1][1];
       };
 
       const drawI = () => {
@@ -593,10 +621,10 @@ const jsonLd = [{
         if (mqNarrowI.matches || mqReducedI.matches) {
           insBand.style.transform = '';
         } else {
-          // Glisse sur le premier ~38 % du gel, le long de sa propre
-          // pente (compensation 3.3rem ≈ 3.1rem de pente × 1.06) pour
-          // que le bord biaisé reste à niveau pendant le mouvement.
-          const bp = sm01(q / 0.38);
+          // Glisse depuis la gauche au rythme des pops, le long de sa
+          // propre pente (compensation 3.3rem ≈ 3.1rem de pente × 1.06)
+          // pour que le bord biaisé reste à niveau pendant le mouvement.
+          const bp = bandAtI(q);
           insBand.style.transform = `translate3d(${(-106 * (1 - bp)).toFixed(1)}%, ${(3.3 * (1 - bp)).toFixed(2)}rem, 0)`;
         }
         if (mqNarrowI.matches) {
@@ -607,8 +635,8 @@ const jsonLd = [{
           if (insMore)
             insMore.classList.toggle('is-on', insMore.getBoundingClientRect().top < line);
         } else {
-          // Pops après la glisse du bandeau : cards à q=0.34/0.52/0.70,
-          // CTA à 0.86 — il reste de la marge avant la libération.
+          // Pop à seuil : la card apparaît quand la bande vient de la
+          // couvrir — CTA à 0.86, marge avant la libération.
           insCards.forEach((el, i) =>
             el.classList.toggle('is-on', q >= 0.34 + i * 0.18)
           );
@@ -626,6 +654,7 @@ const jsonLd = [{
           if (insMore) insMore.classList.remove('is-on');
           return;
         }
+        measureI();
         drawI();
       };
 
