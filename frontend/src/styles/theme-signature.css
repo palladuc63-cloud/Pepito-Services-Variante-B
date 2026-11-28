@@ -809,7 +809,12 @@ a.sig-topbar__item:hover {
 .sig-about.is-in .sig-about__photo,
 .sig-about.is-in .sig-about__title,
 .sig-about.is-in .sig-about__body p,
-.sig-about.is-in .sig-about__facts li {
+.sig-about.is-in .sig-about__facts li,
+/* Mobile : .is-in posé par le JS directement sur chaque enfant. */
+.sig-about.rv .sig-about__photo.is-in,
+.sig-about.rv .sig-about__title.is-in,
+.sig-about.rv .sig-about__body p.is-in,
+.sig-about.rv .sig-about__facts li.is-in {
   opacity: 1;
   transform: none;
 }

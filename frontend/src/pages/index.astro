@@ -493,24 +493,35 @@ const jsonLd = [{
     // titre du process (une fois ; reduced-motion → pas de masquage).
     const mqReducedRv = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (!mqReducedRv.matches) {
-      const rvEls = ['.sig-about']
-        .map((sel) => document.querySelector<HTMLElement>(sel))
-        .filter((el): el is HTMLElement => el !== null);
-      if (rvEls.length > 0) {
-        const io = new IntersectionObserver(
+      // Présentation : desktop → cascade quand 20 % de la section est
+      // visible ; mobile (section plus haute que l'écran) → chaque
+      // élément se révèle quand son haut franchit ~60 % du viewport,
+      // comme les étapes du process.
+      const aboutRv = document.querySelector<HTMLElement>('.sig-about');
+      if (aboutRv) {
+        aboutRv.classList.add('rv');
+        const mqNarrowRv = window.matchMedia('(max-width: 899px)');
+        const ioRv = new IntersectionObserver(
           (entries) => {
             for (const entry of entries) {
               if (entry.isIntersecting) {
                 entry.target.classList.add('is-in');
-                io.unobserve(entry.target);
+                ioRv.unobserve(entry.target);
               }
             }
           },
-          { threshold: 0.2 }
+          mqNarrowRv.matches
+            ? { threshold: 0, rootMargin: '0px 0px -40% 0px' }
+            : { threshold: 0.2 }
         );
-        for (const el of rvEls) {
-          el.classList.add('rv');
-          io.observe(el);
+        if (mqNarrowRv.matches) {
+          aboutRv
+            .querySelectorAll<HTMLElement>(
+              '.sig-about__photo, .sig-about__title, .sig-about__body p, .sig-about__facts li'
+            )
+            .forEach((el) => ioRv.observe(el));
+        } else {
+          ioRv.observe(aboutRv);
         }
       }
 
