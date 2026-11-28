@@ -1028,6 +1028,14 @@ a.sig-topbar__item:hover {
   will-change: transform;
 }
 
+/* Mobile : le bandeau prend la largeur du contenu (marges du
+   container) au lieu de déborder plein écran. */
+@media (max-width: 899px) {
+  .sig-band {
+    inset: 0 1rem;
+  }
+}
+
 /* Le contenu passe au-dessus du bandeau (positionné aussi, ordre DOM). */
 .sig-process .container {
   position: relative;
