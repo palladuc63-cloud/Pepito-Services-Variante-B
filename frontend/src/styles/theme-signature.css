@@ -764,8 +764,6 @@ a.sig-topbar__item:hover {
 
 .sig-about__title {
   text-align: left;
-  /* Respiration entre le titre et le texte de présentation. */
-  margin-bottom: 5vh;
 }
 
 .sig-about__body p {
@@ -817,7 +815,10 @@ a.sig-topbar__item:hover {
 }
 
 /* Cascade : photo, titre, paragraphes, badges. */
-.sig-about.rv .sig-about__title { transition-delay: 0.07s; }
+.sig-about.rv .sig-about__title {
+  transition-delay: 0.07s;
+  margin-bottom: 3vh;
+}
 .sig-about.rv .sig-about__body p:nth-of-type(1) { transition-delay: 0.14s; }
 .sig-about.rv .sig-about__body p:nth-of-type(2) { transition-delay: 0.21s; }
 .sig-about.rv .sig-about__facts li:nth-child(1) { transition-delay: 0.28s; }
@@ -1069,13 +1070,15 @@ a.sig-topbar__item:hover {
 .sig-step {
   display: flex;
   gap: 1rem;
-  align-items: flex-start;
+  /* Texte centré verticalement face à la vignette. */
+  align-items: center;
 }
 
 @media (min-width: 900px) {
   .sig-step {
     flex-direction: column;
     gap: 0;
+    align-items: flex-start;
   }
 }
 

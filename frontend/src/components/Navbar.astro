@@ -212,14 +212,14 @@ const navLinks = settings.nav.map((link) => {
   <ul class="mobile-menu__list" role="menubar">
     {
       navLinks
-        // Accueil retiré : le logo en tête renvoie déjà à l'accueil.
-        .filter((link) => link.href !== base)
-        .map((link, i) => (
+        // Accueil retiré (le logo en tête renvoie à l'accueil) et
+        // entrées simples retirées aussi (Réalisations…) : le burger ne
+        // liste que les services dépliés, puis le bouton devis.
+        .filter((link) => link.href !== base && link.children?.length)
+        .map((link) => (
         <li class="mobile-menu__item" role="none">
-          {link.children?.length ? (
-            // Services dépliés d'office — mis en avant, pas d'accordéon.
             <ul class="mobile-sub-list" role="menu" aria-label={link.label}>
-              {(link.childGroups ?? [{ label: '', items: link.children }]).map((g) => (
+              {(link.childGroups ?? [{ label: '', items: link.children ?? [] }]).map((g) => (
                 <>
                   {g.label && (
                     <li class="mobile-sub-group" role="none">
@@ -253,18 +253,6 @@ const navLinks = settings.nav.map((link) => {
                 </>
               ))}
             </ul>
-          ) : (
-            <a
-              href={link.href}
-              class="mobile-menu__link"
-              aria-current={link.isActive ? 'page' : undefined}
-              role="menuitem"
-            >
-              <span class="nav-rep" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-              {link.icon && <Icon name={link.icon} size={20} class="mobile-nav-icon" />}
-              {link.label}
-            </a>
-          )}
         </li>
       ))
     }
