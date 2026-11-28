@@ -21,6 +21,7 @@ import type { Project, Service } from '../data/types';
 const { settings, services, slides } = await getSite();
 const projects = await getProjects();
 const previewProjects = projects.slice(0, 3);
+const carouselProjects = projects.slice(0, 9);
 const base = import.meta.env.BASE_URL;
 
 // Le contenu « Signature » (hero, activités, arguments, processus) est
@@ -301,8 +302,18 @@ const jsonLd = [{
             <div class="sig-installs__band" aria-hidden="true"></div>
             <div class="container">
               <h2 class="sig-title">{sig.installsTitle}</h2>
-              <div class="projects-grid-preview">
-                {previewProjects.map((project: Project) => <ProjectCard project={project} />)}
+              <div class="sig-carousel">
+                <button type="button" class="sig-carousel__btn sig-carousel__btn--prev" aria-label="Réalisations précédentes" disabled>
+                  <Icon name="chevron-left" size={22} />
+                </button>
+                <div class="sig-carousel__vp">
+                  <div class="sig-carousel__track">
+                    {carouselProjects.map((project: Project) => <ProjectCard project={project} />)}
+                  </div>
+                </div>
+                <button type="button" class="sig-carousel__btn sig-carousel__btn--next" aria-label="Réalisations suivantes">
+                  <Icon name="chevron-right" size={22} />
+                </button>
               </div>
               <div class="sig-installs__more">
                 <a href={`${base}realisations/`} class="sig-btn sig-btn--primary"><span>Voir toutes les réalisations</span><Icon name="move-right" size={16} class="cta-arrow" /></a>
@@ -629,6 +640,52 @@ const jsonLd = [{
       let doneI = false;
       let lastYI = window.scrollY;
 
+      // Carrousel : glisse carte par carte, stop aux extrémités.
+      // .is-ready révèle les flèches (séquence jouée ou 1re card mobile).
+      const carVp = installPath.querySelector<HTMLElement>('.sig-carousel__vp');
+      const carTrack = installPath.querySelector<HTMLElement>('.sig-carousel__track');
+      const prevBtn = installPath.querySelector<HTMLButtonElement>('.sig-carousel__btn--prev');
+      const nextBtn = installPath.querySelector<HTMLButtonElement>('.sig-carousel__btn--next');
+      let carIdx = 0;
+      const carPerView = () =>
+        window.innerWidth < 640 ? 1 : window.innerWidth < 1024 ? 2 : 3;
+      const carMax = () => Math.max(0, insCards.length - carPerView());
+      const carApply = () => {
+        if (!carTrack || !prevBtn || !nextBtn) return;
+        const gap = parseFloat(getComputedStyle(carTrack).gap) || 0;
+        const step = (insCards[0]?.getBoundingClientRect().width ?? 0) + gap;
+        carTrack.style.transform = `translate3d(${(-carIdx * step).toFixed(1)}px, 0, 0)`;
+        prevBtn.disabled = carIdx <= 0;
+        nextBtn.disabled = carIdx >= carMax();
+      };
+      prevBtn?.addEventListener('click', () => {
+        if (carIdx > 0) {
+          carIdx--;
+          carApply();
+        }
+      });
+      nextBtn?.addEventListener('click', () => {
+        if (carIdx < carMax()) {
+          carIdx++;
+          carApply();
+        }
+      });
+      // Swipe tactile : delta > 40px → carte suivante/précédente.
+      let swipeX: number | null = null;
+      carVp?.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'mouse') swipeX = e.clientX;
+      });
+      window.addEventListener('pointerup', (e) => {
+        if (swipeX === null) return;
+        const dx = e.clientX - swipeX;
+        swipeX = null;
+        if (Math.abs(dx) > 40) {
+          if (dx < 0 && carIdx < carMax()) carIdx++;
+          else if (dx > 0 && carIdx > 0) carIdx--;
+          carApply();
+        }
+      });
+
       const measureI = () => {
         if (mqNarrowI.matches || !insSection || !insCards.length) return;
         const pr = insSection.getBoundingClientRect();
@@ -699,14 +756,21 @@ const jsonLd = [{
               'is-on',
               insMore.classList.contains('is-on') || insMore.getBoundingClientRect().top < line
             );
+          // Mobile : flèches révélées dès que la rangée de cards a pop.
+          if (insCards.some((el) => el.classList.contains('is-on')))
+            installPath.classList.add('is-ready');
         } else {
           // Pop à seuil : la card apparaît quand la bande vient de la
-          // couvrir — CTA à 0.86, marge avant la libération. Séquence
-          // finie (doneI) : tout reste affiché en remontant.
+          // couvrir — CTA à 0.86, marge avant la libération. À partir de
+          // ready tout reste affiché (les cards hors champ du carrousel
+          // doivent pouvoir glisser visibles).
+          const ready =
+            doneI || installPath.classList.contains('is-ready') || q >= 0.86;
+          if (ready) installPath.classList.add('is-ready');
           insCards.forEach((el, i) =>
-            el.classList.toggle('is-on', doneI || q >= 0.34 + i * 0.18)
+            el.classList.toggle('is-on', ready || q >= 0.34 + i * 0.18)
           );
-          if (insMore) insMore.classList.toggle('is-on', doneI || q >= 0.86);
+          if (insMore) insMore.classList.toggle('is-on', ready);
         }
       };
 
@@ -721,6 +785,8 @@ const jsonLd = [{
           return;
         }
         measureI();
+        carIdx = Math.min(carIdx, carMax());
+        carApply();
         drawI();
       };
 

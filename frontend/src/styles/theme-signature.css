@@ -1333,8 +1333,107 @@ a.sig-topbar__item:hover {
   position: relative;
 }
 
-.sig-installs .projects-grid-preview {
+.sig-installs .sig-carousel {
   margin-top: 2.5rem;
+}
+
+/* Carrousel : viewport masqué horizontalement, piste flex qui glisse
+   carte par carte (transform piloté par le JS), flèches révélées quand
+   la section est prête (.is-ready). */
+.sig-carousel {
+  position: relative;
+}
+
+.sig-carousel__vp {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+.sig-carousel__track {
+  display: flex;
+  gap: var(--space-6, 1.5rem);
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+  will-change: transform;
+}
+
+.sig-carousel__track > .project-card {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .sig-carousel__track > .project-card {
+    flex-basis: calc((100% - var(--space-6, 1.5rem)) / 2);
+  }
+}
+
+@media (min-width: 1024px) {
+  .sig-carousel__track > .project-card {
+    flex-basis: calc((100% - 2 * var(--space-6, 1.5rem)) / 3);
+  }
+}
+
+.sig-carousel__btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: var(--forest);
+  color: var(--paper);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 10px 22px -10px rgba(20, 40, 26, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.3s ease,
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.sig-installpath.is-ready .sig-carousel__btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sig-carousel__btn:hover {
+  background: var(--forest-dark);
+  transform: translateY(-50%) scale(1.07);
+}
+
+.sig-carousel__btn:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.sig-carousel__btn--prev {
+  left: -1.5rem;
+}
+
+.sig-carousel__btn--next {
+  right: -1.5rem;
+}
+
+/* Sur mobile : flèches à l'intérieur des bords (pas de marge). */
+@media (max-width: 899px) {
+  .sig-carousel__btn--prev {
+    left: 0.5rem;
+  }
+  .sig-carousel__btn--next {
+    right: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sig-carousel__track {
+    transition: none;
+  }
 }
 
 .sig-installs__more {
@@ -1383,12 +1482,12 @@ a.sig-topbar__item:hover {
 
 /* .is-anim masque cards + CTA (pop au scroll, rebond sig-benefit-pop) ;
    sans .is-anim tout reste visible normalement. */
-.sig-installpath.is-anim .projects-grid-preview .project-card,
+.sig-installpath.is-anim .sig-carousel__track .project-card,
 .sig-installpath.is-anim .sig-installs__more {
   opacity: 0;
 }
 
-.sig-installpath.is-anim .projects-grid-preview .project-card.is-on {
+.sig-installpath.is-anim .sig-carousel__track .project-card.is-on {
   animation: sig-benefit-pop 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
