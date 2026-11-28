@@ -7,6 +7,27 @@
   les liens. Pour marquer un élément actif, préférer `border-bottom`
   ou la couleur plutôt que `text-decoration: underline`.
 
+## Blocs de contenu éditables (BO → Contenu)
+
+Système calqué sur AL-Metallerie, pensé pour être générique (réutilisable
+sur les autres sites artisans) : table `content_blocks`
+(`page_key`/`zone`/`block_key`/`type text|html|image`/`value`/`sort_order`).
+
+- **Frontend** : `frontend/src/lib/blocks.js` — `getBlocksMap()` +
+  `blockText(map, key, fallback)` (lookup texte avec défaut code) +
+  `substitute()` pour les tokens `{{block_key}}`. La homepage câble ses
+  textes via `T('home.*', défaut)` dans `index.astro` — bloc absent ou
+  vide = texte du code, jamais de page cassée.
+- **API** : `GET /api/public/blocks` (tout, petit volume, cache ~30 s
+  côté fetchJson) ; CRUD `/api/admin/content-blocks`
+  (list `?page=`, POST clé auto `page.zone.slug`, PUT reorder/:id, DELETE).
+- **Seed** : `backend/src/scripts/seed.js` crée la table + les ~30 blocs
+  `home.*` (zone `_`, type `text`). Rejouer le seed est idempotent —
+  nouveaux textes éditables = ajouter des lignes à `homeBlocks` + un
+  `T('clé', …)` dans la page.
+- **BO** : onglet « Contenu » (`dashboard.astro`) — sélecteur de page,
+  blocs groupés par zone, édition inline, + bloc, ↑↓ pour les blocs html.
+
 ## Assistant SAV du back-office
 
 Widget d'aide intégré au BO (bouton « ? » en bas à droite du dashboard
