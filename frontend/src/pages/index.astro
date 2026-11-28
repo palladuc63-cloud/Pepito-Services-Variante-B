@@ -364,8 +364,10 @@ const jsonLd = [{
       // bord vert arrive sur chaque étape au moment où elle pop.
       let bandKnots: Array<[number, number]> = [];
       // Jouée une seule fois : la séquence terminée reste figée à l'état
-      // final même en remontant la piste (pas de lecture inversée).
+      // final même en remontant la piste (pas de lecture inversée), et
+      // la piste est sautée au scroll (plus de traversée « morte »).
       let doneP = false;
+      let lastYP = window.scrollY;
 
       // Position de mise en page du ruban dans le bloc inner (offsetTop)
       // : constante, insensible au translateY du pan.
@@ -428,6 +430,23 @@ const jsonLd = [{
         const vh = window.innerHeight;
         const q = Math.min(1, Math.max(0, -r.top / (r.height - vh)));
         if (!doneP && q >= 0.95) doneP = true;
+        // Séquence terminée : la piste devient transparente au scroll —
+        // entrer dedans dans un sens ressort de l'autre côté, sinon le
+        // gel consomme ~180vh de scroll sans rien faire bouger. La
+        // direction est suivie à chaque événement (pas seulement après
+        // le verrou) sinon la 1re remontée partirait dans le mauvais sens.
+        const yNow = window.scrollY;
+        const goingDown = yNow > lastYP;
+        lastYP = yNow;
+        if (doneP && !mqNarrow.matches && !mqReducedPath.matches) {
+          const docTop = yNow + r.top;
+          const trackEnd = docTop + r.height - vh;
+          if (goingDown && yNow > docTop + 4 && yNow < trackEnd) {
+            window.scrollTo({ top: trackEnd + 4, behavior: 'instant' });
+          } else if (!goingDown && yNow < trackEnd - 4 && yNow > docTop) {
+            window.scrollTo({ top: docTop - 4, behavior: 'instant' });
+          }
+        }
         // Le bandeau glisse depuis la gauche pendant tout le gel, le
         // long de sa propre pente : la compensation verticale (4.3rem
         // = pente du bord ~4.05rem × 1.06 de course) annule la dérive
@@ -605,8 +624,10 @@ const jsonLd = [{
       // bord vert arrive sur chaque card au moment où elle pop, comme
       // les étapes du process (pas de rectangle vide qui traverse).
       let insKnots: Array<[number, number]> = [];
-      // Jouée une seule fois : séquence terminée = état final figé.
+      // Jouée une seule fois : séquence terminée = état final figé +
+      // piste sautée au scroll (pas de traversée « morte »).
       let doneI = false;
+      let lastYI = window.scrollY;
 
       const measureI = () => {
         if (mqNarrowI.matches || !insSection || !insCards.length) return;
@@ -640,6 +661,20 @@ const jsonLd = [{
         const vh = window.innerHeight;
         const q = Math.min(1, Math.max(0, -r.top / (r.height - vh)));
         if (!doneI && q >= 0.9) doneI = true;
+        // Séquence terminée : la piste est sautée au scroll — entrer
+        // dedans ressort de l'autre côté (comme le scrollpath).
+        const yNow = window.scrollY;
+        const goingDown = yNow > lastYI;
+        lastYI = yNow;
+        if (doneI && !mqNarrowI.matches && !mqReducedI.matches) {
+          const docTop = yNow + r.top;
+          const trackEnd = docTop + r.height - vh;
+          if (goingDown && yNow > docTop + 4 && yNow < trackEnd) {
+            window.scrollTo({ top: trackEnd + 4, behavior: 'instant' });
+          } else if (!goingDown && yNow < trackEnd - 4 && yNow > docTop) {
+            window.scrollTo({ top: docTop - 4, behavior: 'instant' });
+          }
+        }
         if (mqNarrowI.matches || mqReducedI.matches) {
           insBand.style.transform = '';
         } else {
