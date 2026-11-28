@@ -6,6 +6,8 @@ import Section from '../components/Section.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import logo from '../assets/pepito-logo.svg';
+import atelierImg from '../assets/atelier-thiers.jpg';
+import { Image } from 'astro:assets';
 import Icon from '../components/Icon.astro';
 import { signature } from '../data/signature';
 import { ICONS } from '../lib/icons';
@@ -182,9 +184,15 @@ const jsonLd = [{
             <li><Icon name="check" size={13} />Devis gratuit</li>
           </ul>
         </div>
-        <div class="sig-about__photo" aria-hidden="true">
-          <Icon name="building" size={30} />
-          <span>Photo de nos ateliers — à venir</span>
+        <div class="sig-about__photo">
+          <Image
+            src={atelierImg}
+            alt="Les ateliers Pépito Services à Thiers, dans le Livradois-Forez"
+            widths={[640, 1024]}
+            sizes="(min-width: 900px) 42vw, 92vw"
+            format="webp"
+            loading="lazy"
+          />
         </div>
       </div>
     </section>
