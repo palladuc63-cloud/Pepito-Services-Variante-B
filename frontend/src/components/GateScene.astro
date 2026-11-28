@@ -267,7 +267,12 @@ const videoSrc = `${import.meta.env.BASE_URL}gate/gate-scroll.mp4`;
     const tick = () => {
       raf = 0;
       if (video.readyState >= 2 && video.duration > 0) {
-        const t = target * video.duration;
+        // Plafond à duration - 0.05 : seeker exactement sur la fin
+        // passe la vidéo en « ended » → frame noire sur mobile.
+        const t = Math.min(
+          target * video.duration,
+          Math.max(0, video.duration - 0.05)
+        );
         // Seek uniquement si l'écart dépasse ~1 frame : la vidéo est
         // encodée avec une keyframe tous les 6 frames, les seeks sont
         // quasi instantanés mais on évite le travail inutile.
