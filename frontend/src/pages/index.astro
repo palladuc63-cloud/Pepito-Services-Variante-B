@@ -240,9 +240,9 @@ const jsonLd = [{
           <section class="sig-process">
       <div class="sig-band" aria-hidden="true"></div>
       <div class="container">
-        <div class="sig-arms" aria-hidden="true">
-          {sig.steps.map(() => <span class="sig-step__arm" />)}
-        </div>
+        <svg class="sig-arms" aria-hidden="true">
+          {sig.steps.map(() => <path class="sig-step__arm" />)}
+        </svg>
         <ol class="sig-steps">
           {sig.steps.map((s, i) => (
             <li class="sig-step">
@@ -369,7 +369,7 @@ const jsonLd = [{
       const procEl = scrollPath.querySelector<HTMLElement>('.sig-process');
       const armsEl = scrollPath.querySelector<HTMLElement>('.sig-arms');
       const armEls = stepEls.map((_, i) =>
-        armsEl?.querySelectorAll<HTMLElement>('.sig-step__arm').item(i) ?? null
+        armsEl?.querySelectorAll<SVGPathElement>('.sig-step__arm').item(i) ?? null
       );
       // Phases de la vue épinglée : pan du contenu quasi immédiat et
       // court, puis les pops démarrent PENDANT que le bloc finit de se
@@ -387,6 +387,7 @@ const jsonLd = [{
       let tipKnots: Array<[number, number]> = [];
       let iconYs: number[] = [];
       let armLeads: number[] = [];
+      let armLens: number[] = [];
       let procH = 0;
       // Jouée une seule fois : la séquence terminée reste figée à l'état
       // final même en remontant la piste (pas de lecture inversée), et
@@ -471,12 +472,18 @@ const jsonLd = [{
         tipKnots = [];
         iconYs = [];
         armLeads = [];
+        armLens = [];
         // Rien de tracé tant que le haut de la section n'atteint pas
         // ~30 % du viewport : la pointe part alors de 0 et descend à
         // l'écran — chaque icône est connectée quand son centre arrive
         // sur sa ligne cible, de 45 % (1re) à 75 % (dernière).
         const procPathY = layoutPos(procEl, scrollPath).y;
         const qStart = Math.max(0, (procPathY - vh * 0.3) / span);
+        // Axe de la spine en coordonnées du container : la bande
+        // (géométrie dans .sig-process) occupe -0.5rem..1rem relatif à
+        // la section → centre +0.25rem.
+        const cx = 4 - layoutPos(containerEl, procEl).x;
+        const R = 22;
         const n = stepEls.length;
         let startY = 0;
         const iconKnots: Array<[number, number]> = [];
@@ -500,13 +507,22 @@ const jsonLd = [{
           } else {
             iconKnots.push([Math.min(1, qi), y]);
           }
-          // Bras : trait fin depuis la spine (-1rem) jusqu'au bord
-          // droit de l'icône + léger dépassement. Le container sert de
-          // repère : .sig-arms le couvre en inset:0.
+          // Bras : tracé continu — départ dans l'axe de la spine au
+          // haut de l'icône (la pointe y est au début du déploiement),
+          // descente, quart de cercle vers la droite puis glisse sous
+          // l'icône jusqu'à son bord droit + léger dépassement.
           const mCont = layoutPos(marker, containerEl);
-          arm.style.setProperty('--arm-y', `${Math.round(mCont.y + marker.offsetHeight / 2)}px`);
-          arm.style.setProperty('--arm-w', `${Math.round(16 + mCont.x + marker.offsetWidth + 6)}px`);
-          arm.style.setProperty('--arm-h', '1rem');
+          const yC = mCont.y + marker.offsetHeight / 2;
+          const endX = mCont.x + marker.offsetWidth + 6;
+          arm.setAttribute(
+            'd',
+            `M ${cx} ${mCont.y} L ${cx} ${yC - R} ` +
+              `A ${R} ${R} 0 0 0 ${cx + R} ${yC} L ${endX} ${yC}`
+          );
+          const L = arm.getTotalLength();
+          armLens[i] = L;
+          arm.style.strokeDasharray = `${L}px`;
+          arm.style.strokeDashoffset = `${L}px`;
         });
         iconKnots.sort((a, b) => a[0] - b[0]);
         tipKnots = [[qStart, startY], ...iconKnots];
@@ -578,8 +594,11 @@ const jsonLd = [{
               iy === undefined
                 ? 1
                 : Math.min(1, Math.max(0, (tip - (iy - lead)) / lead));
-            if (!mqReducedPath.matches) {
-              armEls[i]?.style.setProperty('--arm-p', p.toFixed(3));
+            if (!mqReducedPath.matches && armLens[i]) {
+              armEls[i]?.style.setProperty(
+                'stroke-dashoffset',
+                `${(armLens[i] * (1 - p)).toFixed(1)}px`
+              );
             }
             el.classList.toggle(
               'is-on',

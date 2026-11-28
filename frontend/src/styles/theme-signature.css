@@ -1124,32 +1124,29 @@ a.sig-topbar__item:hover {
   counter-reset: sigstep;
 }
 
-/* Bras horizontaux de la spine (mobile) : trait fin qui part du
-   bord gauche et se déploie sous chaque icône — géométrie posée
-   par le JS (--arm-y/--arm-w/--arm-h), déploiement --arm-p 0→1.
-   Overlay indépendant des <li> : l'opacité masquée des étapes ne
-   doit pas cacher le bras pendant son extension. */
+/* Bras de la spine (mobile) : tracé SVG continu — chaque path part
+   dans l'axe de la spine, descend, arrondit en quart de cercle puis
+   glisse sous l'icône. Le déploiement est piloté en stroke-dashoffset
+   par le JS : le trait émane de la pointe, un seul bandeau qui tourne.
+   Overlay indépendant des <li> : l'opacité masquée des étapes ne doit
+   pas cacher le bras pendant son extension. */
 .sig-arms {
   display: none;
 }
 
 @media (max-width: 899px) {
-  .sig-arms {
+  .sig-scrollpath.is-anim .sig-arms {
     display: block;
     position: absolute;
     inset: 0;
+    overflow: visible;
     pointer-events: none;
   }
   .sig-step__arm {
-    position: absolute;
-    left: -1rem;
-    top: var(--arm-y, 50%);
-    width: var(--arm-w, 9rem);
-    height: var(--arm-h, 1rem);
-    background: var(--forest);
-    border-radius: 0 999px 999px 0;
-    transform: translateY(-50%) scaleX(var(--arm-p, 0));
-    transform-origin: left center;
+    fill: none;
+    stroke: var(--forest);
+    stroke-width: 16;
+    stroke-linecap: round;
   }
   .sig-step__marker {
     z-index: 1;
