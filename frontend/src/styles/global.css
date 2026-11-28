@@ -617,3 +617,9 @@ body .j-cta,
 body .j-msg.user {
   background-color: var(--forest);
 }
+
+/* Widget chat masqué quand le burger est déployé — le :has() donne
+   la spécificité nécessaire face au style injecté par janus.js. */
+body:has(#mobile-menu:not([hidden])) :is(#janus-btn, #janus-panel, #janus-overlay) {
+  display: none;
+}

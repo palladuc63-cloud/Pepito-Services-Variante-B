@@ -233,7 +233,7 @@ const navLinks = settings.nav.map((link) => {
                           {child.image && (
                             <img src={child.image} alt="" loading="lazy" class="mobile-sub-thumb" />
                           )}
-                          <Icon name={child.icon ?? 'grid'} size={18} class="mobile-sub-icon" />
+                          <Icon name={child.icon ?? 'grid'} size={27} class="mobile-sub-icon" />
                         </span>
                         {child.label}
                       </a>
@@ -962,16 +962,16 @@ const navLinks = settings.nav.map((link) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: 3rem;
+    height: 3rem;
     flex-shrink: 0;
     border-radius: var(--radius-md);
     background: rgba(255, 255, 255, 0.08);
   }
 
   .mobile-sub-media--img {
-    width: 3.6rem;
-    height: 3.3rem;
+    width: 5.4rem;
+    height: 4.95rem;
     padding: 0.05rem;
     background: none;
   }
@@ -1023,7 +1023,7 @@ const navLinks = settings.nav.map((link) => {
 
   .mobile-sub-link--mini {
     /* Aligne le libellé sur celui du parent (retrait + vignette + gap). */
-    padding-left: calc(1.75rem + 3.6rem + 0.6rem);
+    padding-left: calc(1.75rem + 5.4rem + 0.6rem);
     font-size: 0.9rem;
     font-weight: 500;
     opacity: 0.7;
