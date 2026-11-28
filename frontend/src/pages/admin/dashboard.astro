@@ -1972,9 +1972,16 @@ const base = import.meta.env.BASE_URL;
   let allBlocks = [], blocksPage = '';
   const pageLabel = (k) => PAGE_LABELS[k] || k;
 
+  // Textarea auto-dimensionnée : la hauteur suit le contenu (texte entier
+  // visible) et reste redimensionnable à la souris (resize: vertical).
+  const autosize = (ta) => {
+    ta.style.height = 'auto';
+    ta.style.height = `${ta.scrollHeight + 4}px`;
+  };
+
   const blockField = (b) => {
     if (b.type === 'text') {
-      return `<input class="form-input" value="${esc(b.value || '')}" />`;
+      return `<textarea class="form-textarea blk-auto" rows="1">${esc(b.value || '')}</textarea>`;
     }
     if (b.type === 'image') {
       const src = ((String(b.value || '').match(/src="([^"]*)"/) || [])[1]) || '';
@@ -2013,7 +2020,13 @@ const base = import.meta.env.BASE_URL;
           <div class="blk-body">${blockField(b)}</div>
         </div>`).join('');
     }).join('');
+    $('#pg-blocks').querySelectorAll('textarea').forEach(autosize);
   };
+
+  // Auto-dimensionnement pendant la saisie (texte entier visible).
+  $('#pg-blocks').addEventListener('input', (e) => {
+    if (e.target instanceof HTMLTextAreaElement) autosize(e.target);
+  });
 
   loaders.pages = async () => {
     allBlocks = await api.get('/api/admin/content-blocks');

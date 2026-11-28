@@ -629,3 +629,4 @@ a.sp-btn { cursor: pointer; }
 }
 .blk-body .form-input,
 .blk-body .form-textarea { width: 100%; }
+.blk-auto { overflow: hidden; }

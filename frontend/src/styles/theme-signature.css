@@ -749,10 +749,17 @@ a.sig-topbar__item:hover {
 
 /* Titre du processus : dans le contenu épinglé — il reste affiché
    pendant la séquence puis repart avec le scroll (jamais par-dessus
-   les icônes). */
+   les icônes). Mobile : padding-top égal au padding-bottom de
+   .sig-about pour centrer le séparateur entre les deux sections. */
 .sig-process-head {
-  padding-top: 5rem;
+  padding-top: clamp(2.5rem, 5vw, 4rem);
   padding-bottom: 1rem;
+}
+
+@media (min-width: 900px) {
+  .sig-process-head {
+    padding-top: 5rem;
+  }
 }
 
 /* Séparateur sobre : filet pleine largeur à extrémités estompées,
@@ -760,7 +767,7 @@ a.sig-topbar__item:hover {
 .sig-divider {
   width: min(92%, 1140px);
   margin-inline: auto;
-  padding-block: clamp(1rem, 3vw, 2.5rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .sig-divider svg {
