@@ -294,13 +294,16 @@ const jsonLd = [{
       </div>
     </section>
 
-    <section class="sig-installs container">
-      <h2 class="sig-title">{sig.installsTitle}</h2>
-      <div class="projects-grid-preview">
-        {previewProjects.map((project: Project) => <ProjectCard project={project} />)}
-      </div>
-      <div class="sig-installs__more">
-        <a href={`${base}realisations/`} class="sig-btn sig-btn--primary"><span>Voir toutes les réalisations</span><Icon name="move-right" size={16} class="cta-arrow" /></a>
+    <section class="sig-installs">
+      <div class="sig-installs__band" aria-hidden="true"></div>
+      <div class="container">
+        <h2 class="sig-title">{sig.installsTitle}</h2>
+        <div class="projects-grid-preview">
+          {previewProjects.map((project: Project) => <ProjectCard project={project} />)}
+        </div>
+        <div class="sig-installs__more">
+          <a href={`${base}realisations/`} class="sig-btn sig-btn--primary"><span>Voir toutes les réalisations</span><Icon name="move-right" size={16} class="cta-arrow" /></a>
+        </div>
       </div>
     </section>
 
@@ -433,11 +436,11 @@ const jsonLd = [{
         }
         if (mqNarrow.matches) {
           // Étapes révélées une à une pendant la descente mobile :
-          // chacune pop quand son sommet franchit ~80 % du viewport —
+          // chacune pop quand son sommet franchit ~60 % du viewport —
           // l'animation se joue dans le champ visible, pas hors écran
           // dès l'entrée de la piste (le scrollpath démarre au
           // séparateur, loin au-dessus des étapes).
-          const line = vh * 0.8;
+          const line = vh * 0.6;
           stepEls.forEach((el) =>
             el.classList.toggle('is-on', el.getBoundingClientRect().top < line)
           );
@@ -554,6 +557,24 @@ const jsonLd = [{
           { threshold: 0, rootMargin: '0px 0px -40% 0px' }
         );
         ioHead.observe(headEl);
+      }
+
+      // Installs : le bandeau traverse puis les cards poppent — la
+      // section doit être bien remontée dans le viewport avant le
+      // déclenchement pour que l'animation soit visible.
+      const insEl = document.querySelector<HTMLElement>('.sig-installs');
+      if (insEl) {
+        insEl.classList.add('rv');
+        const ioIns = new IntersectionObserver(
+          (entries) => {
+            if (entries.some((e) => e.isIntersecting)) {
+              insEl.classList.add('is-in');
+              ioIns.disconnect();
+            }
+          },
+          { threshold: 0, rootMargin: '0px 0px -30% 0px' }
+        );
+        ioIns.observe(insEl);
       }
     }
   </script>
