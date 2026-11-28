@@ -1608,7 +1608,7 @@ a.sig-topbar__item:hover {
 
 /* ── Zone d'intervention (carte + SEO local) ─────────────────── */
 .sig-zone { padding-block: clamp(2.5rem, 5vw, 4rem); }
-.sig-zone__intro { max-width: 62ch; margin-inline: auto; text-align: center; }
+.sig-zone__intro { text-align: center; }
 .sig-zone__lead { margin-block: 1rem; line-height: 1.7; }
 .sig-zone__map { margin-block: 2.5rem 1.5rem; }
 .sig-zone__map .city-map-wrap { border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,.35); }
