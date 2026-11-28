@@ -466,11 +466,20 @@ const jsonLd = [{
         const containerEl = procEl?.querySelector<HTMLElement>('.container');
         if (!mqNarrow.matches || !bandEl || !procEl || !containerEl || !stepEls.length) return;
         const vh = window.innerHeight;
-        const spr = scrollPath.getBoundingClientRect();
+        const span = Math.max(1, scrollPath.getBoundingClientRect().height - vh);
         procH = procEl.offsetHeight;
-        tipKnots = [[0, 0]];
+        tipKnots = [];
         iconYs = [];
         armLeads = [];
+        // Rien de tracé tant que le haut de la section n'atteint pas
+        // ~30 % du viewport : la pointe part alors de 0 et descend à
+        // l'écran — chaque icône est connectée quand son centre arrive
+        // sur sa ligne cible, de 45 % (1re) à 75 % (dernière).
+        const procPathY = layoutPos(procEl, scrollPath).y;
+        const qStart = Math.max(0, (procPathY - vh * 0.3) / span);
+        const n = stepEls.length;
+        let startY = 0;
+        const iconKnots: Array<[number, number]> = [];
         stepEls.forEach((el, i) => {
           const marker = el.querySelector<HTMLElement>('.sig-step__marker');
           const arm = armEls[i];
@@ -479,26 +488,28 @@ const jsonLd = [{
           const y = mProc.y + marker.offsetHeight / 2;
           iconYs[i] = y;
           armLeads[i] = marker.offsetHeight;
-          // q où le haut de l'icône franchit 60 % du viewport — la
-          // pointe doit alors être au centre de l'icône. Position de
-          // l'icône dans la piste : yTop − q·(H−vh) = 0.6·vh.
+          // q où le centre de l'icône atteint sa cible à l'écran :
+          // yCentre − q·(H−vh) = t·vh. t croît d'icône en icône donc
+          // la connexion se fait de plus en plus bas dans le champ.
           const mPath = layoutPos(marker, scrollPath);
-          const qi = (mPath.y - vh * 0.6) / (spr.height - vh);
-          if (qi <= 0) {
-            // Déjà dans le champ à l'entrée de la piste.
-            tipKnots[0][1] = Math.max(tipKnots[0][1], y);
+          const t = n > 1 ? 0.45 + (0.3 * i) / (n - 1) : 0.6;
+          const qi = (mPath.y + marker.offsetHeight / 2 - vh * t) / span;
+          if (qi <= qStart) {
+            // Icône déjà au-delà de sa cible au départ de la trace.
+            startY = Math.max(startY, y);
           } else {
-            tipKnots.push([Math.min(1, qi), y]);
+            iconKnots.push([Math.min(1, qi), y]);
           }
-          // Bras : de -3rem (hors-champ gauche, aligné sur la spine)
-          // jusqu'au bord droit de l'icône + léger dépassement ;
-          // hauteur ~72 % de l'icône pour un rendu « ruban ». Le
-          // container sert de repère : .sig-arms le couvre en inset:0.
+          // Bras : trait fin depuis la spine (-1rem) jusqu'au bord
+          // droit de l'icône + léger dépassement. Le container sert de
+          // repère : .sig-arms le couvre en inset:0.
           const mCont = layoutPos(marker, containerEl);
           arm.style.setProperty('--arm-y', `${Math.round(mCont.y + marker.offsetHeight / 2)}px`);
-          arm.style.setProperty('--arm-w', `${Math.round(48 + mCont.x + marker.offsetWidth + 6)}px`);
-          arm.style.setProperty('--arm-h', `${Math.round(marker.offsetHeight * 0.72)}px`);
+          arm.style.setProperty('--arm-w', `${Math.round(16 + mCont.x + marker.offsetWidth + 6)}px`);
+          arm.style.setProperty('--arm-h', '1rem');
         });
+        iconKnots.sort((a, b) => a[0] - b[0]);
+        tipKnots = [[qStart, startY], ...iconKnots];
         // La spine s'arrête à la dernière icône.
         tipKnots.push([1, tipKnots[tipKnots.length - 1][1]]);
       };
@@ -539,15 +550,18 @@ const jsonLd = [{
         if (bandEl) {
           if (mqReducedPath.matches) {
             bandEl.style.transform = '';
+            bandEl.style.height = '';
           } else if (mqNarrow.matches) {
-            // Spine verticale : scaleY ancré en haut — sa pointe
-            // descend de palier en palier vers chaque icône.
+            // Spine verticale : sa hauteur suit la pointe — pilotée en
+            // height (pas scaleY) pour garder l'arrondi net en bas.
             const tip = tipAt(q);
-            bandEl.style.transform = `scaleY(${(tip / (procH || 1)).toFixed(4)})`;
+            bandEl.style.transform = '';
+            bandEl.style.height = `${tip.toFixed(1)}px`;
           } else {
             const bp = doneP ? 1 : bandAt(q);
             const bx = (-106 * (1 - bp)).toFixed(1);
             const by = (4.3 * (1 - bp)).toFixed(2);
+            bandEl.style.height = '';
             bandEl.style.transform = `translate3d(${bx}%, ${by}rem, 0)`;
           }
         }
@@ -597,7 +611,10 @@ const jsonLd = [{
         if (mqReducedPath.matches) {
           innerEl.style.transform = '';
           stepEls.forEach((el) => el.classList.remove('is-on'));
-          if (bandEl) bandEl.style.transform = '';
+          if (bandEl) {
+            bandEl.style.transform = '';
+            bandEl.style.height = '';
+          }
           return;
         }
         if (!pinned) innerEl.style.transform = '';
