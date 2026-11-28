@@ -294,18 +294,24 @@ const jsonLd = [{
       </div>
     </section>
 
-    <section class="sig-installs">
-      <div class="sig-installs__band" aria-hidden="true"></div>
-      <div class="container">
-        <h2 class="sig-title">{sig.installsTitle}</h2>
-        <div class="projects-grid-preview">
-          {previewProjects.map((project: Project) => <ProjectCard project={project} />)}
-        </div>
-        <div class="sig-installs__more">
-          <a href={`${base}realisations/`} class="sig-btn sig-btn--primary"><span>Voir toutes les réalisations</span><Icon name="move-right" size={16} class="cta-arrow" /></a>
+    <div class="sig-installpath">
+      <div class="sig-installpath__sticky">
+        <div class="sig-installpath__inner">
+          <section class="sig-installs">
+            <div class="sig-installs__band" aria-hidden="true"></div>
+            <div class="container">
+              <h2 class="sig-title">{sig.installsTitle}</h2>
+              <div class="projects-grid-preview">
+                {previewProjects.map((project: Project) => <ProjectCard project={project} />)}
+              </div>
+              <div class="sig-installs__more">
+                <a href={`${base}realisations/`} class="sig-btn sig-btn--primary"><span>Voir toutes les réalisations</span><Icon name="move-right" size={16} class="cta-arrow" /></a>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
-    </section>
+    </div>
 
     <section class="sig-zone container" id="zone-intervention">
       <div class="sig-zone__intro">
@@ -558,24 +564,76 @@ const jsonLd = [{
         );
         ioHead.observe(headEl);
       }
+    }
 
-      // Installs : le bandeau traverse puis les cards poppent — la
-      // section doit être bien remontée dans le viewport avant le
-      // déclenchement pour que l'animation soit visible.
-      const insEl = document.querySelector<HTMLElement>('.sig-installs');
-      if (insEl) {
-        insEl.classList.add('rv');
-        const ioIns = new IntersectionObserver(
-          (entries) => {
-            if (entries.some((e) => e.isIntersecting)) {
-              insEl.classList.add('is-in');
-              ioIns.disconnect();
-            }
-          },
-          { threshold: 0, rootMargin: '0px 0px -30% 0px' }
-        );
-        ioIns.observe(insEl);
-      }
+    // ═══ Piste épinglée des installations ═══
+    // Même mécanique que le scrollpath : le bandeau glisse depuis la
+    // gauche proportionnellement à q (avec compensation verticale sur
+    // sa pente), puis les cards poppent une à une à des seuils de
+    // progression. Mobile : pop quand chaque card franchit ~60 % du
+    // viewport. Reduced-motion : rien d'épinglé ni de masqué.
+    const installPath = document.querySelector<HTMLElement>('.sig-installpath');
+    const insBand = installPath?.querySelector<HTMLElement>('.sig-installs__band');
+    if (installPath && insBand) {
+      const mqNarrowI = window.matchMedia('(max-width: 899px)');
+      const mqReducedI = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const insCards = Array.from(
+        installPath.querySelectorAll<HTMLElement>('.project-card')
+      );
+      const insMore = installPath.querySelector<HTMLElement>('.sig-installs__more');
+      const sm01 = (t: number) => {
+        const c = Math.min(1, Math.max(0, t));
+        return c * c * (3 - 2 * c);
+      };
+
+      const drawI = () => {
+        const r = installPath.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const q = Math.min(1, Math.max(0, -r.top / (r.height - vh)));
+        if (mqNarrowI.matches || mqReducedI.matches) {
+          insBand.style.transform = '';
+        } else {
+          // Glisse sur le premier ~38 % du gel, le long de sa propre
+          // pente (compensation 3.3rem ≈ 3.1rem de pente × 1.06) pour
+          // que le bord biaisé reste à niveau pendant le mouvement.
+          const bp = sm01(q / 0.38);
+          insBand.style.transform = `translate3d(${(-106 * (1 - bp)).toFixed(1)}%, ${(3.3 * (1 - bp)).toFixed(2)}rem, 0)`;
+        }
+        if (mqNarrowI.matches) {
+          const line = vh * 0.6;
+          insCards.forEach((el) =>
+            el.classList.toggle('is-on', el.getBoundingClientRect().top < line)
+          );
+          if (insMore)
+            insMore.classList.toggle('is-on', insMore.getBoundingClientRect().top < line);
+        } else {
+          // Pops après la glisse du bandeau : cards à q=0.34/0.52/0.70,
+          // CTA à 0.86 — il reste de la marge avant la libération.
+          insCards.forEach((el, i) =>
+            el.classList.toggle('is-on', q >= 0.34 + i * 0.18)
+          );
+          if (insMore) insMore.classList.toggle('is-on', q >= 0.86);
+        }
+      };
+
+      const syncI = () => {
+        const pinned = !mqReducedI.matches && !mqNarrowI.matches;
+        installPath.classList.toggle('is-pinned', pinned);
+        installPath.classList.toggle('is-anim', !mqReducedI.matches);
+        if (mqReducedI.matches) {
+          insBand.style.transform = '';
+          insCards.forEach((el) => el.classList.remove('is-on'));
+          if (insMore) insMore.classList.remove('is-on');
+          return;
+        }
+        drawI();
+      };
+
+      window.addEventListener('scroll', drawI, { passive: true });
+      window.addEventListener('resize', syncI);
+      mqNarrowI.addEventListener('change', syncI);
+      mqReducedI.addEventListener('change', syncI);
+      syncI();
     }
   </script>
 </MainLayout>
